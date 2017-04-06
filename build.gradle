@@ -1,0 +1,44 @@
+allprojects {
+  buildscript {
+    repositories {
+      mavenCentral()
+      mavenLocal()
+    }
+  }
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+}
+
+
+buildscript {
+  repositories {
+    maven {
+      url "${nexusUrl}/content/groups/public"
+    }
+  }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+group = 'no.skatteetaten.aurora.gradle.plugins'
+
+dependencies {
+  compile(
+      gradleApi(),
+      "org.codehaus.groovy:groovy-all:2.4.7",
+      'no.skatteetaten.aurora:aurora-git-version:1.0.0',
+      'org.ajoberstar:grgit:1.7.0'
+  )
+  testCompile(
+      "org.spockframework:spock-core:1.0-groovy-2.4",
+  )
+}
+
+install.dependsOn << build
+
+task wrapper(type: Wrapper) {
+  gradleVersion = "3.0"
+}

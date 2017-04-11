@@ -1,29 +1,25 @@
-allprojects {
-  buildscript {
-    repositories {
-      mavenCentral()
-      mavenLocal()
-    }
-  }
+buildscript {
   repositories {
     mavenCentral()
     mavenLocal()
   }
-}
-
-
-buildscript {
-  repositories {
-    maven {
-      url "${nexusUrl}/content/groups/public"
-    }
+  dependencies {
+    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.0')
   }
 }
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+import no.skatteetaten.aurora.version.git.GitVersion
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
 group = 'no.skatteetaten.aurora.gradle.plugins'
+
+version = GitVersion.determineVersion(file('.')).version
 
 dependencies {
   compile(

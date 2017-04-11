@@ -1,5 +1,7 @@
 # Aurora Gradle Plugin
 
+The contents of the README.md file will be translated into English soon.
+
 Aurora Gradle Plugin er et gradle plugin som gjør det lettere å sette opp prosjekter som integrerer med Aurora tjenester (som Nexus) og følge konvensjoner etablert av Aurora (primært i forhold til
 versjonering av artifakter).
 

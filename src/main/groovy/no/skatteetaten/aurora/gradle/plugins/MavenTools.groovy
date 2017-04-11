@@ -1,4 +1,4 @@
-package ske.aurora.gradle.plugins
+package no.skatteetaten.aurora.gradle.plugins
 
 import java.text.MessageFormat
 

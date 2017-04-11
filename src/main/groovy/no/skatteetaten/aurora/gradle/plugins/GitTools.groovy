@@ -1,4 +1,4 @@
-package ske.aurora.gradle.plugins
+package no.skatteetaten.aurora.gradle.plugins
 
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project

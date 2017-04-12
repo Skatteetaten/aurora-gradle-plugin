@@ -70,6 +70,8 @@ class AuroraPlugin implements Plugin<Project> {
     applyPiTestSupport(p)
     applySonarPlugin(p)
 
+    applyAsciiDocPlugin(p)
+
     if (p.hasProperty('test') && config.setIgnoreTestFailures) {
       p.test {
         ignoreFailures = true
@@ -132,6 +134,23 @@ class AuroraPlugin implements Plugin<Project> {
   void applySonarPlugin(Project project) {
     project.with {
       apply plugin: 'org.sonarqube'
+    }
+  }
+
+  void applyAsciiDocPlugin(Project project) {
+
+    println project.buildscript.dependencies.properties
+    project.buildscript.dependencies {
+      println it
+    }
+    project.buildscript.configurations.forEach({
+      println "\n\n\n\n"
+      println it.name
+      println "\n\n"
+      it.forEach({ println it})
+    })
+    project.buildscript.configurations.find { println it.name; println it; return it.name == 'classpath'}.dependencies.each {
+      println it
     }
   }
 

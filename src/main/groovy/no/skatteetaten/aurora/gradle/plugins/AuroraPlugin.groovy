@@ -38,15 +38,14 @@ class AuroraPlugin implements Plugin<Project> {
 
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
 
+    applyDefaultPlugins(p)
+    applyGroovySupport(p)
+
     Grgit git = openGit()
     if (!git) {
       handleGitNotAvailable(p, config)
     } else {
       handleConfigurationFromGit(p, git, config)
-    }
-
-    if (config.applyCheckstylePlugin) {
-      applyCheckstylePlugin(p, config)
     }
   }
 
@@ -62,10 +61,77 @@ class AuroraPlugin implements Plugin<Project> {
       setDefaultTasks()
     }
 
+    applyDeliveryBundleConfig(p)
+
+    if (config.applyCheckstylePlugin) {
+      applyCheckstylePlugin(p, config)
+    }
+    applyJacocoTestReport(p)
+    applyPiTestSupport(p)
+    applySonarPlugin(p)
+
     if (p.hasProperty('test') && config.setIgnoreTestFailures) {
       p.test {
         ignoreFailures = true
       }
+    }
+  }
+
+  void applyDefaultPlugins(Project project) {
+
+    project.with {
+      apply plugin: 'java'
+      apply plugin: 'maven'
+    }
+  }
+
+  void applyGroovySupport(Project project) {
+
+    project.with {
+      apply plugin: 'groovy'
+
+      dependencies {
+        testCompile("org.codehaus.groovy:groovy-all:2.4.4")
+      }
+    }
+  }
+
+  void applyDeliveryBundleConfig(Project project) {
+
+    project.with {
+      apply plugin: 'application'
+
+      distZip.classifier = 'Leveransepakke'
+    }
+  }
+
+  void applyJacocoTestReport(Project project) {
+    project.with {
+      apply plugin: "jacoco"
+
+      jacocoTestReport {
+        reports {
+          xml.enabled false
+          csv.enabled false
+          html.destination "${buildDir}/reports/jacoco"
+        }
+      }
+    }
+  }
+
+  void applyPiTestSupport(Project project) {
+    project.with {
+      apply plugin: "info.solidsoft.pitest"
+
+      pitest {
+        outputFormats = ['XML', 'HTML']
+      }
+    }
+  }
+
+  void applySonarPlugin(Project project) {
+    project.with {
+      apply plugin: 'org.sonarqube'
     }
   }
 
@@ -119,7 +185,7 @@ class AuroraPlugin implements Plugin<Project> {
    * to this configuration.
    * Apply the Checkstyle plugin and assign the specified configuration file from Aurora Checkstyle configuration 
    * archive.
-   * 
+   *
    * @param project
    * @param pluginConfig
    */
@@ -127,12 +193,12 @@ class AuroraPlugin implements Plugin<Project> {
     def auroraCheckstyleConfig = project.configurations.create("auroraCheckstyleConfig")
 
     auroraCheckstyleConfig.defaultDependencies { dependencies ->
-      dependencies.add(project.dependencies.create("ske.aurora.checkstyle:checkstyle-config:" 
+      dependencies.add(project.dependencies.create("ske.aurora.checkstyle:checkstyle-config:"
           + auroraPluginProperties.checkstyleConfigVersion))
     }
 
     project.plugins.apply("checkstyle")
-    project.checkstyle.config = project.resources.text.fromArchiveEntry(auroraCheckstyleConfig, 
+    project.checkstyle.config = project.resources.text.fromArchiveEntry(auroraCheckstyleConfig,
         auroraPluginProperties.checkstyleConfigFile)
     project.checkstyle.ignoreFailures = true
   }

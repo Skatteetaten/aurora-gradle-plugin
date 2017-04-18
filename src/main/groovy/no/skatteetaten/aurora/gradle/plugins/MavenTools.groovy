@@ -16,7 +16,7 @@ class MavenTools {
   void applyRepositories() {
 
     project.with {
-      if (!hasProperty("nexusUrl")) {
+      if (!project.hasProperty("nexusUrl")) {
         return
       }
 

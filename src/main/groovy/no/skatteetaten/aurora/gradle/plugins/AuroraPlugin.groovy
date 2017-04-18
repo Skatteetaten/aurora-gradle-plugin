@@ -12,7 +12,6 @@ import groovy.util.logging.Slf4j
 class AuroraPlugin implements Plugin<Project> {
 
   private static DEFAULT_CONFIG = [
-      exportHeadMetaData        : true,
       setProjectVersionFromGit  : true,
       enforceTagOnMaster        : true,
       versionPrefix             : 'v',
@@ -200,9 +199,6 @@ class AuroraPlugin implements Plugin<Project> {
       enforceTagOnMaster = config.enforceTagOnMaster
       versionPrefix = config.versionPrefix
 
-      if (config.exportHeadMetaData) {
-        exportHeadMetaData()
-      }
       if (config.setProjectVersionFromGit) {
         setProjectVersionFromGit()
       }

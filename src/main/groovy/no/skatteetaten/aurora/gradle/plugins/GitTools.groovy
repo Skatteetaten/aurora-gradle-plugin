@@ -27,17 +27,6 @@ class GitTools {
     this.git = git
   }
 
-  void exportHeadMetaData() {
-
-    project.with {
-      ext {
-        revision = git.head().id
-        lastUpdateMessage = git.head().shortMessage
-        lastUpdateBy = git.head().author.email
-      }
-    }
-  }
-
   void setProjectVersionFromGit() {
 
     String versionToSet = getVersionFromGit(versionPrefix)

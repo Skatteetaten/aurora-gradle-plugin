@@ -12,6 +12,18 @@ import groovy.util.logging.Slf4j
 class AuroraPlugin implements Plugin<Project> {
 
   private static DEFAULT_CONFIG = [
+      applyDefaultPlugins       : true,
+      applyJavaDefaults         : true,
+      applySpockSupport         : true,
+      groovyVersion             : '2.4.4',
+      spockVersion              : '1.1-groovy-2.4-rc-3',
+      cglibVersion              : '3.1',
+      objenesisVersion          : '2.1',
+      applyAsciiDocPlugin       : true,
+      applyCheckstylePlugin     : true,
+      applyJacocoTestReport     : true,
+      applyPiTestSupport        : true,
+      applySonarPlugin          : true,
       setProjectVersionFromGit  : true,
       enforceTagOnMaster        : true,
       versionPrefix             : 'v',
@@ -19,8 +31,7 @@ class AuroraPlugin implements Plugin<Project> {
       applyNexusRepositories    : true,
       applyMavenDeployer        : true,
       setIgnoreTestFailures     : false,
-      applyCheckstylePlugin     : true,
-      checkstyleConfigVersion   : 0.6,
+      checkstyleConfigVersion   : "0.6",
       checkstyleConfigFile      : 'checkstyle/checkstyle-with-metrics.xml'
   ]
 
@@ -37,10 +48,28 @@ class AuroraPlugin implements Plugin<Project> {
 
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
 
-    applyDefaultPlugins(p)
-    applyJavaDefaults(p)
-    applyGroovySupport(p)
-    applyAsciiDocPlugin(p)
+    new MavenTools(p).with {
+      if (config.applyNexusRepositories) {
+        applyRepositories()
+      }
+      if (config.applyMavenDeployer) {
+        addMavenDeployer()
+      }
+      setDefaultTasks()
+    }
+
+    if (config.applyDefaultPlugins) {
+      applyDefaultPlugins(p)
+    }
+    if (config.applyJavaDefaults) {
+      applyJavaDefaults(p)
+    }
+    if (config.applySpockSupport) {
+      applySpockSupport(p, config.groovyVersion, config.spockVersion, config.cglibVersion, config.objenesisVersion)
+    }
+    if (config.applyAsciiDocPlugin) {
+      applyAsciiDocPlugin(p)
+    }
 
     Grgit git = openGit()
     if (!git) {
@@ -52,24 +81,20 @@ class AuroraPlugin implements Plugin<Project> {
 
   protected void onAfterEvaluate(Project p, Map<String, Object> config) {
 
-    new MavenTools(p).with {
-      if (config.applyNexusRepositories) {
-        applyRepositories()
-      }
-      if (config.applyMavenDeployer) {
-        addMavenDeployer()
-      }
-      setDefaultTasks()
-    }
-
     applyDeliveryBundleConfig(p)
 
     if (config.applyCheckstylePlugin) {
       applyCheckstylePlugin(p, config)
     }
-    applyJacocoTestReport(p)
-    applyPiTestSupport(p)
-    applySonarPlugin(p)
+    if (config.applyJacocoTestReport) {
+      applyJacocoTestReport(p)
+    }
+    if (config.applyPiTestSupport) {
+      applyPiTestSupport(p)
+    }
+    if (config.applySonarPlugin) {
+      applySonarPlugin(p)
+    }
 
     if (p.hasProperty('test') && config.setIgnoreTestFailures) {
       p.test {
@@ -91,13 +116,19 @@ class AuroraPlugin implements Plugin<Project> {
     project.sourceCompatibility = '1.8'
   }
 
-  void applyGroovySupport(Project project) {
+  void applySpockSupport(Project project, String groovyVersion, String spockVersion, String cglibVersion,
+      String objenesisVersion) {
 
     project.with {
       apply plugin: 'groovy'
 
       dependencies {
-        testCompile("org.codehaus.groovy:groovy-all:2.4.4")
+        testCompile(
+            "org.codehaus.groovy:groovy-all:${groovyVersion}",
+            "org.spockframework:spock-core:${spockVersion}",
+            "cglib:cglib-nodep:${cglibVersion}",
+            "org.objenesis:objenesis:${objenesisVersion}",
+        )
       }
     }
   }

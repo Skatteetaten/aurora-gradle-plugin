@@ -15,10 +15,11 @@ class MavenTools {
 
   void applyRepositories() {
 
+    if (!project.hasProperty("nexusUrl")) {
+      return
+    }
+
     project.with {
-      if (!project.hasProperty("nexusUrl")) {
-        return
-      }
 
       allprojects {
         buildscript {

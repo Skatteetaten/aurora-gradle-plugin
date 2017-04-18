@@ -48,6 +48,9 @@ class AuroraPlugin implements Plugin<Project> {
 
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
 
+    if (config.applyDefaultPlugins) {
+      applyDefaultPlugins(p)
+    }
     new MavenTools(p).with {
       if (config.applyNexusRepositories) {
         applyRepositories()
@@ -58,9 +61,6 @@ class AuroraPlugin implements Plugin<Project> {
       setDefaultTasks()
     }
 
-    if (config.applyDefaultPlugins) {
-      applyDefaultPlugins(p)
-    }
     if (config.applyJavaDefaults) {
       applyJavaDefaults(p)
     }

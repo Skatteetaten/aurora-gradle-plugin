@@ -1,55 +1,74 @@
 # Aurora Gradle Plugin
 
-The contents of the README.md file will be translated into English soon.
+The Aurora Gradle Plugin is a plugin that will apply a sensible base line for JVM applications developed by the Norwegian
+Tax Authority. The base line will make sure that the application will comply with most of the requirements set forth by
+the Aurora team for applications that are to be deployed to the [Aurora OpenShift Platform](https://skatteetaten.github.io/aurora-openshift/).
 
-Aurora Gradle Plugin er et gradle plugin som gjør det lettere å sette opp prosjekter som integrerer med Aurora tjenester (som Nexus) og følge konvensjoner etablert av Aurora (primært i forhold til
-versjonering av artifakter).
+When applying the plugin to a project it will modify the build by adding plugins and configuration based on the current
+established standard, but it is possible to opt out of every change the plugin makes with a high degree of granularity.
+So, although the Aurora team encourages every project to be build in pretty much the same way, and to some extent 
+requires that static analysis is performed on the source code, it is possible to skip individual steps if the need
+arises.
 
+To get an overview of how applying the Aurora plugin will affect your project, see the [Features](#Features) section.
 
-## Kom i gang
+## Getting Started
 
-Legg følgende i toppen av din `build.gradle` fil (i rotprosjektet hvis du har et multimodul bygg).
+Put the following snippet in your `build.gradle` file
 
     buildscript {
-        repositories {
-            maven {
-                url "http://aurora/nexus/content/groups/public"
-            }
+      repositories {
+        maven {
+          url "${nexusUrl}/content/groups/public"
         }
+      }
     
-        dependencies {
-            classpath 'ske.aurora.gradle.plugins:aurora-gradle-plugin:1.7.0'
-        }
+      dependencies {
+        classpath(
+            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.0.0'
+        )
+      }
     }
     
-    apply plugin: 'ske.plugins.aurora'
+    apply plugin: 'no.skatteetaten.plugins.aurora'
 
+If you are developing and entirely open source module that does not have any internal dependencies you can use the
+following configuration;
 
-Eventuelt kan du bytte ut maven-blokken med følgende
-
-    ...
-    maven {
-        url "${nexusUrl}/content/groups/public"
+    buildscript {
+      repositories {
+        mavenCentral()
+        jcenter()
+      }
+    
+      dependencies {
+        classpath(
+            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.0.0'
+        )
+      }
     }
-    ...
-
-hvis du har konfigurert nexusUrl i din `~/.gradle/gradle.properties` fil.
-
-
-## Funksjonalitet
-
-### Eksport av git metadata til prosjekt properties 
-
-Følgende variable blir hentet ut fra git og eksportert som project properties (som da kan brukes som parametre til andre plugins eller tasks)
-
- * revision (hashen til head)
- * lastUpdateMessage (heads commit message)
- * lastUpdateBy (epost til brukeren som utførte siste commit)
+    
+    apply plugin: 'no.skatteetaten.plugins.aurora'
 
 
-### Konfigurasjon av repositories
 
-Pluginet vil legge til Aurora Nexus som buildscript repository og project repository for rotprosjektet og alle subprosjekter.
+## Features
+
+### Default Plugins
+
+Since this plugin is intended for use by JVM based applications, and the NTA heavily relies on Nexus for artifact
+dependency management and artifact distribution, both the java and maven plugins will be applied automatically;
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+This behaviour can be opted out with the following config;
+
+    ext.aurora = [
+        applyNexusRepositories: false,
+        applyDefaultPlugins: false,
+        applyMavenDeployer: false
+    ]
 
 
 ### Konfigurasjon av maven deployer

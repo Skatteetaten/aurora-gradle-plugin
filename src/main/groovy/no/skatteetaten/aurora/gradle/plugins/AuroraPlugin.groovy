@@ -39,7 +39,9 @@ class AuroraPlugin implements Plugin<Project> {
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
 
     applyDefaultPlugins(p)
+    applyJavaDefaults(p)
     applyGroovySupport(p)
+    applyAsciiDocPlugin(p)
 
     Grgit git = openGit()
     if (!git) {
@@ -70,8 +72,6 @@ class AuroraPlugin implements Plugin<Project> {
     applyPiTestSupport(p)
     applySonarPlugin(p)
 
-    applyAsciiDocPlugin(p)
-
     if (p.hasProperty('test') && config.setIgnoreTestFailures) {
       p.test {
         ignoreFailures = true
@@ -85,6 +85,11 @@ class AuroraPlugin implements Plugin<Project> {
       apply plugin: 'java'
       apply plugin: 'maven'
     }
+  }
+
+  void applyJavaDefaults(Project project) {
+
+    project.sourceCompatibility = '1.8'
   }
 
   void applyGroovySupport(Project project) {
@@ -139,18 +144,34 @@ class AuroraPlugin implements Plugin<Project> {
 
   void applyAsciiDocPlugin(Project project) {
 
-    println project.buildscript.dependencies.properties
-    project.buildscript.dependencies {
-      println it
+    def asciiDoctorPluginOnClasspath = project.buildscript
+        .configurations.find { it.name == 'classpath' }
+        .dependencies.any { it.group == 'org.asciidoctor' && it.name == 'asciidoctor-gradle-plugin' }
+    if (!asciiDoctorPluginOnClasspath) {
+      return
     }
-    project.buildscript.configurations.forEach({
-      println "\n\n\n\n"
-      println it.name
-      println "\n\n"
-      it.forEach({ println it})
-    })
-    project.buildscript.configurations.find { println it.name; println it; return it.name == 'classpath'}.dependencies.each {
-      println it
+    project.with {
+      apply plugin: 'org.asciidoctor.convert'
+
+      ext.snippetsDir = file("$buildDir/docs/generated-snippets")
+
+      asciidoctor {
+        attributes([
+            snippets: snippetsDir,
+            version : version
+        ])
+        inputs.dir snippetsDir
+        outputDir "$buildDir/asciidoc"
+        dependsOn test
+        sourceDir 'src/main/asciidoc'
+      }
+
+      jar {
+        dependsOn asciidoctor
+        from("${asciidoctor.outputDir}/html5") {
+          into 'static/docs'
+        }
+      }
     }
   }
 

@@ -174,12 +174,6 @@ class AuroraPlugin implements Plugin<Project> {
 
   void applyAsciiDocPlugin(Project project) {
 
-    def asciiDoctorPluginOnClasspath = project.buildscript
-        .configurations.find { it.name == 'classpath' }
-        .dependencies.any { it.group == 'org.asciidoctor' && it.name == 'asciidoctor-gradle-plugin' }
-    if (!asciiDoctorPluginOnClasspath) {
-      return
-    }
     project.with {
       apply plugin: 'org.asciidoctor.convert'
 

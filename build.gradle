@@ -9,6 +9,7 @@ buildscript {
 }
 repositories {
   mavenCentral()
+  jcenter()
   mavenLocal()
 }
 
@@ -27,6 +28,7 @@ dependencies {
       "org.codehaus.groovy:groovy-all:2.4.7",
       'no.skatteetaten.aurora:aurora-git-version:1.0.0',
       'org.ajoberstar:grgit:1.7.0',
+      'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',
       'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11',
       'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.2.1'
   )

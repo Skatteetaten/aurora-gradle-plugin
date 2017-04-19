@@ -17,6 +17,7 @@ import no.skatteetaten.aurora.version.git.GitVersion
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'no.skatteetaten.aurora.gradle.plugins'
 
@@ -38,6 +39,70 @@ dependencies {
 }
 
 install.dependsOn << build
+
+task javadocJar(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives javadocJar, sourcesJar
+}
+
+signing {
+  sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'Aurora Gradle Plugin'
+        packaging 'jar'
+        description 'A plugin that will apply a sensible base line for JVM applications developed by the Norwegian Tax Authority'
+        url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
+
+/*
+        scm {
+          connection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+          developerConnection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+          url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
+        }
+*/
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'bjartek'
+            name 'Bjarte S. Karlsen'
+            email 'Bjarte.Karlsen@Skatteetaten.no'
+          }
+        }
+      }
+    }
+  }
+}
 
 task wrapper(type: Wrapper) {
   gradleVersion = "3.0"

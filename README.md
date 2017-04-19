@@ -50,30 +50,47 @@ following configuration;
     
     apply plugin: 'no.skatteetaten.plugins.aurora'
 
+You can configure the behaviour of the plugin by setting the ```aurora``` property before applying the plugin;
+
+    ...
+    
+    ext.aurora = [
+      // Configuration goes here
+    ]
+    
+    apply plugin: 'no.skatteetaten.plugins.aurora'
 
 
 ## Features
 
-### Default Plugins
+### Default Plugins and Nexus Configuration
 
-Since this plugin is intended for use by JVM based applications, and the NTA heavily relies on Nexus for artifact
-dependency management and artifact distribution, both the java and maven plugins will be applied automatically;
+Since this plugin is intended for use by JVM based applications, and since the NTA heavily relies on Nexus for artifact
+dependency management and artifact distribution, both the java and maven plugin will be applied automatically. The
+```sourceCompatibility``` will be set to 1.8 by default.
 
     apply plugin: 'java'
     apply plugin: 'maven'
+    
+Also, if you have set the ```nexusUrl``` property in your ```~/gradle/.gradle.properties```-file the plugin will register
+project and buildscript repositories for that Nexus instance;
 
-This behaviour can be opted out with the following config;
+    allprojects {
+      buildscript {
+        repositories {
+          maven {
+            url "${nexusUrl}/content/groups/public"
+          }
+        }
+      }
+      repositories {
+        maven {
+          url "${nexusUrl}/content/groups/public"
+        }
+      }
+    }
 
-    ext.aurora = [
-        applyNexusRepositories: false,
-        applyDefaultPlugins: false,
-        applyMavenDeployer: false
-    ]
-
-
-### Konfigurasjon av maven deployer
-
-I moduler som har `maven plugin` aktivert konfigureres maven deployeren til å deploye mot Aurora Nexus automatisk. Typisk betyr dette at følgende konfigurasjon legges til av pluginet;
+and register a Maven deployer;
 
     uploadArchives {
         repositories {
@@ -87,40 +104,99 @@ I moduler som har `maven plugin` aktivert konfigureres maven deployeren til å d
             }
         }
     }
-    
-I tillegg til dette vil pluginet undersøke om artifacten du forsøker laste opp allerede eksisterer på nexus og i så fall hoppe over opplasting (for å unngå feilende bygg).
+
+The Maven deployer that is registered will first check if the artifact being deployed already exists before attempting
+to upload to Nexus. This will prevent a failing build if you rerun a build for an existing artifact.
+
+These features can be opted out of with the following config;
+
+    ext.aurora = [
+      applyNexusRepositories: false,
+      applyDefaultPlugins: false,
+      applyMavenDeployer: false,
+      applyJavaDefaults: false
+    ]
 
 
-### Konfigurasjon av defaultTasks
-
-defaultTasks på rotprosjektet settes til `clean install` dersom denne propertyen ikke allerede er satt og det finnes minst én modul som bruker maven pluginet.
-
-
-### Versjonering basert på git-status
-
-Pluginet vil lese informasjon fra git og sette version-property'en basert på følgende regler:
-
- * Dersom du står på en tag vil denne taggens navn (minus prefix, default 'v') brukes som versjon. F.eks. bygger du fra taggen `v1.0.0` settes prosjektversjon til `1.0.0`.
- * Dersom du står på en commit som ikke er tagget brukes navnet på branchen + -SNAPSHOT som versjon. F.eks. står du på `master` blir versjonen `master-SNAPSHOT`. Står du på `feature/PRJ-8-en-eller-annen-feature` blir versjonen `feature_PRJ_8_en_eller_annen_feature-SNAPSHOT`.
- * Dersom man bygger fra Git detached HEAD så vil pluginet prøve finne hvilken branch denne committen er på. Dersom committen finnes på flere brancher kan man sette miljøvariabelen `BRANCH_NAME` for avgjøre hvilken branch som skal brukes. Merk at `BRANCH_NAME` må inneholde committen det bygges fra.
- * Dersom du bygger fra master uten å stå på en tag vil bygget feile. Dette kan skrus av via konfigurasjonen `enforceTagOnMaster`.
- * Dersom du bygger prosjektet fra en eksportert mappe (uten .git-mappe) er default å falle tilbake på versjon basert på timestamp (yyyyMMddHHss). Denne oppførselen kan deaktiveres med konfigurasjonen `fallbackToTimestampVersion`.
-
+### Delivery Bundle
  
-### Tilpasninger for CI (Jenkins)
+The project will be set up to build the application into a format compatible with the Delivery Bundle (Leveransepakke)
+format by applying the following configuration;
 
-Mange CI systemer, blant annet Jenkins ved bruk av Jenkinsfile, vil feile bygget dersom byggekommandoen feiler. Dermed blir ikke øvrige steg i bygget utført, som f.eks. testrapporter o.l. For å unngå dette kan man i gradle
-sette `test.ignoreFailures`. Da vil bygget lykkes selv om testene feiler. Jenkins vil likevel klare å avgjøre at det er testfeil. For å unngå å måtte sette denne propertyen hver gang i alle bygg gjør dette pluginet det
-automatisk. I praksis legger den til blokken;
+    apply plugin: 'application'
+  
+    distZip.classifier = 'Leveransepakke'
 
-    test {
-        ignoreFailures = true
+  
+### Configuration of defaultTasks
+
+defaultTasks will be set to `clean install` if this property has not already been set.
+
+
+### Versioning from Git status
+
+The plugin will automatically set the ```version``` property based on information collected from Git. The rules used
+for determining the version is described in the [aurora-git-version](https://github.com/Skatteetaten/aurora-git-version)
+module.
+
+
+### Spock for Testing
+
+By default, the Aurora Plugin will activate support for the [Spock Framework](http://spockframework.org/);
+
+    apply plugin: 'groovy'
+
+    dependencies {
+      testCompile(
+          "org.codehaus.groovy:groovy-all:${groovyVersion}",
+          "org.spockframework:spock-core:${spockVersion}",
+          "cglib:cglib-nodep:${cglibVersion}",
+          "org.objenesis:objenesis:${objenesisVersion}",
+      )
     }
-    
-Dersom du ikke ønsker denne funksjonaliteten kan du skru av ved å sette `setIgnoreTestFailures` i configblokken.
+
+Support for this can be disabled or configured with
+
+    ext.aurora = [
+      applySpockSupport         : false,
+      groovyVersion             : '2.4.4',
+      spockVersion              : '1.1-groovy-2.4-rc-3',
+      cglibVersion              : '3.1',
+      objenesisVersion          : '2.1'
+    ]
 
 
-### Checkstyle
+### Asciidoc for Documentation
+
+By default, the Aurora Plugin will activate support for [Asciidoc](http://www.methods.co.nz/asciidoc/) for documentation
+by applying the following configuration;
+
+    apply plugin: 'org.asciidoctor.convert'
+
+    ext.snippetsDir = file("$buildDir/docs/generated-snippets")
+
+    asciidoctor {
+      attributes([
+          snippets: snippetsDir,
+          version : version
+      ])
+      inputs.dir snippetsDir
+      outputDir "$buildDir/asciidoc"
+      dependsOn test
+      sourceDir 'src/main/asciidoc'
+    }
+
+    jar {
+      dependsOn asciidoctor
+      from("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+      }
+    }
+
+The jar task is modified to include the generated documentation into static/docs and also registers an attribute
+snippetsDir for integration with [Spring Rest Docs](https://projects.spring.io/spring-restdocs/).
+ 
+### Source Code Analysis
 
 Aurora plugin vil som standard aktivere Gradle Checkstyle plugin og bruke standard Aurora Checkstyle-konfigurasjon. 
 

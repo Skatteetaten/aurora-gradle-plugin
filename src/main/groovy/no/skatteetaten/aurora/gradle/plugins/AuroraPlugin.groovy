@@ -30,7 +30,6 @@ class AuroraPlugin implements Plugin<Project> {
       fallbackToTimestampVersion: true,
       applyNexusRepositories    : true,
       applyMavenDeployer        : true,
-      setIgnoreTestFailures     : false,
       checkstyleConfigVersion   : "0.6",
       checkstyleConfigFile      : 'checkstyle/checkstyle-with-metrics.xml'
   ]
@@ -94,12 +93,6 @@ class AuroraPlugin implements Plugin<Project> {
     }
     if (config.applySonarPlugin) {
       applySonarPlugin(p)
-    }
-
-    if (p.hasProperty('test') && config.setIgnoreTestFailures) {
-      p.test {
-        ignoreFailures = true
-      }
     }
   }
 

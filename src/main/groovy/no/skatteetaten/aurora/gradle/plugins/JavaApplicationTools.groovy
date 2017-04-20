@@ -12,21 +12,21 @@ class JavaApplicationTools {
   void applyJavaApplicationConfig(Map<String, Object> config) {
 
     if (config.applyDefaultPlugins) {
-      applyDefaultPlugins(p)
+      applyDefaultPlugins(project)
     }
 
     if (config.applyJavaDefaults) {
-      applyJavaDefaults(p)
+      applyJavaDefaults(project)
     }
     if (config.applySpockSupport) {
-      applySpockSupport(p, config.groovyVersion, config.spockVersion, config.cglibVersion, config.objenesisVersion)
+      applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion, config.objenesisVersion)
     }
     if (config.applyAsciiDocPlugin) {
-      applyAsciiDocPlugin(p)
+      applyAsciiDocPlugin(project)
     }
 
     if (config.applyDeliveryBundleConfig) {
-      applyDeliveryBundleConfig(p)
+      applyDeliveryBundleConfig(project)
     }
   }
 

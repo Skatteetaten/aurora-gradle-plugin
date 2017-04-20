@@ -22,6 +22,7 @@ apply plugin: 'signing'
 group = 'no.skatteetaten.aurora.gradle.plugins'
 
 version = GitVersion.determineVersion(file('.')).version
+version = "1.0.0"
 
 dependencies {
   compile(
@@ -77,13 +78,13 @@ uploadArchives {
         description 'A plugin that will apply a sensible base line for JVM applications developed by the Norwegian Tax Authority'
         url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
 
-/*
+
         scm {
           connection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
           developerConnection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
           url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
         }
-*/
+
 
         licenses {
           license {

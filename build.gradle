@@ -4,7 +4,7 @@ buildscript {
     mavenLocal()
   }
   dependencies {
-    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.1')
+    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.0')
   }
 }
 repositories {
@@ -22,13 +22,13 @@ apply plugin: 'signing'
 group = 'no.skatteetaten.aurora.gradle.plugins'
 
 version = GitVersion.determineVersion(file('.')).version
-version = "1.0.0"
+//version = "1.0.0"
 
 dependencies {
   compile(
       gradleApi(),
       "org.codehaus.groovy:groovy-all:2.4.7",
-      'no.skatteetaten.aurora:aurora-git-version:1.0.1',
+      'no.skatteetaten.aurora:aurora-git-version:1.0.0',
       'org.ajoberstar:grgit:1.7.0',
       'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',
       'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11',
@@ -56,48 +56,49 @@ artifacts {
 }
 
 signing {
+  required { gradle.taskGraph.hasTask("uploadArchives") }
   sign configurations.archives
 }
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+if (project.hasProperty("ossrUsername") && project.hasProperty("ossrhPassword")) {
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
 
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
+        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
 
-      pom.project {
-        name 'Aurora Gradle Plugin'
-        packaging 'jar'
-        description 'A plugin that will apply a sensible base line for JVM applications developed by the Norwegian Tax Authority'
-        url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
-
-
-        scm {
-          connection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
-          developerConnection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+        pom.project {
+          name 'Aurora Gradle Plugin'
+          packaging 'jar'
+          description 'A plugin that will apply a sensible base line for JVM applications developed by the Norwegian Tax Authority'
           url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
-        }
 
-
-        licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          scm {
+            connection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+            developerConnection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+            url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
           }
-        }
 
-        developers {
-          developer {
-            id 'bjartek'
-            name 'Bjarte S. Karlsen'
-            email 'Bjarte.Karlsen@Skatteetaten.no'
+          licenses {
+            license {
+              name 'The Apache License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+          }
+
+          developers {
+            developer {
+              id 'bjartek'
+              name 'Bjarte S. Karlsen'
+              email 'Bjarte.Karlsen@Skatteetaten.no'
+            }
           }
         }
       }

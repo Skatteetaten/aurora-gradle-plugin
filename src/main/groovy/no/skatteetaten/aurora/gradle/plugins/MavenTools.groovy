@@ -48,15 +48,17 @@ class MavenTools {
     projectsWithMavenPlugin.each {
       it.with { p ->
         def releasesUrl = "${nexusUrl}/content/repositories/releases"
+        def stagingUrl = "${nexusUrl}/service/local/staging/deploy/maven2/"
+        def snapshotUrl = "${nexusUrl}/content/repositories/snapshots"
         uploadArchives {
           onlyIf { !artifactExists(p, releasesUrl) }
           repositories {
             mavenDeployer {
-              snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots") {
+              snapshotRepository(url: snapshotUrl) {
                 authentication(userName: nexusUsername, password: nexusPassword)
               }
 
-              repository(url: releasesUrl) {
+              repository(url: stagingUrl) {
                 authentication(userName: nexusUsername, password: nexusPassword)
               }
             }
@@ -115,7 +117,8 @@ class MavenTools {
   static determineArtifactUrl(String repositoryUrl, String groupId, String artifactId, String version) {
 
     if ([repositoryUrl, groupId, artifactId, version].any { !it }) {
-      throw new IllegalArgumentException("All parameters must be set, was: ${[repositoryUrl, groupId, artifactId, version]}")
+      throw new IllegalArgumentException(
+          "All parameters must be set, was: ${[repositoryUrl, groupId, artifactId, version]}")
     }
     // Replace dots with slashes in the groupId (ske.aurora.gradle.plugins => ske/aurora/gradle/plugins)
     String groupIdAdapted = groupId.replaceAll(/\./, '/')

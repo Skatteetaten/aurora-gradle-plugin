@@ -4,7 +4,7 @@ buildscript {
     mavenLocal()
   }
   dependencies {
-    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.0')
+    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.1')
   }
 }
 repositories {
@@ -22,7 +22,6 @@ apply plugin: 'signing'
 group = 'no.skatteetaten.aurora.gradle.plugins'
 
 version = GitVersion.determineVersion(file('.')).version
-//version = "1.0.0"
 
 dependencies {
   compile(

@@ -1,36 +1,38 @@
-allprojects {
-  buildscript {
-    repositories {
-      mavenCentral()
-      mavenLocal()
-    }
-  }
+buildscript {
   repositories {
     mavenCentral()
     mavenLocal()
   }
-}
-
-
-buildscript {
-  repositories {
-    maven {
-      url "${nexusUrl}/content/groups/public"
-    }
+  dependencies {
+    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.0')
   }
 }
+repositories {
+  mavenCentral()
+  jcenter()
+  mavenLocal()
+}
+
+import no.skatteetaten.aurora.version.git.GitVersion
 
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'no.skatteetaten.aurora.gradle.plugins'
+
+version = GitVersion.determineVersion(file('.')).version
+//version = "1.0.0"
 
 dependencies {
   compile(
       gradleApi(),
       "org.codehaus.groovy:groovy-all:2.4.7",
       'no.skatteetaten.aurora:aurora-git-version:1.0.0',
-      'org.ajoberstar:grgit:1.7.0'
+      'org.ajoberstar:grgit:1.7.0',
+      'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',
+      'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11',
+      'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.2.1'
   )
   testCompile(
       "org.spockframework:spock-core:1.0-groovy-2.4",
@@ -38,6 +40,71 @@ dependencies {
 }
 
 install.dependsOn << build
+
+task javadocJar(type: Jar) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives javadocJar, sourcesJar
+}
+
+signing {
+  required { gradle.taskGraph.hasTask("uploadArchives") }
+  sign configurations.archives
+}
+
+if (project.hasProperty("ossrUsername") && project.hasProperty("ossrhPassword")) {
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+
+        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+
+        pom.project {
+          name 'Aurora Gradle Plugin'
+          packaging 'jar'
+          description 'A plugin that will apply a sensible base line for JVM applications developed by the Norwegian Tax Authority'
+          url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
+
+          scm {
+            connection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+            developerConnection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
+            url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
+          }
+
+          licenses {
+            license {
+              name 'The Apache License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+          }
+
+          developers {
+            developer {
+              id 'bjartek'
+              name 'Bjarte S. Karlsen'
+              email 'Bjarte.Karlsen@Skatteetaten.no'
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 task wrapper(type: Wrapper) {
   gradleVersion = "3.0"

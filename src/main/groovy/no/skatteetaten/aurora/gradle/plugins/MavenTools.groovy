@@ -1,4 +1,4 @@
-package ske.aurora.gradle.plugins
+package no.skatteetaten.aurora.gradle.plugins
 
 import java.text.MessageFormat
 
@@ -15,10 +15,11 @@ class MavenTools {
 
   void applyRepositories() {
 
+    if (!project.hasProperty("nexusUrl")) {
+      return
+    }
+
     project.with {
-      if (!hasProperty("nexusUrl")) {
-        return
-      }
 
       allprojects {
         buildscript {

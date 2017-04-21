@@ -59,7 +59,7 @@ signing {
   sign configurations.archives
 }
 
-if (project.hasProperty("ossrUsername") && project.hasProperty("ossrhPassword")) {
+if (ext.has("ossrhUsername") && ext.has("ossrhPassword")) {
   uploadArchives {
     repositories {
       mavenDeployer {

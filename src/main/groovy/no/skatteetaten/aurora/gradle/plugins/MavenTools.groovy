@@ -40,7 +40,7 @@ class MavenTools {
 
   void addMavenDeployer() {
 
-    if (!(hasProperty("nexusUsername") && hasProperty("nexusPassword"))) {
+    if (!(project.ext.has("nexusUsername") && project.ext.has("nexusPassword"))) {
       return
     }
 

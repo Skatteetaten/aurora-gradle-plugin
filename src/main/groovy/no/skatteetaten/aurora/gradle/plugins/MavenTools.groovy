@@ -55,7 +55,7 @@ class MavenTools {
       def releasesUrl = "${nexusUrl}/content/repositories/releases"
       def snapshotUrl = "${nexusUrl}/content/repositories/snapshots"
       uploadArchives {
-        onlyIf { !artifactExists(p, releasesUrl) }
+        onlyIf { !artifactExists(project, releasesUrl) }
         repositories {
           mavenDeployer {
             snapshotRepository(url: snapshotUrl) {

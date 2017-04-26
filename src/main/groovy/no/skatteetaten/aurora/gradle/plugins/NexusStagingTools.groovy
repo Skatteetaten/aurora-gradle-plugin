@@ -28,9 +28,6 @@ class NexusStagingTools {
       ext.stagingDirectory = file("${buildDir}/stage")
       ext.repositoryDirectory = file("${buildDir}/repository")
 
-      task('deploy', description: 'Build and deploy artifacts to staging and release staging repository',
-          dependsOn: 'stageRemotely')
-
       task('configure', description: "Configure staging deployment to $nexusUrl") {
         doLast {
           ant.taskdef(uri: 'staging', resource: 'org/sonatype/nexus/ant/staging/antlib.xml', classpath: configurations.nexusStaging.asPath)
@@ -76,6 +73,7 @@ class NexusStagingTools {
       }
 
       task('stageRemotely', dependsOn: stageLocally, description: 'Upload the local staging folder') {
+        onlyIf { !NexusTools.artifactExists(p, nexusUrl) }
         doLast {
           ant.'staging:stageRemotely' {
             'staging:nexusStagingInfo'(refid: nexusStagingInfoId)
@@ -84,6 +82,7 @@ class NexusStagingTools {
       }
 
       task('releaseStagingRepository', dependsOn: stageRemotely, description: 'Release the repo from staging') {
+        onlyIf { !NexusTools.artifactExists(p, nexusUrl) }
         doLast {
           ant.'staging:releaseStagingRepository'(description: 'release staging repo') {
             'staging:nexusStagingInfo'(refid: nexusStagingInfoId)

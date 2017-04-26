@@ -38,27 +38,32 @@ class MavenTools {
     }
   }
 
-  void addMavenDeployer() {
+  void addMavenDeployer(boolean requireStaging = true, String stagingProfileId = null) {
 
     if (!(project.ext.has("nexusUsername") && project.ext.has("nexusPassword"))) {
       return
     }
+    if (requireStaging) {
+      if (!stagingProfileId) {
+        throw new IllegalArgumentException("Required stagingProfileId property not set")
+      }
+      NexusStagingTools.addNexusStagingTasks(project, stagingProfileId)
+    }
+    project.with {
 
-    Set<Project> projectsWithMavenPlugin = findAllMavenProjects()
-    projectsWithMavenPlugin.each {
-      it.with { p ->
-        def releasesUrl = "${nexusUrl}/content/repositories/releases"
-        def stagingUrl = "${nexusUrl}/service/local/staging/deploy/maven2/"
-        def snapshotUrl = "${nexusUrl}/content/repositories/snapshots"
-        uploadArchives {
-          onlyIf { !artifactExists(p, releasesUrl) }
-          repositories {
-            mavenDeployer {
-              snapshotRepository(url: snapshotUrl) {
-                authentication(userName: nexusUsername, password: nexusPassword)
-              }
-
-              repository(url: stagingUrl) {
+//      def stagingUrl = "${nexusUrl}/service/local/staging/deploy/maven2/"
+      def releasesUrl = "${nexusUrl}/content/repositories/releases"
+      def snapshotUrl = "${nexusUrl}/content/repositories/snapshots"
+      uploadArchives {
+        onlyIf { !artifactExists(p, releasesUrl) }
+        repositories {
+          mavenDeployer {
+            snapshotRepository(url: snapshotUrl) {
+              authentication(userName: nexusUsername, password: nexusPassword)
+            }
+            if (!requireStaging) {
+              // If we don't require staging to nexus we can just add a standard release deployer
+              repository(url: releasesUrl) {
                 authentication(userName: nexusUsername, password: nexusPassword)
               }
             }
@@ -74,19 +79,9 @@ class MavenTools {
       // Don't set defaultTasks if it has already been set
       return
     }
-    if (findAllMavenProjects().empty) {
-      // Don't set defaultTasks if there are no maven projects because we are going to set it
-      // to tasks that require the maven plugin to be applied.
-      return
-    }
 
     // defaultTasks only need to be set on the root project
     project.defaultTasks = ['clean', 'install']
-  }
-
-  private Set<Project> findAllMavenProjects() {
-
-    project.allprojects.findAll { it.plugins.hasPlugin("maven") }
   }
 
   /**

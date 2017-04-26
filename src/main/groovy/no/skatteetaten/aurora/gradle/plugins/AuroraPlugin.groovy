@@ -31,6 +31,8 @@ class AuroraPlugin implements Plugin<Project> {
       fallbackToTimestampVersion: true,
       applyNexusRepositories    : true,
       applyMavenDeployer        : true,
+      requireStaging            : true,
+      stagingProfileId          : null,
       checkstyleConfigVersion   : "0.6",
       checkstyleConfigFile      : 'checkstyle/checkstyle-with-metrics.xml'
   ]
@@ -64,10 +66,12 @@ class AuroraPlugin implements Plugin<Project> {
     new CodeAnalysisTools(p).applyCodeAnalysisPlugins(config)
 
     mavenTools.with {
-      if (config.applyMavenDeployer) {
-        addMavenDeployer()
-      }
+
       setDefaultTasks()
+
+      if (config.applyMavenDeployer) {
+        addMavenDeployer(config.requireStaging, config.stagingProfileId)
+      }
     }
   }
 

@@ -61,7 +61,6 @@ class NexusStagingTools {
             from "${buildDir}/distributions"
             into repositoryDirectory
           }
-          logger.lifecycle("    Build artifacts deployed in repository in ${repositoryDirectory}")
         }
       }
 
@@ -73,7 +72,6 @@ class NexusStagingTools {
             'staging:nexusStagingInfo'(refid: nexusStagingInfoId)
             fileset(dir: repositoryDirectory, includes: "**/*.*")
           }
-          logger.lifecycle("    Staged build output into ${stagingDirectory}")
         }
       }
 
@@ -82,7 +80,6 @@ class NexusStagingTools {
           ant.'staging:stageRemotely' {
             'staging:nexusStagingInfo'(refid: nexusStagingInfoId)
           }
-          logger.lifecycle("    Created the remote staging repository.")
         }
       }
 
@@ -91,7 +88,6 @@ class NexusStagingTools {
           ant.'staging:releaseStagingRepository'(description: 'release staging repo') {
             'staging:nexusStagingInfo'(refid: nexusStagingInfoId)
           }
-          logger.lifecycle("    Released the remote staging repository.")
         }
       }
     }

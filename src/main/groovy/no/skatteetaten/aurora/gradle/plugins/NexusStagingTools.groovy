@@ -4,7 +4,16 @@ import org.gradle.api.Project
 
 class NexusStagingTools {
 
-  static addNexusStagingTasks(Project p, String stagingProfileId) {
+  /**
+   * This method adds tasks for uploading to and releasing artifacts from Nexus Staging. It is adapted to a plugin
+   * from the Nexus Book Examples: https://github.com/sonatype/nexus-book-examples/blob/master/gradle/simple-project-staging/build.gradle
+   * and is by every respect a big hunk of mess. It does, however, work, and nobody but me and whoever may be reading
+   * this needs to worry about it as it will seamlessly integrate with the build process of the users of the plugin.
+   * @param p
+   * @param nexusStagingProfileId
+   * @return
+   */
+  static addNexusStagingTasks(Project p, String nexusStagingProfileId) {
     p.with {
       configurations {
         nexusStaging {
@@ -15,7 +24,7 @@ class NexusStagingTools {
         nexusStaging group: 'org.sonatype.nexus.ant', name: 'nexus-staging-ant-tasks', version: '1.6.3', classifier: 'uber'
       }
 
-      ext.nexusStagingInfoId = "target-nexus"
+      ext.nexusStagingInfoId = "target-nexus" // Can pretty much be whatever. It is just used locally to reference the staging configuration.
       ext.stagingDirectory = file("${buildDir}/stage")
       ext.repositoryDirectory = file("${buildDir}/repository")
 
@@ -26,7 +35,7 @@ class NexusStagingTools {
         doLast {
           ant.taskdef(uri: 'staging', resource: 'org/sonatype/nexus/ant/staging/antlib.xml', classpath: configurations.nexusStaging.asPath)
           ant.'staging:nexusStagingInfo'(id: nexusStagingInfoId, stagingDirectory: stagingDirectory) {
-            'staging:projectInfo'(stagingProfileId: stagingProfileId)
+            'staging:projectInfo'(stagingProfileId: nexusStagingProfileId)
             'staging:connectionInfo'(baseUrl: nexusUrl) {
               'staging:authentication'(username: nexusUsername, password: nexusPassword)
             }

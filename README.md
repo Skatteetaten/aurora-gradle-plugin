@@ -25,7 +25,7 @@ Put the following snippet in your `build.gradle` file
     
       dependencies {
         classpath(
-            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.0.0'
+            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.1.0'
         )
       }
     }
@@ -43,7 +43,7 @@ following configuration;
     
       dependencies {
         classpath(
-            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.0.0'
+            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.1.0'
         )
       }
     }
@@ -159,6 +159,24 @@ default ```v``` you can specify that using the versionPrefix config;
 
 The prefix will always be removed from the name before determining the version.
 
+
+### Nexus Staging
+
+In the NTA it is mandatory for all released artifacts to go through a staging repository in Nexus before being released
+to allow Nexus to run Nexus IQ tests. The necessary tasks for deploying to Nexus will applied by the plugin, and all
+you need to do to use it them to supply the ```stagingProfileId``` configuration. You can also skip staging entirely
+and deploy releases directly by setting the ```requireStaging``` configuration (but have a good reason for doing so).
+
+    ext.aurora = [
+      stagingProfileId: 'b62cca8083fa8',
+      requireStaging: false
+    ]
+
+The plugin will also create a ```deploy``` task that will trigger the correct release behaviour based on the configuration
+and the version of the artifact being released; SNAPSHOT-releases does not require staging.
+
+    ./gradlew clean deploy
+  
 
 ### Spock for Testing
 

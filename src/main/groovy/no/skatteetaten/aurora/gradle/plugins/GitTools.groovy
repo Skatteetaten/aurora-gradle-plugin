@@ -33,6 +33,10 @@ class GitTools {
     ProjectTools.setProjectVersion(project, versionToSet)
   }
 
+  void setProjectRevision() {
+    project.ext["revision"] = git.head().id
+  }
+
   String getVersionFromGit(String versionPrefix) {
 
     def options = new GitVersion.Options(

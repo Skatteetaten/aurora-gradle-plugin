@@ -102,6 +102,7 @@ class AuroraPlugin implements Plugin<Project> {
 
       if (config.setProjectVersionFromGit) {
         setProjectVersionFromGit()
+        setProjectRevision()
       }
     }
   }

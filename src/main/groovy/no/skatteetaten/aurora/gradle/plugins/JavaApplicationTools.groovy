@@ -66,6 +66,7 @@ class JavaApplicationTools {
       apply plugin: 'application'
 
       distZip.classifier = 'Leveransepakke'
+      startScripts.enabled = false
     }
   }
 

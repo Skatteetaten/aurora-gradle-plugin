@@ -31,7 +31,7 @@ dependencies {
       'org.ajoberstar:grgit:1.7.0',
       'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',
       'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11',
-      'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.2.1'
+      'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5'
   )
   testCompile(
       "org.spockframework:spock-core:1.0-groovy-2.4",

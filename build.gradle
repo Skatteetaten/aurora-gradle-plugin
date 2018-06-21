@@ -26,7 +26,7 @@ version = GitVersion.determineVersion(file('.')).version
 dependencies {
   compile(
       gradleApi(),
-      "org.codehaus.groovy:groovy-all:2.4.11",
+      "org.codehaus.groovy:groovy-all:2.4.15",
       'no.skatteetaten.aurora:aurora-git-version:1.0.1',
       'org.ajoberstar:grgit:1.7.0',
       'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',

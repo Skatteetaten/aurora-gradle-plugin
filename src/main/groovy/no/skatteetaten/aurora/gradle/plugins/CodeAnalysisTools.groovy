@@ -36,7 +36,7 @@ class CodeAnalysisTools {
         reports {
           xml.enabled false
           csv.enabled false
-          html.destination "${buildDir}/reports/jacoco"
+//          html.destination "${buildDir}/reports/jacoco"
         }
       }
     }

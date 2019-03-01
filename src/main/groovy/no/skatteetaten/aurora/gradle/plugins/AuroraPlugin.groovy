@@ -1,8 +1,5 @@
 package no.skatteetaten.aurora.gradle.plugins
 
-import java.text.SimpleDateFormat
-
-import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -12,25 +9,25 @@ import groovy.util.logging.Slf4j
 class AuroraPlugin implements Plugin<Project> {
 
   private static DEFAULT_CONFIG = [
-      applyDefaultPlugins       : true,
-      applyJavaDefaults         : true,
-      applyDeliveryBundleConfig : true,
-      applySpockSupport         : true,
-      groovyVersion             : '2.5.4',
-      spockVersion              : '1.2-groovy-2.5',
-      cglibVersion              : '3.1',
-      objenesisVersion          : '2.1',
-      applyAsciiDocPlugin       : true,
-      applyCheckstylePlugin     : true,
-      applyJacocoTestReport     : true,
-      applyPiTestSupport        : true,
-      applySonarPlugin          : true,
-      applyNexusRepositories    : true,
-      applyMavenDeployer        : true,
-      requireStaging            : true,
-      stagingProfileId          : null,
-      checkstyleConfigVersion   : "2.1.6",
-      checkstyleConfigFile      : 'checkstyle/checkstyle-with-metrics.xml'
+      applyDefaultPlugins      : true,
+      applyJavaDefaults        : true,
+      applyDeliveryBundleConfig: true,
+      applySpockSupport        : true,
+      groovyVersion            : '2.5.4',
+      spockVersion             : '1.2-groovy-2.5',
+      cglibVersion             : '3.1',
+      objenesisVersion         : '2.1',
+      applyAsciiDocPlugin      : true,
+      applyCheckstylePlugin    : true,
+      applyJacocoTestReport    : true,
+      applyPiTestSupport       : true,
+      applySonarPlugin         : true,
+      applyNexusRepositories   : true,
+      applyMavenDeployer       : true,
+      requireStaging           : true,
+      stagingProfileId         : null,
+      checkstyleConfigVersion  : "2.1.6",
+      checkstyleConfigFile     : 'checkstyle/checkstyle-with-metrics.xml'
   ]
 
   void apply(Project p) {

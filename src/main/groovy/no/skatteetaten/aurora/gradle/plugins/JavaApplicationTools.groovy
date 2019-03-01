@@ -12,7 +12,7 @@ class JavaApplicationTools {
   void applyJavaApplicationConfig(Map<String, Object> config) {
 
     if (config.applyDefaultPlugins) {
-      applyDefaultPlugins(project, config.versionCheckVersion)
+      applyDefaultPlugins(project)
     }
 
     if (config.applyJavaDefaults) {
@@ -30,7 +30,7 @@ class JavaApplicationTools {
       applyDeliveryBundleConfig(project)
     }
 
-    if (config.springVersion != null) {
+    project.plugins.withId("org.springframework.boot") {
       applySpring(project, config.auroraSpringBootStarterVersion)
     }
 
@@ -38,20 +38,29 @@ class JavaApplicationTools {
       applyJunit5(project)
     }
 
-    if (config.kotlinVersion != null) {
-      applyKotlinSupport(project, config.springVersion, config.kotlinLoggingVersion)
+    project.plugins.withId("org.springframework.boot") {
+      applyKotlinSupport(project, config.kotlinLoggingVersion)
+    }
+
+    project.plugins.withId("org.jetbrains.kotlin.plugin.spring"){
+      applyKotlinSpringSupport(project)
+    }
+
+  }
+
+  void applyKotlinSpringSupport(Project project) {
+    project.with {
+      dependencies {
+        compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+      }
     }
   }
 
-  void applyKotlinSupport(Project project, String springVersion, String kotlinLoggingVersion) {
+  void applyKotlinSupport(Project project, String kotlinLoggingVersion) {
 
     project.with {
 
       dependencies {
-
-        if (springVersion != null) {
-          compile('com.fasterxml.jackson.module:jackson-module-kotlin')
-        }
 
         compile(
             'org.jetbrains.kotlin:kotlin-reflect',

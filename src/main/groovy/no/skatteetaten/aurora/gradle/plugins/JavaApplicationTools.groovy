@@ -146,8 +146,6 @@ class JavaApplicationTools {
       apply plugin: 'java'
       apply plugin: 'maven'
 
-      group = System.getProperty("groupId")
-      version = System.getProperty("version")
     }
   }
 

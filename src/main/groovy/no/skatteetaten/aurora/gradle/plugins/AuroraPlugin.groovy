@@ -25,15 +25,11 @@ class AuroraPlugin implements Plugin<Project> {
       applyJacocoTestReport     : true,
       applyPiTestSupport        : true,
       applySonarPlugin          : true,
-      setProjectVersionFromGit  : true,
-      enforceTagOnMaster        : true,
-      versionPrefix             : 'v',
-      fallbackToTimestampVersion: true,
       applyNexusRepositories    : true,
       applyMavenDeployer        : true,
       requireStaging            : true,
       stagingProfileId          : null,
-      checkstyleConfigVersion   : "2.0.0",
+      checkstyleConfigVersion   : "2.1.6",
       checkstyleConfigFile      : 'checkstyle/checkstyle-with-metrics.xml'
   ]
 
@@ -49,13 +45,6 @@ class AuroraPlugin implements Plugin<Project> {
   }
 
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
-
-    Grgit git = openGit()
-    if (!git) {
-      setProjectVersionFromTimestamp(p, config)
-    } else {
-      setProjectVersionFromGit(p, git, config)
-    }
 
     def mavenTools = new MavenTools(p)
     if (config.applyNexusRepositories) {
@@ -83,38 +72,4 @@ class AuroraPlugin implements Plugin<Project> {
     config
   }
 
-  private static Grgit openGit() {
-
-    Grgit git = null
-    try {
-      git = Grgit.open(dir: ".")
-    } catch (Exception e) {
-      log.warn("Unable to read git repository information. Details: $e.message")
-    }
-    git
-  }
-
-  private static setProjectVersionFromGit(Project p, Grgit git, Map<String, Object> config) {
-
-    new GitTools(p, git).with {
-      enforceTagOnMaster = config.enforceTagOnMaster
-      versionPrefix = config.versionPrefix
-
-      if (config.setProjectVersionFromGit) {
-        setProjectVersionFromGit()
-        setProjectRevision()
-      }
-    }
-  }
-
-  private static setProjectVersionFromTimestamp(Project p, Map<String, Object> config) {
-
-    if (!config.fallbackToTimestampVersion) {
-      return
-    }
-
-    p.logger.info("Falling back to timestamp version")
-    String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())
-    ProjectTools.setProjectVersion(p, timestamp)
-  }
 }

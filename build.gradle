@@ -3,9 +3,6 @@ buildscript {
     mavenCentral()
     mavenLocal()
   }
-  dependencies {
-    classpath('no.skatteetaten.aurora:aurora-git-version:1.0.1')
-  }
 }
 repositories {
   mavenCentral()
@@ -13,22 +10,18 @@ repositories {
   mavenLocal()
 }
 
-import no.skatteetaten.aurora.version.git.GitVersion
-
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-group = 'no.skatteetaten.aurora.gradle.plugins'
+group = groupId
 
-version = GitVersion.determineVersion(file('.')).version
+version "${version}"
 
 dependencies {
   compile(
       gradleApi(),
       "org.codehaus.groovy:groovy-all:2.4.12",
-      'no.skatteetaten.aurora:aurora-git-version:1.0.1',
-      'org.ajoberstar:grgit:1.7.0',
       'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',
       'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11',
       'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5'

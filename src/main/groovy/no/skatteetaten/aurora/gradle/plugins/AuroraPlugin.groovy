@@ -22,7 +22,6 @@ class AuroraPlugin implements Plugin<Project> {
       applyJacocoTestReport    : true,
       applyPiTestSupport       : true,
       applySonarPlugin         : true,
-      applyNexusRepositories   : true,
       applyMavenDeployer       : true,
       requireStaging           : true,
       stagingProfileId         : null,
@@ -30,6 +29,7 @@ class AuroraPlugin implements Plugin<Project> {
       kotlinLoggingVersion     : "1.6.24",
       checkstyleConfigVersion  : "2.1.6",
       checkstyleConfigFile     : 'checkstyle/checkstyle-with-metrics.xml',
+      applyJunit5Support       : true
   ]
 
   void apply(Project p) {
@@ -46,9 +46,7 @@ class AuroraPlugin implements Plugin<Project> {
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
 
     def mavenTools = new MavenTools(p)
-    if (config.applyNexusRepositories) {
-      mavenTools.applyRepositories()
-    }
+
 
     new JavaApplicationTools(p).applyJavaApplicationConfig(config)
     new CodeAnalysisTools(p).applyCodeAnalysisPlugins(config)

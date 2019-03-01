@@ -13,31 +13,6 @@ class MavenTools {
     this.project = p
   }
 
-  void applyRepositories() {
-
-    if (!project.hasProperty("nexusUrl")) {
-      return
-    }
-
-    project.with {
-
-      allprojects {
-        buildscript {
-          repositories {
-            maven {
-              url "${nexusUrl}/content/groups/public"
-            }
-          }
-        }
-        repositories {
-          maven {
-            url "${nexusUrl}/content/groups/public"
-          }
-        }
-      }
-    }
-  }
-
   void addMavenDeployer(boolean requireStaging = true, String stagingProfileId = null) {
 
     if (!(project.ext.has("nexusUsername") && project.ext.has("nexusPassword") && project.ext.has("nexusUrl"))) {

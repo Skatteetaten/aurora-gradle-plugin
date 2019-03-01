@@ -12,14 +12,15 @@ class JavaApplicationTools {
   void applyJavaApplicationConfig(Map<String, Object> config) {
 
     if (config.applyDefaultPlugins) {
-      applyDefaultPlugins(project)
+      applyDefaultPlugins(project, config.versionCheckVersion)
     }
 
     if (config.applyJavaDefaults) {
       applyJavaDefaults(project)
     }
     if (config.applySpockSupport) {
-      applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion, config.objenesisVersion)
+      applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion,
+          config.objenesisVersion)
     }
     if (config.applyAsciiDocPlugin) {
       applyAsciiDocPlugin(project)
@@ -28,6 +29,106 @@ class JavaApplicationTools {
     if (config.applyDeliveryBundleConfig) {
       applyDeliveryBundleConfig(project)
     }
+
+    if (config.springVersion != null) {
+      applySpring(project, config.auroraSpringBootStarterVersion)
+    }
+
+    if (config.applyJunit5Support) {
+      applyJunit5(project)
+    }
+
+    if (config.kotlinVersion != null) {
+      applyKotlinSupport(project, config.springVersion, config.kotlinLoggingVersion)
+    }
+  }
+
+  void applyKotlinSupport(Project project, String springVersion, String kotlinLoggingVersion) {
+
+    project.with {
+
+      dependencies {
+
+        if (springVersion != null) {
+          compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+        }
+
+        compile(
+            'org.jetbrains.kotlin:kotlin-reflect',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+            "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
+        )
+
+        compileKotlin {
+          kotlinOptions {
+            suppressWarnings = true
+            jvmTarget = 1.8
+            freeCompilerArgs = ["-Xjsr305=strict"]
+          }
+        }
+
+        compileTestKotlin {
+          kotlinOptions {
+            suppressWarnings = true
+            jvmTarget = 1.8
+            freeCompilerArgs = ["-Xjsr305=strict"]
+          }
+        }
+      }
+
+    }
+  }
+
+  void applyJunit5(Project project) {
+    project.with {
+
+      dependencies {
+        [
+            'org.junit.jupiter:junit-jupiter-api',
+            "org.junit.jupiter:junit-jupiter-params",
+        ].each { testCompile(it) { exclude group: 'junit' } }
+
+        testImplementation(
+            "org.junit.jupiter:junit-jupiter-api",
+        )
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+      }
+      test {
+        useJUnitPlatform()
+      }
+    }
+
+  }
+
+  void applySpring(Project project, String starterVersion) {
+
+    project.with {
+
+      apply plugin: 'io.spring.dependency-management'
+
+      [jar, distZip]*.enabled = true
+      [bootJar, distTar, bootDistTar, bootDistZip]*.enabled = false
+
+      configurations.archives.artifacts.removeIf {
+        if (it.hasProperty("archiveTask")) {
+          !it.archiveTask.enabled
+        } else {
+          !it.delegate.archiveTask.enabled
+        }
+      }
+
+      springBoot {
+        buildInfo()
+      }
+      dependencies {
+        compile(
+            'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
+            "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
+        )
+      }
+
+    }
+
   }
 
   void applyDefaultPlugins(Project project) {
@@ -35,6 +136,9 @@ class JavaApplicationTools {
     project.with {
       apply plugin: 'java'
       apply plugin: 'maven'
+
+      group = System.getProperty("groupId")
+      version = System.getProperty("version")
     }
   }
 
@@ -96,4 +200,5 @@ class JavaApplicationTools {
       }
     }
   }
+
 }

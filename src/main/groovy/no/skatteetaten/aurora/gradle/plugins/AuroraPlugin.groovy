@@ -12,7 +12,7 @@ class AuroraPlugin implements Plugin<Project> {
       applyDefaultPlugins      : true,
       applyJavaDefaults        : true,
       applyDeliveryBundleConfig: true,
-      applySpockSupport        : true,
+      applySpockSupport        : false,
       groovyVersion            : '2.5.4',
       spockVersion             : '1.2-groovy-2.5',
       cglibVersion             : '3.1',
@@ -26,8 +26,10 @@ class AuroraPlugin implements Plugin<Project> {
       applyMavenDeployer       : true,
       requireStaging           : true,
       stagingProfileId         : null,
+      ktlintVersion            : "6.3.1",
+      kotlinLoggingVersion     : "1.6.24",
       checkstyleConfigVersion  : "2.1.6",
-      checkstyleConfigFile     : 'checkstyle/checkstyle-with-metrics.xml'
+      checkstyleConfigFile     : 'checkstyle/checkstyle-with-metrics.xml',
   ]
 
   void apply(Project p) {

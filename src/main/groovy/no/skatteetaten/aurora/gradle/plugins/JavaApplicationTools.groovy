@@ -133,8 +133,8 @@ class JavaApplicationTools {
       test {
         useJUnitPlatform()
       }
+      compileTestGroovy.enabled = false
     }
-    compileTestGroovy.enabled = false
   }
 
   void applySpring(Project project, String starterVersion) {

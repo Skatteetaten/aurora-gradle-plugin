@@ -37,6 +37,10 @@ class AuroraPlugin implements Plugin<Project> {
     onApplyPlugin(p, config)
 
     p.afterEvaluate {
+      p.plugins.withId("spring-cloud-contract") {
+        new JavaApplicationTools().
+            applySpringCloudContract(p, config.applyJunit5Support, config.springCloudContractVersion)
+      }
       // We do everything on apply
     }
   }

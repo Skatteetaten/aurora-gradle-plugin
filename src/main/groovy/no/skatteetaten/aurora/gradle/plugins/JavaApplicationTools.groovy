@@ -36,9 +36,11 @@ class JavaApplicationTools {
       applySpring(project, config.auroraSpringBootStarterVersion)
     }
 
+    /*
     project.plugins.withId("spring-cloud-contract") {
       applySpringCloudContract(project, config.applyJunit5Support, config.springCloudContractVersion)
     }
+    */
 
     if (config.applyJunit5Support == true) {
       applyJunit5(project)
@@ -63,12 +65,12 @@ class JavaApplicationTools {
         }
       }
       contracts {
-        packageWithBaseClasses = "$groupId.$artifactId.contracts"
+        packageWithBaseClasses = "${groupId}.${artifactId}.contracts"
 
         if (junit5) {
-          testFramework = 'JUNIT5'
+          testFramework = "JUNIT5"
         } else {
-          testFramework = 'SPOCK'
+          testFramework ="SPOCK"
         }
       }
     }
@@ -132,7 +134,7 @@ class JavaApplicationTools {
         useJUnitPlatform()
       }
     }
-
+    compileTestGroovy.enabled = false
   }
 
   void applySpring(Project project, String starterVersion) {

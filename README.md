@@ -168,6 +168,10 @@ java8, add `Xjsr305=strict` and supress warnings
 ### Kotlin and Spring
 The Aurora plugin will react to spring.kotlin plugin and the jackson kotlin module
 
+### Spring Cloud Contract
+The Aurora plugin will react to spring cloud contract plugin and add dependencies from the bom as well as configure the 
+correct packe with base class and test framework.
+
     
 ### Config Overview
 
@@ -194,6 +198,7 @@ All configuration options and their default values are listed below;
     aurora.requireStaging                = false,
     aurora.stagingProfileId              = null,
     
+    aurora.springCloudContractVersion    : "2.1.0.RELEASE",
     aurora.auroraSpringBootStarterVersion= "2.0.0",
     aurora.kotlinLoggingVersion          = "1.6.24",
     aurora.applyJunit5Support            = true

@@ -15,7 +15,7 @@ class JavaApplicationTools {
       applyDefaultPlugins(project)
     }
 
-    if(config.applyJavaDefaults == true) {
+    if (config.applyJavaDefaults == true) {
       applyJavaDefaults(project, config.javaSourceCompatibility)
     }
 
@@ -36,6 +36,10 @@ class JavaApplicationTools {
       applySpring(project, config.auroraSpringBootStarterVersion)
     }
 
+    project.plugins.withId("spring-cloud-contract") {
+      applySpringCloudContract(project, config.applyJunit5Support, config.springCloudContractVersion)
+    }
+
     if (config.applyJunit5Support == true) {
       applyJunit5(project)
     }
@@ -48,6 +52,26 @@ class JavaApplicationTools {
       applyKotlinSpringSupport(project)
     }
 
+  }
+
+  def applySpringCloudContract(Project project, Boolean junit5, String springCloudContractVersion) {
+    project.with {
+
+      dependencyManagement {
+        imports {
+          mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:$springCloudContractVersion"
+        }
+      }
+      contracts {
+        packageWithBaseClasses = "$groupId.$artifactId.contracts"
+
+        if (junit5) {
+          testFramework = 'JUNIT5'
+        } else {
+          testFramework = 'SPOCK'
+        }
+      }
+    }
   }
 
   void applyKotlinSpringSupport(Project project) {

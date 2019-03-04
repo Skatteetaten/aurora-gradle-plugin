@@ -14,18 +14,16 @@ class CodeAnalysisTools {
 
   void applyCodeAnalysisPlugins(Map<String, Object> config) {
 
-    if (config.applyCheckstylePlugin) {
+    if (config.applyCheckstylePlugin == true) {
       applyCheckstylePlugin(config.checkstyleConfigVersion as String, config.checkstyleConfigFile as String)
     }
-    if (config.applyJacocoTestReport) {
+    if (config.applyJacocoTestReport == true) {
       applyJacocoTestReport()
     }
-    if (config.applyPiTestSupport) {
+    project.plugins.withId("info.solidsoft.pitest") {
       applyPiTestSupport()
     }
-    if (config.applySonarPlugin) {
-      applySonarPlugin()
-    }
+
   }
 
   void applyJacocoTestReport() {
@@ -43,17 +41,10 @@ class CodeAnalysisTools {
 
   void applyPiTestSupport() {
     project.with {
-      apply plugin: "info.solidsoft.pitest"
 
       pitest {
         outputFormats = ['XML', 'HTML']
       }
-    }
-  }
-
-  void applySonarPlugin() {
-    project.with {
-      apply plugin: 'org.sonarqube'
     }
   }
 
@@ -78,5 +69,6 @@ class CodeAnalysisTools {
     project.checkstyle.config = project.resources.text.fromArchiveEntry(auroraCheckstyleConfig,
         checkstyleConfigFile)
     project.checkstyle.ignoreFailures = true
+    project.checkstyle.exclude = "**/generated**"
   }
 }

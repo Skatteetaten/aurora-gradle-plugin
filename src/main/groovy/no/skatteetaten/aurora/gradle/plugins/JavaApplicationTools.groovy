@@ -11,22 +11,22 @@ class JavaApplicationTools {
 
   void applyJavaApplicationConfig(Map<String, Object> config) {
 
-    if (config.applyDefaultPlugins) {
+    if (config.applyDefaultPlugins == true) {
       applyDefaultPlugins(project)
     }
 
-    if (config.applyJavaDefaults) {
-      applyJavaDefaults(project)
-    }
-    if (config.applySpockSupport) {
+    applyJavaDefaults(project, config.javaSourceCompatibility)
+
+    if (config.applySpockSupport == true) {
       applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion,
           config.objenesisVersion)
     }
-    if (config.applyAsciiDocPlugin) {
+
+    project.plugins.withId("org.asciidoctor.convert'") {
       applyAsciiDocPlugin(project)
     }
 
-    if (config.applyDeliveryBundleConfig) {
+    if (config.applyDeliveryBundleConfig == true) {
       applyDeliveryBundleConfig(project)
     }
 
@@ -34,7 +34,7 @@ class JavaApplicationTools {
       applySpring(project, config.auroraSpringBootStarterVersion)
     }
 
-    if (config.applyJunit5Support) {
+    if (config.applyJunit5Support == true) {
       applyJunit5(project)
     }
 
@@ -42,7 +42,7 @@ class JavaApplicationTools {
       applyKotlinSupport(project, config.kotlinLoggingVersion)
     }
 
-    project.plugins.withId("org.jetbrains.kotlin.plugin.spring"){
+    project.plugins.withId("org.jetbrains.kotlin.plugin.spring") {
       applyKotlinSpringSupport(project)
     }
 
@@ -149,9 +149,20 @@ class JavaApplicationTools {
     }
   }
 
-  void applyJavaDefaults(Project project) {
+  void applyJavaDefaults(Project project, String compability) {
 
-    project.sourceCompatibility = '1.8'
+    project.with {
+
+      sourceCompatibility = compability
+      if (ext.has("version")) {
+        version = version
+      }
+      if (ext.has("groupId")) {
+        group = groupId
+      }
+
+    }
+
   }
 
   void applySpockSupport(Project project, String groovyVersion, String spockVersion, String cglibVersion,
@@ -184,9 +195,7 @@ class JavaApplicationTools {
   void applyAsciiDocPlugin(Project project) {
 
     project.with {
-      apply plugin: 'org.asciidoctor.convert'
-
-      ext.snippetsDir = file("$buildDir/docs/generated-snippets")
+      ext.snippetsDir = file("$buildDir/generated-snippets")
 
       asciidoctor {
         attributes([

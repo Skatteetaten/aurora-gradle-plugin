@@ -9,31 +9,28 @@ import groovy.util.logging.Slf4j
 class AuroraPlugin implements Plugin<Project> {
 
   private static DEFAULT_CONFIG = [
-      applyDefaultPlugins      : true,
-      applyJavaDefaults        : true,
-      applyDeliveryBundleConfig: true,
-      applySpockSupport        : false,
-      groovyVersion            : '2.5.4',
-      spockVersion             : '1.2-groovy-2.5',
-      cglibVersion             : '3.1',
-      objenesisVersion         : '2.1',
-      applyAsciiDocPlugin      : true,
-      applyCheckstylePlugin    : true,
-      applyJacocoTestReport    : true,
-      applyPiTestSupport       : true,
-      applySonarPlugin         : true,
-      applyMavenDeployer       : true,
-      requireStaging           : true,
-      stagingProfileId         : null,
-      ktlintVersion            : "6.3.1",
-      kotlinLoggingVersion     : "1.6.24",
-      checkstyleConfigVersion  : "2.1.6",
-      checkstyleConfigFile     : 'checkstyle/checkstyle-with-metrics.xml',
-      applyJunit5Support       : true
+      applyDefaultPlugins           : true,
+      javaSourceCompatibility       : "1.8",
+      applyDeliveryBundleConfig     : true,
+      applySpockSupport             : false,
+      groovyVersion                 : '2.5.4',
+      spockVersion                  : '1.2-groovy-2.5',
+      cglibVersion                  : '3.1',
+      objenesisVersion              : '2.1',
+      applyCheckstylePlugin         : true,
+      applyJacocoTestReport         : true,
+      applyMavenDeployer            : true,
+      requireStaging                : false,
+      auroraSpringBootStarterVersion: "2.0.0",
+      stagingProfileId              : null,
+      ktlintVersion                 : "6.3.1",
+      kotlinLoggingVersion          : "1.6.24",
+      checkstyleConfigVersion       : "2.1.6",
+      checkstyleConfigFile          : 'checkstyle/checkstyle-with-metrics.xml',
+      applyJunit5Support            : true
   ]
 
   void apply(Project p) {
-
     Map<String, Object> config = getConfiguration(p)
 
     onApplyPlugin(p, config)
@@ -46,7 +43,6 @@ class AuroraPlugin implements Plugin<Project> {
   protected void onApplyPlugin(Project p, Map<String, Object> config) {
 
     def mavenTools = new MavenTools(p)
-
 
     new JavaApplicationTools(p).applyJavaApplicationConfig(config)
     new CodeAnalysisTools(p).applyCodeAnalysisPlugins(config)
@@ -65,8 +61,16 @@ class AuroraPlugin implements Plugin<Project> {
 
     def config = [:]
     config.putAll(DEFAULT_CONFIG)
-    config.putAll(p.ext.properties.aurora ?: [:])
+
+    def prefix = "aurora."
+    def key = p.extensions.extraProperties.getProperties()
+        .findAll { it.key.startsWith(prefix) }
+        .collectEntries { k, v -> [k.substring(prefix.length()), v] }
+    key.each { k, v -> log.debug("overrides -> ${k}:${v}") }
+    config.putAll(key ?: [:])
+    config.each { k, v -> log.debug("config -> ${k}:${v}") }
     config
+
   }
 
 }

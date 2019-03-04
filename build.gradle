@@ -20,11 +20,7 @@ version "${version}"
 
 dependencies {
   compile(
-      gradleApi(),
-      "org.codehaus.groovy:groovy-all:2.4.12",
-      'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3',
-      'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11',
-      'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5'
+      gradleApi()
   )
   testCompile(
       "org.spockframework:spock-core:1.0-groovy-2.4",
@@ -48,9 +44,11 @@ artifacts {
 }
 
 signing {
+  useGpgCmd() //I need this on mac but not on linux i think.
   required { gradle.taskGraph.hasTask("uploadArchives") }
   sign configurations.archives
 }
+
 
 if (ext.has("ossrhUsername") && ext.has("ossrhPassword")) {
   uploadArchives {
@@ -96,8 +94,4 @@ if (ext.has("ossrhUsername") && ext.has("ossrhPassword")) {
       }
     }
   }
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = "4.8"
 }

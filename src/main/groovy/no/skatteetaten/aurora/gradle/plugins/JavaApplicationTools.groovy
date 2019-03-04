@@ -15,7 +15,9 @@ class JavaApplicationTools {
       applyDefaultPlugins(project)
     }
 
-    applyJavaDefaults(project, config.javaSourceCompatibility)
+    if(config.applyJavaDefaults == true) {
+      applyJavaDefaults(project, config.javaSourceCompatibility)
+    }
 
     if (config.applySpockSupport == true) {
       applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion,
@@ -38,7 +40,7 @@ class JavaApplicationTools {
       applyJunit5(project)
     }
 
-    project.plugins.withId("org.springframework.boot") {
+    project.plugins.withId("org.jetbrains.kotlin.jvm") {
       applyKotlinSupport(project, config.kotlinLoggingVersion)
     }
 

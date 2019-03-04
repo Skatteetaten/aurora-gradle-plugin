@@ -10,6 +10,7 @@ class AuroraPlugin implements Plugin<Project> {
 
   private static DEFAULT_CONFIG = [
       applyDefaultPlugins           : true,
+      applyJavaDefaults             : true,
       javaSourceCompatibility       : "1.8",
       applyDeliveryBundleConfig     : true,
       applySpockSupport             : false,
@@ -23,7 +24,6 @@ class AuroraPlugin implements Plugin<Project> {
       requireStaging                : false,
       auroraSpringBootStarterVersion: "2.0.0",
       stagingProfileId              : null,
-      ktlintVersion                 : "6.3.1",
       kotlinLoggingVersion          : "1.6.24",
       checkstyleConfigVersion       : "2.1.6",
       checkstyleConfigFile          : 'checkstyle/checkstyle-with-metrics.xml',

@@ -1,97 +1,31 @@
-buildscript {
-  repositories {
-    mavenCentral()
-    mavenLocal()
-  }
+plugins {
+  id "groovy"
+  id "com.gradle.plugin-publish" version "0.10.1"
+  id "java-gradle-plugin"
 }
-repositories {
-  mavenCentral()
-  jcenter()
-  mavenLocal()
-}
-
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 group = groupId
 
 version "${version}"
 
-dependencies {
-  compile(
-      gradleApi()
-  )
-  testCompile(
-      "org.spockframework:spock-core:1.0-groovy-2.4",
-  )
+gradlePlugin {
+  plugins {
+    auroraPlugin {
+      id = 'no.skatteetaten.gradle.aurora'
+      implementationClass = 'no.skatteetaten.aurora.gradle.plugins.AuroraPlugin'
+    }
+  }
 }
 
-install.dependsOn << build
+pluginBundle {
+  website = 'https://github.com/Skatteetaten/aurora-gradle-plugin'
+  vcsUrl = 'https://github.com/Skatteetaten/aurora-gradle-plugin'
+  description = 'Gradle plugin to apply Skatteetaten specific settings to java projects'
+  tags = ['skatteetaten', 'corporate']
 
-task javadocJar(type: Jar) {
-  classifier = 'javadoc'
-  from javadoc
-}
-
-task sourcesJar(type: Jar) {
-  classifier = 'sources'
-  from sourceSets.main.allSource
-}
-
-artifacts {
-  archives javadocJar, sourcesJar
-}
-
-signing {
-  useGpgCmd() //I need this on mac but not on linux i think.
-  required { gradle.taskGraph.hasTask("uploadArchives") }
-  sign configurations.archives
-}
-
-
-if (ext.has("ossrhUsername") && ext.has("ossrhPassword")) {
-  uploadArchives {
-    repositories {
-      mavenDeployer {
-        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-          authentication(userName: ossrhUsername, password: ossrhPassword)
-        }
-
-        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-          authentication(userName: ossrhUsername, password: ossrhPassword)
-        }
-
-        pom.project {
-          name 'Aurora Gradle Plugin'
-          packaging 'jar'
-          description 'A plugin that will apply a sensible base line for JVM applications developed by the Norwegian Tax Authority'
-          url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
-
-          scm {
-            connection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
-            developerConnection 'scm:git:https://github.com/Skatteetaten/aurora-gradle-plugin.git'
-            url 'https://github.com/Skatteetaten/aurora-gradle-plugin'
-          }
-
-          licenses {
-            license {
-              name 'The Apache License, Version 2.0'
-              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            }
-          }
-
-          developers {
-            developer {
-              id 'bjartek'
-              name 'Bjarte S. Karlsen'
-              email 'Bjarte.Karlsen@Skatteetaten.no'
-            }
-          }
-        }
-      }
+  plugins {
+    auroraPlugin {
+      displayName = 'Skatteetaten Aurora Gradle plugin'
     }
   }
 }

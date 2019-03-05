@@ -133,7 +133,6 @@ class JavaApplicationTools {
       test {
         useJUnitPlatform()
       }
-      compileTestGroovy.enabled = false
     }
   }
 

@@ -22,7 +22,6 @@ class MavenTools {
       if (!stagingProfileId) {
         throw new IllegalArgumentException("Required stagingProfileId property not set")
       }
-      NexusStagingTools.addNexusStagingTasks(project, stagingProfileId)
     }
     project.with {
 

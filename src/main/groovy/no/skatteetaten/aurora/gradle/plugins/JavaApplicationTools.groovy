@@ -25,7 +25,7 @@ class JavaApplicationTools {
           config.objenesisVersion)
     }
 
-    project.plugins.withId("org.asciidoctor.convert'") {
+    project.plugins.withId("org.asciidoctor.convert") {
       applyAsciiDocPlugin(project)
     }
 

@@ -68,7 +68,7 @@ An complete example `build.gradle.kts` file can look like this
         id("com.gorylenko.gradle-git-properties") version "2.0.0"
         id("org.sonarqube") version "2.7"
         id("org.asciidoctor.convert") version "1.6.0"
-        id("no.skatteetaten.gradle.aurora"k version "1.0.0"
+        id("no.skatteetaten.gradle.aurora") version "1.0.0"
     }
     
     dependencies {
@@ -90,6 +90,15 @@ An complete example `build.gradle.kts` file can look like this
 
 ## Features
 
+The following plugins will be reacted upon by this Aurora Plugin
+ - spring-cloud-contract
+ - info.solidsoft.pitest
+ - org.asciidoctor.convert
+ - com.github.ben-manves.versions
+ - org.springframework.boot
+ - org.jetbrains.kotlin.jvm
+ - org.jetbrains.kotlin.plugin.spring
+ 
 ### Default Plugins and Nexus Configuration
 
 Since this plugin is intended for use by JVM based applications, and since the NTA heavily relies on Nexus for artifact

@@ -28,6 +28,16 @@ class JavaApplicationTools {
       applyAsciiDocPlugin(project)
     }
 
+    project.plugins.withId("com.github.ben-manes.versions") {
+      project.with {
+        dependencyUpdates.revision = "release"
+        dependencyUpdates.checkForGradleUpdate = true
+        dependencyUpdates.outputFormatter = "json"
+        dependencyUpdates.outputDir = "build/dependencyUpdates"
+        dependencyUpdates.reportfileName = "report"
+      }
+    }
+
     if (config.applyDeliveryBundleConfig == true) {
       applyDeliveryBundleConfig(project)
     }
@@ -70,7 +80,7 @@ class JavaApplicationTools {
         if (junit5) {
           testFramework = "JUNIT5"
         } else {
-          testFramework ="SPOCK"
+          testFramework = "SPOCK"
         }
       }
     }

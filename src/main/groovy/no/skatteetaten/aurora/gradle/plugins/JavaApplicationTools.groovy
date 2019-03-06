@@ -1,6 +1,7 @@
 package no.skatteetaten.aurora.gradle.plugins
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ComponentSelection
 
 import groovy.transform.Canonical
 
@@ -35,6 +36,18 @@ class JavaApplicationTools {
         dependencyUpdates.outputFormatter = "json"
         dependencyUpdates.outputDir = "build/dependencyUpdates"
         dependencyUpdates.reportfileName = "report"
+        dependencyUpdates.resolutionStrategy {
+          componentSelection { rules ->
+            rules.all { ComponentSelection selection ->
+              boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+              }
+              if (rejected) {
+                selection.reject('Release candidate')
+              }
+            }
+          }
+        }
       }
     }
 

@@ -26,19 +26,20 @@ Put the following snippet in your `~/.gradle/init.gradle` file
          repositories repos
         }
     }
-    
-Put the following snippet in your `build.gradle` file
-
-    buildscript {
-      dependencies {
-        classpath(
-            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.1.0'
-        )
+    settingsEvaluated { settings ->
+      settings.pluginManagement {
+        repositories {
+          maven {
+            url 'http://aurora/nexus/content/repositories/gradle-plugins/'
+          }
+          gradlePluginPortal()
+          maven { url "http://aurora/nexus/content/groups/public" }
+        }
       }
     }
     
-    apply plugin: 'no.skatteetaten.plugins.aurora'
- 
+If you are not developing inhourse remove the maven repositores that start with aurora/nexus.
+
 Make sure that `settings.gradle` contains
     
     rootProject.name = artifactId
@@ -55,6 +56,37 @@ If you want to configure this plugin you can do so in the `gradle.properties` fi
     aurora.applyCheckstylePlugin=false 
 
 For a complete reference of options look at the bottom of this file.
+
+An complete example `build.gradle.kts` file can look like this
+
+    plugins {
+        id("org.jetbrains.kotlin.jvm") version "1.3.21"
+        id("org.jetbrains.kotlin.plugin.spring") version "1.3.21"
+        id("org.springframework.boot") version "2.1.3.RELEASE"
+        id("org.jlleitschuh.gradle.ktlint") version "6.3.1"
+        id("com.github.ben-manes.versions") version "0.20.0"
+        id("com.gorylenko.gradle-git-properties") version "2.0.0"
+        id("org.sonarqube") version "2.7"
+        id("org.asciidoctor.convert") version "1.6.0"
+        id("no.skatteetaten.gradle.aurora"k version "1.0.0"
+    }
+    
+    dependencies {
+        implementation("io.fabric8:openshift-client:4.1.2")
+        implementation("org.springframework.boot:spring-boot-starter-security")
+        implementation("org.springframework.boot:spring-boot-starter-web")
+    
+        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+        testImplementation("org.springframework.security:spring-security-test")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("io.fabric8:openshift-server-mock:4.1.2")
+        testImplementation("io.mockk:mockk:1.8.9")
+        testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.13")
+        testImplementation("com.fkorotkov:kubernetes-dsl:2.0.1")
+        testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
+        testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")
+    }
+    
 
 ## Features
 

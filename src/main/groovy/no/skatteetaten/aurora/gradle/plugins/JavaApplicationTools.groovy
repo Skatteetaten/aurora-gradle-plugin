@@ -102,7 +102,7 @@ class JavaApplicationTools {
   void applyKotlinSpringSupport(Project project) {
     project.with {
       dependencies {
-        compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+        implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
       }
     }
   }
@@ -113,7 +113,7 @@ class JavaApplicationTools {
 
       dependencies {
 
-        compile(
+        implementation(
             'org.jetbrains.kotlin:kotlin-reflect',
             'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
             "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
@@ -146,7 +146,7 @@ class JavaApplicationTools {
         [
             'org.junit.jupiter:junit-jupiter-api',
             "org.junit.jupiter:junit-jupiter-params",
-        ].each { testCompile(it) { exclude group: 'junit' } }
+        ].each { testImplementation(it) { exclude group: 'junit' } }
 
         testImplementation(
             "org.junit.jupiter:junit-jupiter-api",
@@ -180,7 +180,7 @@ class JavaApplicationTools {
         buildInfo()
       }
       dependencies {
-        compile(
+        implementation(
             'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
             "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
         )

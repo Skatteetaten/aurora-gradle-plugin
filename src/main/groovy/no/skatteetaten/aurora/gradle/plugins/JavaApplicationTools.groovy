@@ -59,12 +59,6 @@ class JavaApplicationTools {
       applySpring(project, config.auroraSpringBootStarterVersion)
     }
 
-    /*
-    project.plugins.withId("spring-cloud-contract") {
-      applySpringCloudContract(project, config.applyJunit5Support, config.springCloudContractVersion)
-    }
-    */
-
     if (config.applyJunit5Support == true) {
       applyJunit5(project)
     }

@@ -1,6 +1,7 @@
 package no.skatteetaten.aurora.gradle.plugins
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ComponentSelection
 
 import groovy.transform.Canonical
 
@@ -11,23 +12,176 @@ class JavaApplicationTools {
 
   void applyJavaApplicationConfig(Map<String, Object> config) {
 
-    if (config.applyDefaultPlugins) {
+    if (config.applyDefaultPlugins == true) {
       applyDefaultPlugins(project)
     }
 
-    if (config.applyJavaDefaults) {
-      applyJavaDefaults(project)
+    if (config.applyJavaDefaults == true) {
+      applyJavaDefaults(project, config.javaSourceCompatibility)
     }
-    if (config.applySpockSupport) {
-      applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion, config.objenesisVersion)
+
+    if (config.applySpockSupport == true) {
+      applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion,
+          config.objenesisVersion)
     }
-    if (config.applyAsciiDocPlugin) {
+
+    project.plugins.withId("org.asciidoctor.convert") {
       applyAsciiDocPlugin(project)
     }
 
-    if (config.applyDeliveryBundleConfig) {
+    project.plugins.withId("com.github.ben-manes.versions") {
+      project.with {
+        dependencyUpdates.revision = "release"
+        dependencyUpdates.checkForGradleUpdate = true
+        dependencyUpdates.outputFormatter = "json"
+        dependencyUpdates.outputDir = "build/dependencyUpdates"
+        dependencyUpdates.reportfileName = "report"
+        dependencyUpdates.resolutionStrategy {
+          componentSelection { rules ->
+            rules.all { ComponentSelection selection ->
+              boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+              }
+              if (rejected) {
+                selection.reject('Release candidate')
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (config.applyDeliveryBundleConfig == true) {
       applyDeliveryBundleConfig(project)
     }
+
+    project.plugins.withId("org.springframework.boot") {
+      applySpring(project, config.auroraSpringBootStarterVersion)
+    }
+
+    if (config.applyJunit5Support == true) {
+      applyJunit5(project)
+    }
+
+    project.plugins.withId("org.jetbrains.kotlin.jvm") {
+      applyKotlinSupport(project, config.kotlinLoggingVersion)
+    }
+
+    project.plugins.withId("org.jetbrains.kotlin.plugin.spring") {
+      applyKotlinSpringSupport(project)
+    }
+
+  }
+
+  def applySpringCloudContract(Project project, Boolean junit5, String springCloudContractVersion) {
+    project.with {
+
+      dependencyManagement {
+        imports {
+          mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:$springCloudContractVersion"
+        }
+      }
+      contracts {
+        packageWithBaseClasses = "${groupId}.${artifactId}.contracts"
+
+        if (junit5) {
+          testFramework = "JUNIT5"
+        } else {
+          testFramework = "SPOCK"
+        }
+      }
+    }
+  }
+
+  void applyKotlinSpringSupport(Project project) {
+    project.with {
+      dependencies {
+        implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
+      }
+    }
+  }
+
+  void applyKotlinSupport(Project project, String kotlinLoggingVersion) {
+
+    project.with {
+
+      dependencies {
+
+        implementation(
+            'org.jetbrains.kotlin:kotlin-reflect',
+            'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+            "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
+        )
+
+        compileKotlin {
+          kotlinOptions {
+            suppressWarnings = true
+            jvmTarget = 1.8
+            freeCompilerArgs = ["-Xjsr305=strict"]
+          }
+        }
+
+        compileTestKotlin {
+          kotlinOptions {
+            suppressWarnings = true
+            jvmTarget = 1.8
+            freeCompilerArgs = ["-Xjsr305=strict"]
+          }
+        }
+      }
+
+    }
+  }
+
+  void applyJunit5(Project project) {
+    project.with {
+
+      dependencies {
+        [
+            'org.junit.jupiter:junit-jupiter-api',
+            "org.junit.jupiter:junit-jupiter-params",
+        ].each { testImplementation(it) { exclude group: 'junit' } }
+
+        testImplementation(
+            "org.junit.jupiter:junit-jupiter-api",
+        )
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+      }
+      test {
+        useJUnitPlatform()
+      }
+    }
+  }
+
+  void applySpring(Project project, String starterVersion) {
+
+    project.with {
+
+      apply plugin: 'io.spring.dependency-management'
+
+      [jar, distZip]*.enabled = true
+      [bootJar, distTar, bootDistTar, bootDistZip]*.enabled = false
+
+      configurations.archives.artifacts.removeIf {
+        if (it.hasProperty("archiveTask")) {
+          !it.archiveTask.enabled
+        } else {
+          !it.delegate.archiveTask.enabled
+        }
+      }
+
+      springBoot {
+        buildInfo()
+      }
+      dependencies {
+        implementation(
+            'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
+            "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
+        )
+      }
+
+    }
+
   }
 
   void applyDefaultPlugins(Project project) {
@@ -35,12 +189,24 @@ class JavaApplicationTools {
     project.with {
       apply plugin: 'java'
       apply plugin: 'maven'
+
     }
   }
 
-  void applyJavaDefaults(Project project) {
+  void applyJavaDefaults(Project project, String compability) {
 
-    project.sourceCompatibility = '1.8'
+    project.with {
+
+      sourceCompatibility = compability
+      if (ext.has("version")) {
+        version = version
+      }
+      if (ext.has("groupId")) {
+        group = groupId
+      }
+
+    }
+
   }
 
   void applySpockSupport(Project project, String groovyVersion, String spockVersion, String cglibVersion,
@@ -73,9 +239,7 @@ class JavaApplicationTools {
   void applyAsciiDocPlugin(Project project) {
 
     project.with {
-      apply plugin: 'org.asciidoctor.convert'
-
-      ext.snippetsDir = file("$buildDir/docs/generated-snippets")
+      ext.snippetsDir = file("$buildDir/generated-snippets")
 
       asciidoctor {
         attributes([
@@ -96,4 +260,5 @@ class JavaApplicationTools {
       }
     }
   }
+
 }

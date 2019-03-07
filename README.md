@@ -4,7 +4,7 @@ The Aurora Gradle Plugin is a plugin that will apply a sensible base line for JV
 Tax Authority. The base line will make sure that the application will comply with most of the requirements set forth by
 the Aurora team for applications that are to be deployed to the [Aurora OpenShift Platform](https://skatteetaten.github.io/aurora-openshift/).
 
-When applying the plugin to a project it will modify the build by adding plugins and configuration based on the current
+When applying the plugin to a project it will modify the build by reacting to added plugins to make sure they are according to the
 established standard, but it is possible to opt out of every change the plugin makes with a high degree of granularity.
 So, although the Aurora team encourages every project to be build in pretty much the same way, and to some extent 
 requires that static analysis is performed on the source code, it is possible to skip individual steps if the need
@@ -14,119 +14,115 @@ To get an overview of how applying the Aurora plugin will affect your project, s
 
 ## Getting Started
 
-Put the following snippet in your `build.gradle` file
+Put the following snippet in your `~/.gradle/init.gradle` file
 
-    buildscript {
-      repositories {
-        maven {
-          url "${nexusUrl}/content/groups/public"
+    allprojects {
+        ext.repos= {
+            maven { url "http://aurora/nexus/content/groups/public" }
+            mavenCentral()
+        }
+        repositories repos
+        buildscript {
+         repositories repos
+        }
+    }
+    settingsEvaluated { settings ->
+      settings.pluginManagement {
+        repositories {
+          maven {
+            url 'http://aurora/nexus/content/repositories/gradle-plugins/'
+          }
+          gradlePluginPortal()
+          maven { url "http://aurora/nexus/content/groups/public" }
         }
       }
-    
-      dependencies {
-        classpath(
-            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.1.0'
-        )
-      }
     }
     
-    apply plugin: 'no.skatteetaten.plugins.aurora'
+If you are not developing inhourse remove the maven repositores that start with aurora/nexus.
 
-If you are developing and entirely open source module that does not have any internal dependencies you can use the
-following configuration;
-
-    buildscript {
-      repositories {
-        mavenCentral()
-        jcenter()
-      }
+Make sure that `settings.gradle` contains
     
-      dependencies {
-        classpath(
-            'no.skatteetaten.aurora.gradle.plugins:aurora-gradle-plugin:1.1.0'
-        )
-      }
+    rootProject.name = artifactId
+    
+Put the following snippet in your `gradle.properties` file
+
+    version=local-SNAPSHOT
+    groupId=no.skatteetaten.<you>.<groupId>
+    artifactId= <your name>    
+   
+
+If you want to configure this plugin you can do so in the `gradle.properties` file 
+
+    aurora.applyCheckstylePlugin=false 
+
+For a complete reference of options look at the bottom of this file.
+
+An complete example `build.gradle.kts` file can look like this
+
+    plugins {
+        id("org.jetbrains.kotlin.jvm") version "1.3.21"
+        id("org.jetbrains.kotlin.plugin.spring") version "1.3.21"
+        id("org.springframework.boot") version "2.1.3.RELEASE"
+        id("org.jlleitschuh.gradle.ktlint") version "6.3.1"
+        id("com.github.ben-manes.versions") version "0.20.0"
+        id("com.gorylenko.gradle-git-properties") version "2.0.0"
+        id("org.sonarqube") version "2.7"
+        id("org.asciidoctor.convert") version "1.6.0"
+        id("no.skatteetaten.gradle.aurora") version "1.0.0"
     }
     
-    apply plugin: 'no.skatteetaten.plugins.aurora'
-
-You can configure the behaviour of the plugin by setting the ```aurora``` property before applying the plugin;
-
-    ...
+    dependencies {
+        implementation("io.fabric8:openshift-client:4.1.2")
+        implementation("org.springframework.boot:spring-boot-starter-security")
+        implementation("org.springframework.boot:spring-boot-starter-web")
     
-    ext.aurora = [
-      // Configuration goes here
-    ]
+        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+        testImplementation("org.springframework.security:spring-security-test")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("io.fabric8:openshift-server-mock:4.1.2")
+        testImplementation("io.mockk:mockk:1.8.9")
+        testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.13")
+        testImplementation("com.fkorotkov:kubernetes-dsl:2.0.1")
+        testImplementation("com.nhaarman:mockito-kotlin:1.6.0")
+        testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")
+    }
     
-    apply plugin: 'no.skatteetaten.plugins.aurora'
-
 
 ## Features
 
+The following plugins will be reacted upon by this Aurora Plugin
+ - spring-cloud-contract
+ - info.solidsoft.pitest
+ - org.asciidoctor.convert
+ - com.github.ben-manves.versions
+ - org.springframework.boot
+ - org.jetbrains.kotlin.jvm
+ - org.jetbrains.kotlin.plugin.spring
+ 
 ### Default Plugins and Nexus Configuration
 
 Since this plugin is intended for use by JVM based applications, and since the NTA heavily relies on Nexus for artifact
 dependency management and artifact distribution, both the java and maven plugin will be applied automatically. The
-```sourceCompatibility``` will be set to 1.8 by default.
+```sourceCompatibility``` will be set to 1.8 by default. This can be changed with setting the 
+`aurora.javaSourceCompatibility` property. 
 
-    apply plugin: 'java'
-    apply plugin: 'maven'
-    
-Also, if you have set the ```nexusUrl``` property in your ```~/gradle/.gradle.properties```-file the plugin will register
-project and buildscript repositories for that Nexus instance;
-
-    allprojects {
-      buildscript {
-        repositories {
-          maven {
-            url "${nexusUrl}/content/groups/public"
-          }
-        }
-      }
-      repositories {
-        maven {
-          url "${nexusUrl}/content/groups/public"
-        }
-      }
-    }
-
-and register a Maven deployer;
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots") {
-                    authentication(userName: nexusUsername, password: nexusPassword)
-                }
-                repository(url: "${nexusUrl}/content/repositories/releases") {
-                    authentication(userName: nexusUsername, password: nexusPassword)
-                }
-            }
-        }
-    }
+Also, if you have set the ```nexusUrl``` property in your ```~/gradle/.gradle.properties```-file the plugin will register a Maven deployer for both snapshots and releases
 
 The Maven deployer that is registered will first check if the artifact being deployed already exists before attempting
 to upload to Nexus. This will prevent a failing build if you rerun a build for an existing artifact.
 
 These features can be opted out of with the following config;
 
-    ext.aurora = [
-      applyNexusRepositories: false,
-      applyDefaultPlugins: false,
-      applyMavenDeployer: false,
-      applyJavaDefaults: false
-    ]
-
+    aurora.applyNexusRepositories=false
+    aurora.applyMavenDeployer=false
+    aurora.applyDefaultPlugins=false
+    aurora.applyJavaDefaults=false
 
 ### Delivery Bundle
  
 The project will be set up to build the application into a format compatible with the Delivery Bundle (Leveransepakke)
 format by applying the following configuration;
 
-    apply plugin: 'application'
-  
-    distZip.classifier = 'Leveransepakke'
-    
 This will make sure that the application will be packaged in a zip file with all its dependencies and that this zip
 file will get the classifier Leveransepakke. Note that the default is to not generate a start script as this script,
 by default, will be generated when a Docker image is produced for the Delivery Bundle. If you require a custom script
@@ -134,102 +130,34 @@ you will need to provide it itself, or configure the application plugin to gener
 
 You can disable this with;
 
-    ext.aurora = [
-      applyDeliveryBundleConfig: false
-    ]
-
+    aurora.applyDeliveryBundleConfig: false
   
 ### Configuration of defaultTasks
 
 defaultTasks will be set to `clean install` if this property has not already been set.
 
 
-### Versioning from Git status
+### Testing with Junit5
 
-The plugin will automatically set the ```version``` property based on information collected from Git. The rules used
-for determining the version is described in the [aurora-git-version](https://github.com/Skatteetaten/aurora-git-version)
-module.
+Testing with Junit5 is enabled by default, in order to turn off this feature specify
 
-If you have another prefix as convention for tags indicating a version, for instance ```version/``` than the
-default ```v``` you can specify that using the versionPrefix config;
-
-    ext.aurora = [
-      versionPrefix: 'version/'
-    ]
-
-The prefix will always be removed from the name before determining the version.
-
-
-### Nexus Staging
-
-In the NTA it is mandatory for all released artifacts to go through a staging repository in Nexus before being released
-to allow Nexus to run Nexus IQ tests. The necessary tasks for deploying to Nexus will applied by the plugin, and all
-you need to do to use it them to supply the ```stagingProfileId``` configuration. You can also skip staging entirely
-and deploy releases directly by setting the ```requireStaging``` configuration (but have a good reason for doing so).
-
-    ext.aurora = [
-      stagingProfileId: 'b62cca8083fa8',
-      requireStaging: false
-    ]
-
-The plugin will also create a ```deploy``` task that will trigger the correct release behaviour based on the configuration
-and the version of the artifact being released; SNAPSHOT-releases does not require staging.
-
-    ./gradlew clean deploy
-  
-
+    aurora.junit5Support=false
+    
 ### Spock for Testing
 
-By default, the Aurora Plugin will activate support for the [Spock Framework](http://spockframework.org/);
+The plugin supports the [Spock Framework](http://spockframework.org/) can be turned on and configured with the following 
+parameters:
 
-    apply plugin: 'groovy'
-
-    dependencies {
-      testCompile(
-        "org.codehaus.groovy:groovy-all:${groovyVersion}",
-        "org.spockframework:spock-core:${spockVersion}",
-        "cglib:cglib-nodep:${cglibVersion}",
-        "org.objenesis:objenesis:${objenesisVersion}",
-      )
-    }
-
-Support for this can be disabled or configured with
-
-    ext.aurora = [
-      applySpockSupport: false,
-      groovyVersion    : '2.4.4',
-      spockVersion     : '1.1-groovy-2.4-rc-3',
-      cglibVersion     : '3.1',
-      objenesisVersion : '2.1'
-    ]
+    aurora.applySpockSupport=true
+    aurora.groovyVersion    = '2.5.4',
+    aurora.spockVersion     = '1.2-groovy-2.5'
+    aurora.cglibVersion     = '3.1'
+    aurora.objenesisVersion = '2.1'
 
 
 ### Asciidoc for Documentation
 
-By default, the Aurora Plugin will activate support for [Asciidoc](http://www.methods.co.nz/asciidoc/) for documentation
-by applying the following configuration;
-
-    apply plugin: 'org.asciidoctor.convert'
-
-    ext.snippetsDir = file("$buildDir/docs/generated-snippets")
-
-    asciidoctor {
-      attributes([
-        snippets: snippetsDir,
-        version : version
-      ])
-      inputs.dir snippetsDir
-      outputDir "$buildDir/asciidoc"
-      dependsOn test
-      sourceDir 'src/main/asciidoc'
-    }
-
-    jar {
-      dependsOn asciidoctor
-      from("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
-      }
-    }
+The Aurora plugin will react to the Asciidoc plugin
 
 The jar task is modified to include the generated documentation into static/docs and also registers an attribute
 snippetsDir for integration with [Spring Rest Docs](https://projects.spring.io/spring-restdocs/).
@@ -244,11 +172,9 @@ to some extent be changed or disabled by configuration.
 Checkstyle will be activated and configured to use the standard [Aurora Checkstyle configuration](https://github.com/Skatteetaten/checkstyle-config).
 Errors from Checkstyle will by default not fail the build. The plugin can be configured with the following options;
 
-    ext.aurora = [
-      applyCheckstylePlugin  : true, // Should the Checkstyle plugin be activated
-      checkstyleConfigVersion: "0.6", // The version of the Aurora Checkstyle config. Default 0.6.
-      checkstyleConfigFile   : 'checkstyle/checkstyle-with-metrics.xml' // The Aurora Checkstyle config file to use.
-    ]
+    aurora.applyCheckstylePlugin  : true, // Should the Checkstyle plugin be activated
+    aurora.checkstyleConfigVersion: "2.1.6", // The version of the Aurora Checkstyle config. Default 2.1.6.
+    aurora.checkstyleConfigFile   : 'checkstyle/checkstyle-with-metrics.xml' // The Aurora Checkstyle config file to use.
 
 Other Checkstyle-parameters can be configured according to the [Checkstyle Plugin User Guide](https://docs.gradle.org/current/userguide/checkstyle_plugin.html)).
 I.e.
@@ -263,51 +189,60 @@ I.e.
 By default the [jacoco plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html) will be activated. It can
 be disabled with;
 
-    ext.aurora = [
-      applyJacocoTestReport: false
-    ]
+    aurora.applyJacocoTestReport=false
     
 **PiTest**
 
-By default the [pitest plugin](http://gradle-pitest-plugin.solidsoft.info/) will be activated. Can be disabled with; 
-
-    ext.aurora = [
-      applyPiTestReport: false
-    ]
-
-**SonarQube**
-
-By default the [SonarQube plugin](https://plugins.gradle.org/plugin/org.sonarqube) will be activated. Can be disabled with; 
-
-    ext.aurora = [
-      applySonarPlugin: false
-    ]
+If the [pitest plugin](http://gradle-pitest-plugin.solidsoft.info/) is applied it will produce reports in  both HTML and XML
     
+### Spring 
+
+The plugin will react to Spring plugin and modify it to produce DeliveryBundles the way we want it it. It will also add
+the auroraSpringBootStarter as a dependency using the version specified in `aurora.auroraSpringBootStarterVersion`. 
+Support for JSR310 to get dateTimes properly is also added
+
+### Kotlin
+The Aurora plugin will react to kotlin plugin and add dependencies on kotlin-reflect, stdlib-jdk8 and add 
+kotlinLogging (wrapper for Logback) with the version of `aurora.kotlinLoggingVersion`. Kotln will be configured to target
+java8, add `Xjsr305=strict` and supress warnings
+
+### Kotlin and Spring
+The Aurora plugin will react to spring.kotlin plugin and the jackson kotlin module
+
+### Spring Cloud Contract
+The Aurora plugin will react to spring cloud contract plugin and add dependencies from the bom as well as configure the 
+correct packe with base class and test framework.
+
+### Versions plugin from ben-manes
+This plugin is configured to ignore snapshots, releases, miletones aso. The report will be generated in json.
     
 ### Config Overview
 
 All configuration options and their default values are listed below;
 
-    ext.aurora = [
-       applyDefaultPlugins       : true,
-       applyJavaDefaults         : true,
-       applyDeliveryBundleConfig : true,
-       applySpockSupport         : true,
-       groovyVersion             : '2.4.4',
-       spockVersion              : '1.1-groovy-2.4-rc-3',
-       cglibVersion              : '3.1',
-       objenesisVersion          : '2.1',
-       applyAsciiDocPlugin       : true,
-       applyCheckstylePlugin     : true,
-       applyJacocoTestReport     : true,
-       applyPiTestSupport        : true,
-       applySonarPlugin          : true,
-       setProjectVersionFromGit  : true,
-       enforceTagOnMaster        : true,
-       versionPrefix             : 'v',
-       fallbackToTimestampVersion: true,
-       applyNexusRepositories    : true,
-       applyMavenDeployer        : true,
-       checkstyleConfigVersion   : "0.6",
-       checkstyleConfigFile      : 'checkstyle/checkstyle-with-metrics.xml'
-    ]
+    aurora.applyDefaultPlugins           = true,
+    aurora.applyJavaDefaults             = true,
+    aurora.javaSourceCompatibility       = "1.8",
+    aurora.applyDeliveryBundleConfig     = true,
+    
+    aurora.applySpockSupport             = false,
+    aurora.groovyVersion                 = '2.5.4',
+    aurora.spockVersion                  = '1.2-groovy-2.5',
+    aurora.cglibVersion                  = '3.1',
+    aurora.objenesisVersion              = '2.1',
+    
+    aurora.applyCheckstylePlugin         = true,
+    aurora.checkstyleConfigVersion       = "2.1.6",
+    aurora.checkstyleConfigFile          = 'checkstyle/checkstyle-with-metrics.xml',
+    
+    aurora.applyJacocoTestReport         = true,
+    aurora.applyMavenDeployer            = true,
+    
+    aurora.requireStaging                = false,
+    aurora.stagingProfileId              = null,
+    
+    aurora.springCloudContractVersion    : "2.1.0.RELEASE",
+    aurora.auroraSpringBootStarterVersion= "2.0.0",
+    aurora.kotlinLoggingVersion          = "1.6.24",
+    aurora.applyJunit5Support            = true
+    

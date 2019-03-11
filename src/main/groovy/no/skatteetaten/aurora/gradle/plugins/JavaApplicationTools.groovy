@@ -94,6 +94,7 @@ class JavaApplicationTools {
       dependencies {
         testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier")
         testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
+        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
       }
 
       tasks.create("stubsJar", Jar) {

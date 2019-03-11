@@ -2,6 +2,7 @@ package no.skatteetaten.aurora.gradle.plugins
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ComponentSelection
+import org.gradle.jvm.tasks.Jar
 
 import groovy.transform.Canonical
 
@@ -90,6 +91,27 @@ class JavaApplicationTools {
           testFramework = "SPOCK"
         }
       }
+      dependencies {
+        testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier")
+        testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
+      }
+
+      task stubsJar(type: Jar) {
+        classifier = "stubs"
+        into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
+          include("**/*.*")
+          from("${project.buildDir}/generated-snippets/stubs")
+        }
+      }
+      // we need the tests to pass to build the stub jar
+      stubsJar.dependsOn(test)
+// we want to disable the default Spring Cloud Contract stub jar generation
+      verifierStubsJar.enabled = false
+
+      artifacts {
+        archives stubsJar
+      }
+
     }
   }
 

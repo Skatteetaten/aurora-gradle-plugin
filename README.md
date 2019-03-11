@@ -211,7 +211,9 @@ The Aurora plugin will react to spring.kotlin plugin and the jackson kotlin modu
 
 ### Spring Cloud Contract
 The Aurora plugin will react to spring cloud contract plugin and add dependencies from the bom as well as configure the 
-correct packe with base class and test framework.
+correct packet with base class and test framework.
+
+It will also create a proper stubs jar file with the contracts in the. The dependencies added are wiremock and verifyer
 
 ### Versions plugin from ben-manes
 This plugin is configured to ignore snapshots, releases, miletones aso. The report will be generated in json.

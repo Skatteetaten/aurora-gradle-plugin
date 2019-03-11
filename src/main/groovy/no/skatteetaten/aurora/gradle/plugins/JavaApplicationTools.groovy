@@ -96,15 +96,15 @@ class JavaApplicationTools {
         testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
       }
 
-      task stubsJar(type: Jar) {
-        classifier = "stubs"
+      tasks.create("stubsJar", Jar) {
+        dependsOn("test")
+        archiveClassifier.set("stubs")
         into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
           include("**/*.*")
           from("${project.buildDir}/generated-snippets/stubs")
         }
       }
-      // we need the tests to pass to build the stub jar
-      stubsJar.dependsOn(test)
+
 // we want to disable the default Spring Cloud Contract stub jar generation
       verifierStubsJar.enabled = false
 

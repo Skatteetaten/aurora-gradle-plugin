@@ -13,7 +13,7 @@ class MavenTools {
     this.project = p
   }
 
-  void addMavenDeployer(boolean requireStaging = true, String stagingProfileId = null) {
+  AuroraReport addMavenDeployer(boolean requireStaging = true, String stagingProfileId = null) {
 
     if (!(project.ext.has("nexusUsername") && project.ext.has("nexusPassword") && project.ext.has("nexusUrl"))) {
       return
@@ -50,6 +50,8 @@ class MavenTools {
         mustRunAfter 'clean'
       }
     }
+    return new AuroraReport(name :"aurora.applyMavenDeployer",
+        description: "add uploadArchives task and configure from nexusUrl in .gradle.properties")
   }
 
   void setDefaultTasks() {

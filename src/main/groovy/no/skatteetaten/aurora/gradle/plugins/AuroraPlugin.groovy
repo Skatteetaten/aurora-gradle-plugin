@@ -34,32 +34,105 @@ class AuroraPlugin implements Plugin<Project> {
   void apply(Project p) {
     Map<String, Object> config = getConfiguration(p)
 
-    onApplyPlugin(p, config)
+    List<AuroraReport> reports = []
+    def mavenTools = new MavenTools(p)
+    def tools = new CodeAnalysisTools(p)
+    def java = new JavaApplicationTools(p)
 
     p.afterEvaluate {
-      p.plugins.withId("spring-cloud-contract") {
-        new JavaApplicationTools().
-            applySpringCloudContract(p, config.applyJunit5Support, config.springCloudContractVersion)
+      log.info("After evaluate")
+
+      mavenTools.setDefaultTasks()
+
+      if (config.applyJavaDefaults.toBoolean()) {
+        reports.add(java.applyJavaDefaults(config.javaSourceCompatibility))
       }
-      // We do everything on apply
+
+      if (config.applyDefaultPlugins.toBoolean()) {
+        reports.add(java.applyDefaultPlugins())
+      }
+
+      p.plugins.withId("org.asciidoctor.convert") {
+        reports.add(java.applyAsciiDocPlugin())
+      }
+
+      p.plugins.withId("com.github.ben-manes.versions") {
+        reports.add(java.applyVersions())
+      }
+
+      if (config.applyDeliveryBundleConfig.toBoolean()) {
+        reports.add(java.applyDeliveryBundleConfig())
+      }
+
+      p.plugins.withId("org.springframework.boot") {
+        reports.add(java.applySpring(config.auroraSpringBootStarterVersion))
+      }
+
+      if (config.applyJunit5Support.toBoolean()) {
+        reports.add(java.applyJunit5())
+      }
+
+      p.plugins.withId("org.jetbrains.kotlin.jvm") {
+        reports.add(java.applyKotlinSupport(config.kotlinLoggingVersion))
+      }
+
+      p.plugins.withId("org.jetbrains.kotlin.plugin.spring") {
+        reports.add(java.applyKotlinSpringSupport())
+      }
+
+      if (config.applyCheckstylePlugin.toBoolean()) {
+        reports.add(tools.
+            applyCheckstylePlugin(config.checkstyleConfigVersion as String, config.checkstyleConfigFile as String))
+      }
+
+      if (config.applyJacocoTestReport.toBoolean()) {
+        reports.add(tools.applyJacocoTestReport())
+      }
+
+      p.plugins.withId("info.solidsoft.pitest") {
+        reports.add(tools.applyPiTestSupport())
+      }
+
+      if (config.applyMavenDeployer) {
+        log.info("Apply maven deployer")
+        reports.add(mavenTools.addMavenDeployer(config.requireStaging, config.stagingProfileId))
+      }
+
+      p.plugins.withId("spring-cloud-contract") {
+        reports.add(java.
+            applySpringCloudContract(config.applyJunit5Support, config.springCloudContractVersion))
+      }
+
+      if (config.applySpockSupport.toBoolean()) {
+        log.info("SPOCK support")
+        reports.add(java.applySpockSupport(config.groovyVersion, config.spockVersion, config.cglibVersion,
+            config.objenesisVersion))
+      }
+
+      p.with {
+
+        tasks.register("aurora") {
+          doLast {
+            printReport(reports)
+          }
+        }
+      }
+
+      log.lifecycle("Use task :aurora to get full report on how AuroraPlugin modify your gradle setup")
+
     }
   }
 
-  protected void onApplyPlugin(Project p, Map<String, Object> config) {
-
-    def mavenTools = new MavenTools(p)
-
-    new JavaApplicationTools(p).applyJavaApplicationConfig(config)
-    new CodeAnalysisTools(p).applyCodeAnalysisPlugins(config)
-
-    mavenTools.with {
-
-      setDefaultTasks()
-
-      if (config.applyMavenDeployer) {
-        addMavenDeployer(config.requireStaging, config.stagingProfileId)
-      }
+  private printReport(List<AuroraReport> reports) {
+    if (!reports.isEmpty()) {
+      def sortedReport=reports.sort { it.name}
+      log.lifecycle("----- Aurora Plugin Report -----")
+      log.lifecycle("The aurora plugin can be configured via aurora.* feature flags in .gradle.properties or reacting on applied plugins.\n")
+      log.lifecycle("Each feature can add dependencies to your build, add another plugin or modify configuration\n")
+      sortedReport.each { log.lifecycle(it.toString() + "\n") }
+      log.lifecycle("--------------------------------")
     }
+
   }
 
   private static Map<String, Object> getConfiguration(Project p) {
@@ -71,9 +144,9 @@ class AuroraPlugin implements Plugin<Project> {
     def key = p.extensions.extraProperties.getProperties()
         .findAll { it.key.startsWith(prefix) }
         .collectEntries { k, v -> [k.substring(prefix.length()), v] }
-    key.each { k, v -> log.debug("overrides -> ${k}:${v}") }
+    key.each { k, v -> log.info("overrides -> ${k}:${v}") }
     config.putAll(key ?: [:])
-    config.each { k, v -> log.debug("config -> ${k}:${v}") }
+    config.each { k, v -> log.info("config -> ${k}:${v}") }
     config
 
   }

@@ -5,76 +5,26 @@ import org.gradle.api.artifacts.ComponentSelection
 import org.gradle.jvm.tasks.Jar
 
 import groovy.transform.Canonical
+import groovy.util.logging.Slf4j
 
 @Canonical
+@Slf4j
 class JavaApplicationTools {
 
   Project project
 
-  void applyJavaApplicationConfig(Map<String, Object> config) {
+  JavaApplicationTools(Project p) {
 
-    if (config.applyDefaultPlugins == true) {
-      applyDefaultPlugins(project)
-    }
-
-    if (config.applyJavaDefaults == true) {
-      applyJavaDefaults(project, config.javaSourceCompatibility)
-    }
-
-    if (config.applySpockSupport == true) {
-      applySpockSupport(project, config.groovyVersion, config.spockVersion, config.cglibVersion,
-          config.objenesisVersion)
-    }
-
-    project.plugins.withId("org.asciidoctor.convert") {
-      applyAsciiDocPlugin(project)
-    }
-
-    project.plugins.withId("com.github.ben-manes.versions") {
-      project.with {
-        dependencyUpdates.revision = "release"
-        dependencyUpdates.checkForGradleUpdate = true
-        dependencyUpdates.outputFormatter = "json"
-        dependencyUpdates.outputDir = "build/dependencyUpdates"
-        dependencyUpdates.reportfileName = "report"
-        dependencyUpdates.resolutionStrategy {
-          componentSelection { rules ->
-            rules.all { ComponentSelection selection ->
-              boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-              }
-              if (rejected) {
-                selection.reject('Release candidate')
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (config.applyDeliveryBundleConfig == true) {
-      applyDeliveryBundleConfig(project)
-    }
-
-    project.plugins.withId("org.springframework.boot") {
-      applySpring(project, config.auroraSpringBootStarterVersion)
-    }
-
-    if (config.applyJunit5Support == true) {
-      applyJunit5(project)
-    }
-
-    project.plugins.withId("org.jetbrains.kotlin.jvm") {
-      applyKotlinSupport(project, config.kotlinLoggingVersion)
-    }
-
-    project.plugins.withId("org.jetbrains.kotlin.plugin.spring") {
-      applyKotlinSpringSupport(project)
-    }
-
+    this.project = p
   }
 
-  def applySpringCloudContract(Project project, Boolean junit5, String springCloudContractVersion) {
+  AuroraReport applySpringCloudContract(Boolean junit5, String springCloudContractVersion) {
+    log.info("Apply spring-cloud-contract support")
+    def testDependencies = [
+        "org.springframework.cloud:spring-cloud-starter-contract-verifier",
+        "org.springframework.cloud:spring-cloud-contract-wiremock",
+        "org.springframework.restdocs:spring-restdocs-mockmvc"
+    ]
     project.with {
 
       dependencyManagement {
@@ -85,16 +35,14 @@ class JavaApplicationTools {
       contracts {
         packageWithBaseClasses = "${groupId}.${artifactId}.contracts"
 
-        if (junit5) {
+        if (junit5.toBoolean()) {
           testFramework = "JUNIT5"
         } else {
           testFramework = "SPOCK"
         }
       }
       dependencies {
-        testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier")
-        testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock")
-        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+        testDependencies.each { testImplementation it }
       }
 
       tasks.create("stubsJar", Jar) {
@@ -106,7 +54,6 @@ class JavaApplicationTools {
         }
       }
 
-// we want to disable the default Spring Cloud Contract stub jar generation
       verifierStubsJar.enabled = false
 
       artifacts {
@@ -114,27 +61,49 @@ class JavaApplicationTools {
       }
 
     }
+
+    return new AuroraReport(name: "plugin spring-cloud-contract",
+        dependenciesAdded: testDependencies.collect {
+          "testImplementation $it"
+        } + "bom org.springframework.cloud:spring-cloud-contract-dependencies:$springCloudContractVersion",
+        description: "Configure stubs, testframework"
+    )
   }
 
-  void applyKotlinSpringSupport(Project project) {
+  AuroraReport applyKotlinSpringSupport() {
+    def implementationDependencies = [
+        "com.fasterxml.jackson.module:jackson-module-kotlin"
+    ]
+
+    log.info("Apply spring kotlin support")
     project.with {
       dependencies {
-        implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
+        implementationDependencies.each { implementation it }
       }
     }
+    return new AuroraReport(
+        name: "plugin org.jetbrains.kotlin.plugin.spring",
+        dependenciesAdded: implementationDependencies.collect {
+          "implementation $it"
+        })
+
   }
 
-  void applyKotlinSupport(Project project, String kotlinLoggingVersion) {
+  AuroraReport applyKotlinSupport(String kotlinLoggingVersion) {
 
+    def implementationDependencies = [
+
+        'org.jetbrains.kotlin:kotlin-reflect',
+        'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+        "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
+    ]
+
+    log.info("Apply kotlin support")
     project.with {
 
       dependencies {
 
-        implementation(
-            'org.jetbrains.kotlin:kotlin-reflect',
-            'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
-            "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
-        )
+        implementationDependencies.each { implementation it }
 
         compileKotlin {
           kotlinOptions {
@@ -154,9 +123,15 @@ class JavaApplicationTools {
       }
 
     }
+    return new AuroraReport(name: "plugin org.jetbrains.kotlin.jvm",
+        description: "jsr305 strict, jvmTarget 1.8, supress warnings",
+        dependenciesAdded: implementationDependencies.collect {
+          "implementation $it"
+        })
   }
 
-  void applyJunit5(Project project) {
+  AuroraReport applyJunit5() {
+    log.info("Apply Junit 5 support")
     project.with {
 
       dependencies {
@@ -165,19 +140,27 @@ class JavaApplicationTools {
             "org.junit.jupiter:junit-jupiter-params",
         ].each { testImplementation(it) { exclude group: 'junit' } }
 
-        testImplementation(
-            "org.junit.jupiter:junit-jupiter-api",
-        )
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
       }
       test {
         useJUnitPlatform()
       }
     }
+    return new AuroraReport(name: "aurora.applyJunit5Support", description: "use jUnitPlattform",
+        dependenciesAdded: [
+            "testImplementation org.junit.jupiter:junit-jupiter-api",
+            "testImplementation org.junit.jupiter:junit-jupiter-params",
+            "testRuntimeOnly org.junit.jupiter:junit-jupiter-engine"
+        ])
   }
 
-  void applySpring(Project project, String starterVersion) {
+  AuroraReport applySpring(String starterVersion) {
 
+    def implementationDependencies = [
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
+        "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
+    ]
+    log.info("Apply Spring support")
     project.with {
 
       apply plugin: 'io.spring.dependency-management'
@@ -197,26 +180,37 @@ class JavaApplicationTools {
         buildInfo()
       }
       dependencies {
-        implementation(
-            'com.fasterxml.jackson.datatype:jackson-datatype-jsr310',
-            "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
-        )
+
+        implementationDependencies.each { implementation it }
       }
 
     }
+    return new AuroraReport(
+        name: "plugin org.springframework.boot",
+        dependenciesAdded: implementationDependencies.collect {
+          "implementation $it"
+        },
+        description: "Build info, disable fat jar",
+        pluginsApplied: ["io.spring.dependency-management"])
 
   }
 
-  void applyDefaultPlugins(Project project) {
+  AuroraReport applyDefaultPlugins() {
 
     project.with {
       apply plugin: 'java'
       apply plugin: 'maven'
 
     }
+
+    return new AuroraReport(
+        name: "aurora.applyDefaultPlugins",
+        pluginsApplied: ["java", "maven"]
+    )
+
   }
 
-  void applyJavaDefaults(Project project, String compability) {
+  AuroraReport applyJavaDefaults(String compability) {
 
     project.with {
 
@@ -230,26 +224,56 @@ class JavaApplicationTools {
 
     }
 
+    return new AuroraReport(name: "aurora.applyJavaDefaults", description: "Set groupId, version and add sourceCompability")
   }
 
-  void applySpockSupport(Project project, String groovyVersion, String spockVersion, String cglibVersion,
+  AuroraReport applySpockSupport(String groovyVersion, String spockVersion, String cglibVersion,
       String objenesisVersion) {
-
+    def testDependencies = [
+        "org.codehaus.groovy:groovy-all:${groovyVersion}",
+        "org.spockframework:spock-core:${spockVersion}",
+        "cglib:cglib-nodep:${cglibVersion}",
+        "org.objenesis:objenesis:${objenesisVersion}",
+    ]
+    log.info("Applying spock support")
     project.with {
       apply plugin: 'groovy'
 
       dependencies {
-        testCompile(
-            "org.codehaus.groovy:groovy-all:${groovyVersion}",
-            "org.spockframework:spock-core:${spockVersion}",
-            "cglib:cglib-nodep:${cglibVersion}",
-            "org.objenesis:objenesis:${objenesisVersion}",
-        )
+        testDependencies.each { testImplementation it }
       }
     }
+    return new AuroraReport(name: "aurora.applySpockSupport", pluginsApplied: ["groovy"],
+        dependenciesAdded: testDependencies.collect { "testImplemenation $it" })
   }
 
-  void applyDeliveryBundleConfig(Project project) {
+  AuroraReport applyVersions() {
+    project.with {
+      dependencyUpdates.revision = "release"
+      dependencyUpdates.checkForGradleUpdate = true
+      dependencyUpdates.outputFormatter = "json"
+      dependencyUpdates.outputDir = "build/dependencyUpdates"
+      dependencyUpdates.reportfileName = "report"
+      dependencyUpdates.resolutionStrategy {
+        componentSelection { rules ->
+          rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
+              selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+              selection.reject('Release candidate')
+            }
+          }
+        }
+      }
+    }
+
+    new AuroraReport(
+        name: "plugin com.github.ben-manes.versions",
+        description: "only allow stable versions in upgrade")
+  }
+
+  AuroraReport applyDeliveryBundleConfig() {
 
     project.with {
       apply plugin: 'application'
@@ -257,9 +281,12 @@ class JavaApplicationTools {
       distZip.classifier = 'Leveransepakke'
       startScripts.enabled = false
     }
+
+    new AuroraReport(name: "aurora.applyDeliveryBundleConfig", pluginsApplied: ["application"],
+        description: "Configure Leveransepakke")
   }
 
-  void applyAsciiDocPlugin(Project project) {
+  void applyAsciiDocPlugin() {
 
     project.with {
       ext.snippetsDir = file("$buildDir/generated-snippets")
@@ -282,6 +309,10 @@ class JavaApplicationTools {
         }
       }
     }
+    new AuroraReport(
+        name: "plugin org.asciidoctor.convert",
+        description: "configure html5 report in static/docs")
+
   }
 
 }

@@ -3,8 +3,10 @@ package no.skatteetaten.aurora.gradle.plugins
 import org.gradle.api.Project
 
 import groovy.transform.Canonical
+import groovy.util.logging.Slf4j
 
 @Canonical
+@Slf4j
 /**
  * Helper class for applying code analysis plugins like checkstyle, jacoco, pitest and sonar with default configuration.
  */
@@ -12,21 +14,13 @@ class CodeAnalysisTools {
 
   Project project
 
-  void applyCodeAnalysisPlugins(Map<String, Object> config) {
+  CodeAnalysisTools(Project p) {
 
-    if (config.applyCheckstylePlugin == true) {
-      applyCheckstylePlugin(config.checkstyleConfigVersion as String, config.checkstyleConfigFile as String)
-    }
-    if (config.applyJacocoTestReport == true) {
-      applyJacocoTestReport()
-    }
-    project.plugins.withId("info.solidsoft.pitest") {
-      applyPiTestSupport()
-    }
-
+    this.project = p
   }
 
-  void applyJacocoTestReport() {
+  AuroraReport applyJacocoTestReport() {
+    log.info("Apply jacoco support")
     project.with {
       apply plugin: "jacoco"
 
@@ -37,15 +31,22 @@ class CodeAnalysisTools {
         }
       }
     }
+    return new AuroraReport(name: "aurora.applyJacocoTestReport",
+        pluginsApplied: ["jacoco"],
+        description: "disable xml,csv report"
+    )
   }
 
-  void applyPiTestSupport() {
+  AuroraReport applyPiTestSupport() {
+    log.info("Apply pitest support")
     project.with {
 
       pitest {
         outputFormats = ['XML', 'HTML']
       }
     }
+
+    new AuroraReport(name : "plugin info.solidsoft.pitest", description: "output format xml and html")
   }
 
   /**
@@ -57,7 +58,7 @@ class CodeAnalysisTools {
    * @param checkstyleConfigVersion
    * @param checkstyleConfigFile
    */
-  private void applyCheckstylePlugin(String checkstyleConfigVersion, String checkstyleConfigFile) {
+  AuroraReport applyCheckstylePlugin(String checkstyleConfigVersion, String checkstyleConfigFile) {
     def auroraCheckstyleConfig = project.configurations.create("auroraCheckstyleConfig")
 
     auroraCheckstyleConfig.defaultDependencies { dependencies ->
@@ -69,6 +70,8 @@ class CodeAnalysisTools {
     project.checkstyle.config = project.resources.text.fromArchiveEntry(auroraCheckstyleConfig,
         checkstyleConfigFile)
     project.checkstyle.ignoreFailures = true
-    project.checkstyle.exclude = "**/generated**"
+    return new AuroraReport(name: "aurora.applyCheckstylePlugin",
+        dependenciesAdded: ["implementation no.skatteetaten.aurora.checkstyle:checkstyle-config:$checkstyleConfigVersion"],
+        description: "with file $checkstyleConfigFile")
   }
 }

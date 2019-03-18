@@ -46,7 +46,7 @@ class CodeAnalysisTools {
       }
     }
 
-    new AuroraReport(name : "plugin info.solidsoft.pitest", description: "output format xml and html")
+    return new AuroraReport(name : "plugin info.solidsoft.pitest", description: "output format xml and html")
   }
 
   /**

@@ -18,9 +18,19 @@ class JavaApplicationTools {
     this.project = p
   }
 
+  AuroraReport applyKtLint() {
+    project.with {
+      ktlint {
+        android = false
+      }
+    }
+    return new AuroraReport(name: "plugin org.jlleitschuh.gradle.ktlint", description: "disable android")
+  }
+
   AuroraReport applySpringCloudContract(Boolean junit5, String springCloudContractVersion) {
     log.info("Apply spring-cloud-contract support")
     def testDependencies = [
+        "org.springframework.cloud:spring-cloud-starter-contract-stub-runner",
         "org.springframework.cloud:spring-cloud-starter-contract-verifier",
         "org.springframework.cloud:spring-cloud-contract-wiremock",
         "org.springframework.restdocs:spring-restdocs-mockmvc"
@@ -35,7 +45,7 @@ class JavaApplicationTools {
       contracts {
         packageWithBaseClasses = "${groupId}.${artifactId}.contracts"
 
-        if (junit5.toBoolean()) {
+        if (junit5) {
           testFramework = "JUNIT5"
         } else {
           testFramework = "SPOCK"
@@ -142,6 +152,9 @@ class JavaApplicationTools {
 
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
       }
+
+      ext["junit-jupiter.version"] = "5.4.1"
+
       test {
         useJUnitPlatform()
       }
@@ -154,12 +167,15 @@ class JavaApplicationTools {
         ])
   }
 
-  AuroraReport applySpring(String starterVersion) {
+  AuroraReport applySpring(String starterVersion, Boolean devTools) {
 
     def implementationDependencies = [
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
         "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
     ]
+    if(devTools){
+      implementationDependencies.add("org.springframework.boot:spring-boot-devtools")
+    }
     log.info("Apply Spring support")
     project.with {
 
@@ -190,7 +206,7 @@ class JavaApplicationTools {
         dependenciesAdded: implementationDependencies.collect {
           "implementation $it"
         },
-        description: "Build info, disable fat jar",
+        description: "Build info, disable fat jar. Optional devtools",
         pluginsApplied: ["io.spring.dependency-management"])
 
   }
@@ -224,7 +240,8 @@ class JavaApplicationTools {
 
     }
 
-    return new AuroraReport(name: "aurora.applyJavaDefaults", description: "Set groupId, version and add sourceCompability")
+    return new AuroraReport(name: "aurora.applyJavaDefaults",
+        description: "Set groupId, version and add sourceCompability")
   }
 
   AuroraReport applySpockSupport(String groovyVersion, String spockVersion, String cglibVersion,
@@ -268,7 +285,7 @@ class JavaApplicationTools {
       }
     }
 
-    new AuroraReport(
+    return new AuroraReport(
         name: "plugin com.github.ben-manes.versions",
         description: "only allow stable versions in upgrade")
   }
@@ -282,11 +299,11 @@ class JavaApplicationTools {
       startScripts.enabled = false
     }
 
-    new AuroraReport(name: "aurora.applyDeliveryBundleConfig", pluginsApplied: ["application"],
+    return new AuroraReport(name: "aurora.applyDeliveryBundleConfig", pluginsApplied: ["application"],
         description: "Configure Leveransepakke")
   }
 
-  void applyAsciiDocPlugin() {
+  AuroraReport applyAsciiDocPlugin() {
 
     project.with {
       ext.snippetsDir = file("$buildDir/generated-snippets")
@@ -309,7 +326,7 @@ class JavaApplicationTools {
         }
       }
     }
-    new AuroraReport(
+    return new AuroraReport(
         name: "plugin org.asciidoctor.convert",
         description: "configure html5 report in static/docs")
 

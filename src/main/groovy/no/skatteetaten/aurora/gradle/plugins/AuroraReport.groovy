@@ -2,7 +2,7 @@ package no.skatteetaten.aurora.gradle.plugins
 
 class AuroraReport {
 
-  String name
+  String name = ""
   String description = ""
   List<String> pluginsApplied = []
   List<String> dependenciesAdded = []

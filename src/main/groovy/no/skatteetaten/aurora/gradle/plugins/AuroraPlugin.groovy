@@ -28,7 +28,8 @@ class AuroraPlugin implements Plugin<Project> {
       kotlinLoggingVersion          : "1.6.25",
       checkstyleConfigVersion       : "2.1.6",
       checkstyleConfigFile          : 'checkstyle/checkstyle-with-metrics.xml',
-      applyJunit5Support            : true
+      applyJunit5Support            : true,
+      springDevTools : false
   ]
 
   void apply(Project p) {
@@ -65,7 +66,7 @@ class AuroraPlugin implements Plugin<Project> {
       }
 
       p.plugins.withId("org.springframework.boot") {
-        reports.add(java.applySpring(config.auroraSpringBootStarterVersion))
+        reports.add(java.applySpring(config.auroraSpringBootStarterVersion, config.springDevTools.toBoolean()))
       }
 
       if (config.applyJunit5Support.toBoolean()) {
@@ -100,7 +101,11 @@ class AuroraPlugin implements Plugin<Project> {
 
       p.plugins.withId("spring-cloud-contract") {
         reports.add(java.
-            applySpringCloudContract(config.applyJunit5Support, config.springCloudContractVersion))
+            applySpringCloudContract(config.applyJunit5Support.toBoolean(), config.springCloudContractVersion))
+      }
+
+      p.plugins.withId("org.jlleitschuh.gradle.ktlint"){
+        reports.add(java.applyKtLint())
       }
 
       if (config.applySpockSupport.toBoolean()) {
@@ -125,6 +130,10 @@ class AuroraPlugin implements Plugin<Project> {
 
   private printReport(List<AuroraReport> reports) {
     if (!reports.isEmpty()) {
+
+      reports.each {
+        println(it)
+      }
       def sortedReport=reports.sort { it.name}
       log.lifecycle("----- Aurora Plugin Report -----")
       log.lifecycle("The aurora plugin can be configured via aurora.* feature flags in .gradle.properties or reacting on applied plugins.\n")

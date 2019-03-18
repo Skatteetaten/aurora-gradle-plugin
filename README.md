@@ -201,6 +201,9 @@ The plugin will react to Spring plugin and modify it to produce DeliveryBundles 
 the auroraSpringBootStarter as a dependency using the version specified in `aurora.auroraSpringBootStarterVersion`. 
 Support for JSR310 to get dateTimes properly is also added
 
+If `aurora.springDevTools` is set devtools will be included in the genererated app. This instruction should be set globally
+in your `~/.gradle/gradle.properties` file and be turned of in ci server.
+
 ### Kotlin
 The Aurora plugin will react to kotlin plugin and add dependencies on kotlin-reflect, stdlib-jdk8 and add 
 kotlinLogging (wrapper for Logback) with the version of `aurora.kotlinLoggingVersion`. Kotln will be configured to target

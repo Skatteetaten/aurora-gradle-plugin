@@ -173,7 +173,7 @@ class JavaApplicationTools {
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
         "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
     ]
-    if(devTools){
+    if (devTools) {
       implementationDependencies.add("org.springframework.boot:spring-boot-devtools")
     }
     log.info("Apply Spring support")
@@ -246,15 +246,27 @@ class JavaApplicationTools {
 
   AuroraReport applySpockSupport(String groovyVersion, String spockVersion, String cglibVersion,
       String objenesisVersion) {
+
     def testDependencies = [
         "org.codehaus.groovy:groovy-all:${groovyVersion}",
         "org.spockframework:spock-core:${spockVersion}",
         "cglib:cglib-nodep:${cglibVersion}",
         "org.objenesis:objenesis:${objenesisVersion}",
     ]
+
+    project.plugins.withId("org.springframework.boot") {
+      testDependencies.add("org.spockframework:spock-spring:$spockVersion")
+    }
+
     log.info("Applying spock support")
     project.with {
       apply plugin: 'groovy'
+
+      plugins.withId("org.jetbrains.kotlin.jvm"){
+        compileTestGroovy.dependsOn compileTestKotlin
+        compileTestGroovy.classpath += files(compileTestKotlin.destinationDir)
+        testClasses.dependsOn compileTestGroovy
+      }
 
       dependencies {
         testDependencies.each { testImplementation it }

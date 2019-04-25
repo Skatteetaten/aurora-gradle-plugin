@@ -22,7 +22,7 @@ class AuroraPlugin implements Plugin<Project> {
       applyJacocoTestReport         : true,
       applyMavenDeployer            : true,
       requireStaging                : false,
-      auroraSpringBootStarterVersion: "2.2.0",
+      auroraSpringBootStarterVersion: "2.2.1",
       springCloudContractVersion    : "2.1.1.RELEASE",
       stagingProfileId              : null,
       kotlinLoggingVersion          : "1.6.26",

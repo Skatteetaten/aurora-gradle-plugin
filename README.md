@@ -18,8 +18,8 @@ Put the following snippet in your `~/.gradle/init.gradle` file
 
     allprojects {
         ext.repos= {
-            maven { url "http://aurora/nexus/content/groups/public" }
             mavenCentral()
+            jcentral()
         }
         repositories repos
         buildscript {

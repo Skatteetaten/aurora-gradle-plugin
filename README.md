@@ -19,7 +19,7 @@ Put the following snippet in your `~/.gradle/init.gradle` file
     allprojects {
         ext.repos= {
             mavenCentral()
-            jcentral()
+            jcenter()
         }
         repositories repos
         buildscript {

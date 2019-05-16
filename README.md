@@ -38,7 +38,11 @@ Put the following snippet in your `~/.gradle/init.gradle` file
       }
     }
     
-If you are not developing inhourse remove the maven repositores that start with aurora/nexus.
+If you are not developing inhouse, remove the maven repositores that start with aurora/nexus. You also have to change the distributionUrl property in gradle-wrapper.properties to a public repo in order to use the gradlew command. `../gradle/wrapper/gradle-wrapper.properties`
+
+    <...>
+    distributionUrl=https\://services.gradle.org/distributions/gradle-<version>-bin.zip
+    <...>
 
 Make sure that `settings.gradle` contains
     

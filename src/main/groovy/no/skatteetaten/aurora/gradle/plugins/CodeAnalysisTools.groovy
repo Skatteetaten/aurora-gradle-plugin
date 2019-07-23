@@ -19,21 +19,38 @@ class CodeAnalysisTools {
     this.project = p
   }
 
+  AuroraReport applySonarqubeScan() {
+    
+    log.info("Apply sonarqube support")
+    
+    project.with {
+        dependencies {
+           testImplementation "org.jetbrains.kotlin:kotlin-test:1.3.30" }
+    }
+    
+    return new AuroraReport(name:"aurora.applySonarqubeScan",
+    dependenciesAdded: ["org.jetbrains.kotlin:kotlin-test:1.3.30"],
+    description: "set property for xmlreportpaths")
+  }
+  
   AuroraReport applyJacocoTestReport() {
     log.info("Apply jacoco support")
+    
     project.with {
       apply plugin: "jacoco"
 
       jacocoTestReport {
+
         reports {
-          xml.enabled false
-          csv.enabled false
+          xml.enabled = true
+          xml.destination = file("${buildDir}/reports/jacoco/report.xml")
+          csv.enabled = false
         }
       }
     }
     return new AuroraReport(name: "aurora.applyJacocoTestReport",
         pluginsApplied: ["jacoco"],
-        description: "disable xml,csv report"
+        description: "enable xml,csv report"
     )
   }
 

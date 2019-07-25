@@ -190,7 +190,7 @@ I.e.
 
 **Sonarqube**
 
-By default Sonarqube scan is enabled. Add sonarqube as a dependency in your 'build.gradle.kts' to enable sonarqube scanning.
+By default Sonarqube scan is enabled and ads a testdependency to kotlin-test. Add sonarqube as a plugin in your project 'build.gradle.kts' to enable the sonarqube step.
 To disable;
 
     aurora.applySonarqubeScan=false

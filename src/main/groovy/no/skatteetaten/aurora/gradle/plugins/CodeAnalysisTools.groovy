@@ -19,7 +19,7 @@ class CodeAnalysisTools {
     this.project = p
   }
 
-  AuroraReport applySonarqubeScan(String kotlinTestVersion) {
+  AuroraReport l(String kotlinTestVersion) {
 
     def testDependencies = [
         "org.jetbrains.kotlin:kotlin-test:${kotlinTestVersion}"

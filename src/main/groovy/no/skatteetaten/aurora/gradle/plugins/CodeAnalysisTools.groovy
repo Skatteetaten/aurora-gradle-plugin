@@ -19,16 +19,20 @@ class CodeAnalysisTools {
     this.project = p
   }
 
-  AuroraReport applySonarqubeScan() {
+  AuroraReport applySonarqubeScan(String kotlinTestVersion) {
+
+    def testDependencies = [
+        "org.jetbrains.kotlin:kotlin-test:${kotlinTestVersion}"
+    ]
     
     log.info("Apply sonarqube support")
     project.with {
-        dependencies {
-           testImplementation "org.jetbrains.kotlin:kotlin-test:1.3.30" }
+      dependencies {
+        testDependencies.each { testImplementation it }
+      }
     }
-    
     return new AuroraReport(name:"aurora.applySonarqubeScan",
-    dependenciesAdded: ["org.jetbrains.kotlin:kotlin-test:1.3.30"],
+    dependenciesAdded: testDependencies.collect { "testImplemenation $it" },
     description: "Sets dependency needed for autodiscovery of xml report.")
   }
   

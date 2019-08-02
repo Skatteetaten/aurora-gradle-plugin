@@ -18,7 +18,7 @@ class CodeAnalysisTools {
 
     this.project = p
   }
-
+  
   AuroraReport applyJacocoTestReport() {
     log.info("Apply jacoco support")
     project.with {
@@ -26,14 +26,15 @@ class CodeAnalysisTools {
 
       jacocoTestReport {
         reports {
-          xml.enabled false
-          csv.enabled false
+          xml.enabled = true
+          xml.destination = file("${buildDir}/reports/jacoco/report.xml")
+          csv.enabled = false
         }
       }
     }
     return new AuroraReport(name: "aurora.applyJacocoTestReport",
         pluginsApplied: ["jacoco"],
-        description: "disable xml,csv report"
+        description: "enable xml, disable csv report"
     )
   }
 

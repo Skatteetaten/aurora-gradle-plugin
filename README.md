@@ -190,7 +190,7 @@ I.e.
 
 **Jacoco**
 
-By default the [jacoco plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html) will be activated. It can
+By default the [jacoco plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html) will be activated. Default value for xml.destination = file("${buildDir}/reports/jacoco/report.xml"). It can
 be disabled with;
 
     aurora.applyJacocoTestReport=false

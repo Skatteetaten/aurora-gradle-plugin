@@ -19,7 +19,6 @@ class AuroraPlugin implements Plugin<Project> {
       cglibVersion                  : '3.1',
       objenesisVersion              : '2.1',
       applyCheckstylePlugin         : true,
-      applySonarqubeScan            : true,
       applyJacocoTestReport         : true,
       applyMavenDeployer            : true,
       requireStaging                : false,
@@ -90,10 +89,6 @@ class AuroraPlugin implements Plugin<Project> {
 
       if (config.applyJacocoTestReport.toBoolean()) {
         reports.add(tools.applyJacocoTestReport())
-      }
-      
-      if (config.applySonarqubeScan.toBoolean()) {
-        reports.add(tools.applySonarqubeScan(config.kotlinTestVersion))
       }
 
       p.plugins.withId("info.solidsoft.pitest") {

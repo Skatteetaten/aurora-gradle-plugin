@@ -188,13 +188,6 @@ I.e.
       showViolations = false
     }
 
-**Sonarqube**
-
-By default Sonarqube scan is enabled and ads a testdependency to kotlin-test. Add sonarqube as a plugin in your project 'build.gradle.kts' to enable the sonarqube step.
-To disable;
-
-    aurora.applySonarqubeScan=false
-
 **Jacoco**
 
 By default the [jacoco plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html) will be activated. Default value for xml.destination = file("${buildDir}/reports/jacoco/report.xml"). It can
@@ -251,7 +244,6 @@ All configuration options and their default values are listed below;
     aurora.checkstyleConfigVersion       = "2.1.6",
     aurora.checkstyleConfigFile          = 'checkstyle/checkstyle-with-metrics.xml',
     
-    aurora.applySonarqubeScan            = true,
     aurora.applyJacocoTestReport         = true,
     aurora.applyMavenDeployer            = true,
     

@@ -25,7 +25,7 @@ class AuroraPlugin implements Plugin<Project> {
       auroraSpringBootStarterVersion: "2.3.0",
       springCloudContractVersion    : "2.1.2.RELEASE",
       stagingProfileId              : null,
-      kotlinLoggingVersion          : "1.7.2",
+      kotlinLoggingVersion          : "1.7.3",
       checkstyleConfigVersion       : "2.1.7",
       checkstyleConfigFile          : 'checkstyle/checkstyle-with-metrics.xml',
       applyJunit5Support            : true,

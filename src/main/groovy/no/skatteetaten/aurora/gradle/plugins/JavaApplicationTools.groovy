@@ -286,7 +286,7 @@ class JavaApplicationTools {
       dependencyUpdates.resolutionStrategy {
         componentSelection { rules ->
           rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
+            boolean rejected = ['alpha', 'beta', 'pr', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
               selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
             }
             if (rejected) {

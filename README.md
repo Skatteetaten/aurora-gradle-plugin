@@ -61,18 +61,18 @@ If you want to configure this plugin you can do so in the `gradle.properties` fi
 
 For a complete reference of options look at the bottom of this file.
 
-An complete example `build.gradle.kts` file can look like this
+A complete example `build.gradle.kts` file can look like this
 
     plugins {
-        id("org.jetbrains.kotlin.jvm") version "1.3.21"
-        id("org.jetbrains.kotlin.plugin.spring") version "1.3.21"
-        id("org.springframework.boot") version "2.1.3.RELEASE"
-        id("org.jlleitschuh.gradle.ktlint") version "6.3.1"
-        id("com.github.ben-manes.versions") version "0.20.0"
+        id("org.jetbrains.kotlin.jvm") version "1.3.41"
+        id("org.jetbrains.kotlin.plugin.spring") version "1.3.41"
+        id("org.springframework.boot") version "2.1.7.RELEASE"
+        id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
+        id("com.github.ben-manes.versions") version "0.22.0"
         id("com.gorylenko.gradle-git-properties") version "2.0.0"
-        id("org.sonarqube") version "2.7"
-        id("org.asciidoctor.convert") version "1.6.0"
-        id("no.skatteetaten.gradle.aurora") version "1.0.0"
+        id("org.sonarqube") version "2.7.1"
+        id("org.asciidoctor.convert") version "2.3.0"
+        id("no.skatteetaten.gradle.aurora") version "2.3.0"
     }
     
     dependencies {
@@ -153,10 +153,10 @@ The plugin supports the [Spock Framework](http://spockframework.org/) can be tur
 parameters:
 
     aurora.applySpockSupport=true
-    aurora.groovyVersion    = '2.5.4',
-    aurora.spockVersion     = '1.2-groovy-2.5'
-    aurora.cglibVersion     = '3.1'
-    aurora.objenesisVersion = '2.1'
+    aurora.groovyVersion                 : '2.5.7',
+    aurora.spockVersion                  : '1.3-groovy-2.5',
+    aurora.cglibVersion                  : '3.2.12',
+    aurora.objenesisVersion              : '3.0.1',
 
 
 ### Asciidoc for Documentation
@@ -177,7 +177,7 @@ Checkstyle will be activated and configured to use the standard [Aurora Checksty
 Errors from Checkstyle will by default not fail the build. The plugin can be configured with the following options;
 
     aurora.applyCheckstylePlugin  : true, // Should the Checkstyle plugin be activated
-    aurora.checkstyleConfigVersion: "2.1.6", // The version of the Aurora Checkstyle config. Default 2.1.6.
+    aurora.checkstyleConfigVersion: "2.1.7", // The version of the Aurora Checkstyle config. Default 2.1.6.
     aurora.checkstyleConfigFile   : 'checkstyle/checkstyle-with-metrics.xml' // The Aurora Checkstyle config file to use.
 
 Other Checkstyle-parameters can be configured according to the [Checkstyle Plugin User Guide](https://docs.gradle.org/current/userguide/checkstyle_plugin.html)).
@@ -235,13 +235,13 @@ All configuration options and their default values are listed below;
     aurora.applyDeliveryBundleConfig     = true,
     
     aurora.applySpockSupport             = false,
-    aurora.groovyVersion                 = '2.5.4',
-    aurora.spockVersion                  = '1.2-groovy-2.5',
-    aurora.cglibVersion                  = '3.1',
-    aurora.objenesisVersion              = '2.1',
+    aurora.groovyVersion                 = '2.5.7',
+    aurora.spockVersion                  = '1.3-groovy-2.5',
+    aurora.cglibVersion                  = '3.2.12',
+    aurora.objenesisVersion              = '3.0.1',
     
     aurora.applyCheckstylePlugin         = true,
-    aurora.checkstyleConfigVersion       = "2.1.6",
+    aurora.checkstyleConfigVersion       = "2.1.7",
     aurora.checkstyleConfigFile          = 'checkstyle/checkstyle-with-metrics.xml',
     
     aurora.applyJacocoTestReport         = true,
@@ -250,8 +250,8 @@ All configuration options and their default values are listed below;
     aurora.requireStaging                = false,
     aurora.stagingProfileId              = null,
     
-    aurora.springCloudContractVersion    : "2.1.0.RELEASE",
-    aurora.auroraSpringBootStarterVersion= "2.0.0",
-    aurora.kotlinLoggingVersion          = "1.6.24",
+    aurora.springCloudContractVersion    : "2.1.2.RELEASE",
+    aurora.auroraSpringBootStarterVersion= "2.3.0",
+    aurora.kotlinLoggingVersion          = "1.7.2",
     aurora.applyJunit5Support            = true
     

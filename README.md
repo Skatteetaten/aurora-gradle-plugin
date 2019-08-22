@@ -209,12 +209,12 @@ If `aurora.springDevTools` is set devtools will be included in the genererated a
 in your `~/.gradle/gradle.properties` file and be turned of in ci server.
 
 ### Kotlin
-The Aurora plugin will react to kotlin plugin and add dependencies on kotlin-reflect, stdlib-jdk8 and add 
+The Aurora plugin will react to Kotlin plugin and add dependencies on kotlin-reflect, stdlib-jdk8 and add 
 kotlinLogging (wrapper for Logback) with the version of `aurora.kotlinLoggingVersion`. Kotln will be configured to target
 java8, add `Xjsr305=strict` and supress warnings
 
 ### Kotlin and Spring
-The Aurora plugin will react to spring.kotlin plugin and the jackson kotlin module
+The Aurora plugin will react to spring.kotlin plugin and the jackson Kotlin module
 
 ### Spring Cloud Contract
 The Aurora plugin will react to spring cloud contract plugin and add dependencies from the bom as well as configure the 

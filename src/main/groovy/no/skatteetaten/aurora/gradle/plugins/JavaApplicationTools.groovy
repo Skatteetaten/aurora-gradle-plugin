@@ -153,7 +153,7 @@ class JavaApplicationTools {
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
       }
 
-      ext["junit-jupiter.version"] = "5.4.2"
+      ext["junit-jupiter.version"] = "5.5.2"
 
       test {
         useJUnitPlatform()

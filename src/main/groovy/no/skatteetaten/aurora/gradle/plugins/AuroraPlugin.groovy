@@ -21,11 +21,9 @@ class AuroraPlugin implements Plugin<Project> {
       applyCheckstylePlugin         : true,
       applyJacocoTestReport         : true,
       applyMavenDeployer            : true,
-      requireStaging                : false,
       auroraSpringBootStarterVersion: "2.3.0",
-      springCloudContractVersion    : "2.1.2.RELEASE",
-      stagingProfileId              : null,
-      kotlinLoggingVersion          : "1.7.3",
+      springCloudContractVersion    : "2.1.3.RELEASE",
+      kotlinLoggingVersion          : "1.7.6",
       checkstyleConfigVersion       : "2.1.7",
       checkstyleConfigFile          : 'checkstyle/checkstyle-with-metrics.xml',
       applyJunit5Support            : true,
@@ -96,7 +94,7 @@ class AuroraPlugin implements Plugin<Project> {
 
       if (config.applyMavenDeployer) {
         log.info("Apply maven deployer")
-        reports.add(mavenTools.addMavenDeployer(config.requireStaging, config.stagingProfileId))
+        reports.add(mavenTools.addMavenDeployer())
       }
 
       p.plugins.withId("spring-cloud-contract") {

@@ -13,40 +13,31 @@ class MavenTools {
     this.project = p
   }
 
-  AuroraReport addMavenDeployer(boolean requireStaging = true, String stagingProfileId = null) {
+  AuroraReport addMavenDeployer() {
 
-    if (!(project.ext.has("nexusUsername") && project.ext.has("nexusPassword") && project.ext.has("nexusUrl"))) {
+    if (!(project.ext.has("nexusUsername")
+        && project.ext.has("nexusPassword")
+        && project.ext.has("nexusReleaseUrl")
+        && project.ext.has("nexusSnapshotUrl")
+    )) {
       return
     }
-    if (requireStaging) {
-      if (!stagingProfileId) {
-        throw new IllegalArgumentException("Required stagingProfileId property not set")
-      }
-    }
     project.with {
-
-//      def stagingUrl = "${nexusUrl}/service/local/staging/deploy/maven2/"
-      def releasesUrl = "${nexusUrl}/content/repositories/releases"
-      def snapshotUrl = "${nexusUrl}/content/repositories/snapshots"
       uploadArchives {
-        onlyIf { !NexusTools.artifactExists(project, nexusUrl) }
         repositories {
           mavenDeployer {
-            snapshotRepository(url: snapshotUrl) {
+            snapshotRepository(url: nexusSnapshotUrl) {
               authentication(userName: nexusUsername, password: nexusPassword)
             }
-            repository(url: releasesUrl) {
+            repository(url: nexusReleaseUrl) {
               authentication(userName: nexusUsername, password: nexusPassword)
             }
           }
         }
       }
 
-      String deployTask = requireStaging ? 'releaseStagingRepository' : 'uploadArchives'
-      deployTask = version?.endsWith('-SNAPSHOT') ? 'uploadArchives' : deployTask
-
       task('deploy', description: 'Build and deploy artifacts to Nexus, potentially via staging') {
-        dependsOn deployTask
+        dependsOn 'uploadArchives'
         mustRunAfter 'clean'
       }
     }

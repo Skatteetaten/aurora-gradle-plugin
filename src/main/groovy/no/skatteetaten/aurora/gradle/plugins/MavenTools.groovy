@@ -20,7 +20,7 @@ class MavenTools {
         && project.ext.has("nexusReleaseUrl")
         && project.ext.has("nexusSnapshotUrl")
     )) {
-      return
+      return new AuroraReport(name: "aurora.applyMavenDeployer", description: "missing properties in .gradle file")
     }
     project.with {
       uploadArchives {
@@ -36,13 +36,13 @@ class MavenTools {
         }
       }
 
-      task('deploy', description: 'Build and deploy artifacts to Nexus, potentially via staging') {
+      task('deploy', description: 'Build and deploy artifacts to Nexus') {
         dependsOn 'uploadArchives'
         mustRunAfter 'clean'
       }
     }
     return new AuroraReport(name :"aurora.applyMavenDeployer",
-        description: "add uploadArchives task and configure from nexusUrl in .gradle.properties")
+        description: "add deploy task and configure from nexusUrls/credentials in .gradle.properties")
   }
 
   void setDefaultTasks() {

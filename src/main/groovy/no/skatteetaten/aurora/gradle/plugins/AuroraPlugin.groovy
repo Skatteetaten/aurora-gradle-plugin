@@ -112,9 +112,6 @@ class AuroraPlugin implements Plugin<Project> {
             config.objenesisVersion))
       }
 
-      p.plugins.withId("com.adarshr.test-logger"){
-        reports.add(java.applyTestLogger())
-      }
 
       p.with {
 

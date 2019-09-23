@@ -1,7 +1,5 @@
 package no.skatteetaten.aurora.gradle.plugins
 
-import java.text.MessageFormat
-
 import org.gradle.api.Project
 
 class MavenTools {

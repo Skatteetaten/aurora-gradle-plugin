@@ -18,6 +18,15 @@ class JavaApplicationTools {
     this.project = p
   }
 
+  AuroraReport applyTestLogger() {
+   project.wity {
+     testlogger {
+       theme = ThemeType.PLAIN
+     }
+
+   }
+    return new AuroraReport(name: "plugin com.adarshr.test-logger", description: "add plain theme type")
+  }
   AuroraReport applyKtLint() {
     project.with {
       ktlint {

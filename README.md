@@ -110,10 +110,7 @@ dependency management and artifact distribution, both the java and maven plugin 
 ```sourceCompatibility``` will be set to 1.8 by default. This can be changed with setting the 
 `aurora.javaSourceCompatibility` property. 
 
-Also, if you have set the ```nexusUrl``` property in your ```~/gradle/.gradle.properties```-file the plugin will register a Maven deployer for both snapshots and releases
-
-The Maven deployer that is registered will first check if the artifact being deployed already exists before attempting
-to upload to Nexus. This will prevent a failing build if you rerun a build for an existing artifact.
+If you set the properties ```nexusUsername```, ```nexusPassword```, ```nexusReleaseUrl``` and ```nexusSnapshotUrl``` in your ```~/gradle/.gradle.properties```-file the plugin will register Maven deployer for both snapshots and releases.
 
 These features can be opted out of with the following config;
 
@@ -247,11 +244,9 @@ All configuration options and their default values are listed below;
     aurora.applyJacocoTestReport         = true,
     aurora.applyMavenDeployer            = true,
     
-    aurora.requireStaging                = false,
-    aurora.stagingProfileId              = null,
     
-    aurora.springCloudContractVersion    : "2.1.2.RELEASE",
+    aurora.springCloudContractVersion    : "2.1.3.RELEASE",
     aurora.auroraSpringBootStarterVersion= "2.3.0",
-    aurora.kotlinLoggingVersion          = "1.7.2",
+    aurora.kotlinLoggingVersion          = "1.7.6",
     aurora.applyJunit5Support            = true
     

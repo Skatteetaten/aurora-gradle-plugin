@@ -13,22 +13,23 @@ class MavenTools {
 
   AuroraReport addMavenDeployer() {
 
-    if (!(project.ext.has("nexusUsername")
-        && project.ext.has("nexusPassword")
-        && project.ext.has("nexusReleaseUrl")
-        && project.ext.has("nexusSnapshotUrl")
+    if (!(project.ext.has("repositoryUsername")
+        && project.ext.has("repositoryPassword")
+        && project.ext.has("repositoryReleaseUrl")
+        && project.ext.has("repositorySnapshotUrl")
     )) {
-      return new AuroraReport(name: "aurora.applyMavenDeployer", description: "missing properties in .gradle file")
+      return new AuroraReport(name: "aurora.applyMavenDeployer", description: """One of the following properties are missing in your .gradle file
+         repositoryUsername, repositoryPassword, repositoryReleaseUrl, repositorySnapshotUrl""")
     }
     project.with {
       uploadArchives {
         repositories {
           mavenDeployer {
-            snapshotRepository(url: nexusSnapshotUrl) {
-              authentication(userName: nexusUsername, password: nexusPassword)
+            snapshotRepository(url: repositorySnapshotUrl) {
+              authentication(userName: repositoryUsername, password: repositoryPassword)
             }
-            repository(url: nexusReleaseUrl) {
-              authentication(userName: nexusUsername, password: nexusPassword)
+            repository(url: repositoryReleaseUrl) {
+              authentication(userName: repositoryUsername, password: repositoryPassword)
             }
           }
         }
@@ -39,8 +40,8 @@ class MavenTools {
         mustRunAfter 'clean'
       }
     }
-    return new AuroraReport(name :"aurora.applyMavenDeployer",
-        description: "add deploy task and configure from nexusUrls/credentials in .gradle.properties")
+    return new AuroraReport(name: "aurora.applyMavenDeployer",
+        description: "add deploy task and configure from repository* properties in .gradle.properties.")
   }
 
   void setDefaultTasks() {

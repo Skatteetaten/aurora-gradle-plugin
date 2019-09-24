@@ -103,14 +103,14 @@ The following plugins will be reacted upon by this Aurora Plugin
  - org.jetbrains.kotlin.jvm
  - org.jetbrains.kotlin.plugin.spring
  
-### Default Plugins and Nexus Configuration
+### Default Plugins and Repository Configuration
 
 Since this plugin is intended for use by JVM based applications, and since the NTA heavily relies on Nexus for artifact
 dependency management and artifact distribution, both the java and maven plugin will be applied automatically. The
 ```sourceCompatibility``` will be set to 1.8 by default. This can be changed with setting the 
 `aurora.javaSourceCompatibility` property. 
 
-If you set the properties ```nexusUsername```, ```nexusPassword```, ```nexusReleaseUrl``` and ```nexusSnapshotUrl``` in your ```~/gradle/.gradle.properties```-file the plugin will register Maven deployer for both snapshots and releases.
+If you set the properties ```repositoryUsername```, ```repositoryPassword```, ```repositoryReleaseUrl``` and ```repositorySnapshotUrl``` in your ```~/gradle/.gradle.properties```-file the plugin will register Maven deployer for both snapshots and releases.
 
 These features can be opted out of with the following config;
 

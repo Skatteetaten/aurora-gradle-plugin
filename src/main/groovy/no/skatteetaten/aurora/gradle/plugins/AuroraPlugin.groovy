@@ -97,6 +97,9 @@ class AuroraPlugin implements Plugin<Project> {
         reports.add(mavenTools.addMavenDeployer())
       }
 
+      p.plugins.withId("io.gitlab.arturbosch.detekt") {
+        reports.add(tools.applySonarDetektSupport())
+      }
       p.plugins.withId("spring-cloud-contract") {
         reports.add(java.
             applySpringCloudContract(config.applyJunit5Support.toBoolean(), config.springCloudContractVersion))

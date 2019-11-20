@@ -18,7 +18,7 @@ class CodeAnalysisTools {
 
     this.project = p
   }
-  
+
   AuroraReport applyJacocoTestReport() {
     log.info("Apply jacoco support")
     project.with {
@@ -47,7 +47,7 @@ class CodeAnalysisTools {
       }
     }
 
-    return new AuroraReport(name : "plugin info.solidsoft.pitest", description: "output format xml and html")
+    return new AuroraReport(name: "plugin info.solidsoft.pitest", description: "output format xml and html")
   }
 
   /**
@@ -74,5 +74,15 @@ class CodeAnalysisTools {
     return new AuroraReport(name: "aurora.applyCheckstylePlugin",
         dependenciesAdded: ["implementation no.skatteetaten.aurora.checkstyle:checkstyle-config:$checkstyleConfigVersion"],
         description: "with file $checkstyleConfigFile")
+  }
+
+  AuroraReport applySonarDetektSupport() {
+    log.info("Apply detekt reports to sonarqube")
+    project.with {
+          sonar.kotlin.detekt.reportPaths = "build/reports/detekt/detekt.xml"
+    }
+
+    return new AuroraReport(name: "aurora.applyDetektReportSonarqubeSupport", description: "set reportpath to detekt " +
+        "reports for sonarqube plugin")
   }
 }

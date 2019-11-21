@@ -79,7 +79,11 @@ class CodeAnalysisTools {
   AuroraReport applySonarDetektSupport() {
     log.info("Apply detekt reports to sonarqube")
     project.with {
-          sonar.kotlin.detekt.reportPaths = "build/reports/detekt/detekt.xml"
+      sonarqube {
+        properties {
+          property "sonar.kotlin.detekt.reportPath", "build/reports/detekt/detekt.xml"
+        }
+      }
     }
 
     return new AuroraReport(name: "aurora.applyDetektReportSonarqubeSupport", description: "set reportpath to detekt " +

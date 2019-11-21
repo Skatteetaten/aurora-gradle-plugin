@@ -1,5 +1,6 @@
 package no.skatteetaten.aurora.gradle.plugins
 
+import org.gradle.api.Action
 import org.gradle.api.Project
 
 import groovy.transform.Canonical
@@ -80,8 +81,8 @@ class CodeAnalysisTools {
     log.info("Apply detekt reports to sonarqube")
     project.with {
       sonarqube {
-        properties {
-          property "sonar.kotlin.detekt.reportPath", "build/reports/detekt/detekt.xml"
+        it.properties {
+          it.property "sonar.kotlin.detekt.reportPaths" , "build/reports/detekt/detekt.xml"
         }
       }
     }

@@ -21,7 +21,7 @@ class AuroraPlugin implements Plugin<Project> {
       applyCheckstylePlugin         : true,
       applyJacocoTestReport         : true,
       applyMavenDeployer            : true,
-      auroraSpringBootStarterVersion: "2.3.2",
+      auroraSpringBootStarterVersion: "2.3.3",
       springCloudContractVersion    : "2.2.1.RELEASE",
       kotlinLoggingVersion          : "1.7.8",
       checkstyleConfigVersion       : "2.2.4",

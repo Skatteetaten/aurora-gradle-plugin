@@ -160,7 +160,6 @@ class JavaApplicationTools {
 
       test {
         useJUnitPlatform()
-        failFast = true
       }
     }
     return new AuroraReport(name: "aurora.applyJunit5Support", description: "use jUnitPlattform",

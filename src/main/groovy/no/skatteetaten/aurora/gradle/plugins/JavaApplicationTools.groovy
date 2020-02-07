@@ -23,7 +23,10 @@ class JavaApplicationTools {
       ktlint {
         android = false
       }
+
+      compileKotlin.dependsOn 'ktlintKotlinScriptCheck'
     }
+
     return new AuroraReport(name: "plugin org.jlleitschuh.gradle.ktlint", description: "disable android")
   }
 

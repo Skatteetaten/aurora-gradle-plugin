@@ -24,7 +24,8 @@ class JavaApplicationTools {
         android = false
       }
 
-      compileKotlin.dependsOn 'ktlintKotlinScriptCheck'
+      compileKotlin.dependsOn ':ktlintMainSourceSetCheck'
+      compileTestKotlin.dependsOn ':ktlintTestSourceSetCheck'
     }
 
     return new AuroraReport(name: "plugin org.jlleitschuh.gradle.ktlint", description: "disable android")
@@ -266,7 +267,7 @@ class JavaApplicationTools {
     project.with {
       apply plugin: 'groovy'
 
-      plugins.withId("org.jetbrains.kotlin.jvm"){
+      plugins.withId("org.jetbrains.kotlin.jvm") {
         compileTestGroovy.dependsOn compileTestKotlin
         compileTestGroovy.classpath += files(compileTestKotlin.destinationDir)
         testClasses.dependsOn compileTestGroovy

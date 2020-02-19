@@ -19,9 +19,13 @@ class JavaApplicationTools {
   }
 
   AuroraReport applyKtLint() {
+    def rulesToDisable = [
+        "import-ordering"
+    ]
     project.with {
       ktlint {
         android = false
+        disabledRules.set(rulesToDisable)
       }
 
       compileKotlin.dependsOn ':ktlintMainSourceSetCheck'

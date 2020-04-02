@@ -212,13 +212,7 @@ class JavaApplicationTools {
       }
     }
 
-    def resolvedBootJarText = {
-      if (bootJarEnabled) {
-        "."
-      } else {
-        ", bootJar disabled."
-      }
-    }
+    def resolvedBootJarText = bootJarEnabled ? "" : ", bootJar disabled"
 
     return new AuroraReport(
         name: "plugin org.springframework.boot",

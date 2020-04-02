@@ -176,8 +176,7 @@ class JavaApplicationTools {
         ])
   }
 
-  AuroraReport applySpring(String starterVersion, Boolean devTools) {
-
+  AuroraReport applySpring(String starterVersion, Boolean devTools, Boolean bootJarEnabled) {
     def implementationDependencies = [
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
         "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
@@ -185,39 +184,43 @@ class JavaApplicationTools {
     if (devTools) {
       implementationDependencies.add("org.springframework.boot:spring-boot-devtools")
     }
-    log.info("Apply Spring support")
-    project.with {
 
+    log.info("Apply Spring support")
+
+    project.with {
       apply plugin: 'io.spring.dependency-management'
 
-      [jar, distZip]*.enabled = true
-      [bootJar, distTar, bootDistTar, bootDistZip]*.enabled = false
+      if (!bootJarEnabled) {
+        [jar, distZip]*.enabled = true
+        [bootJar, distTar, bootDistTar, bootDistZip]*.enabled = false
 
-      configurations.archives.artifacts.removeIf {
-        if (it.hasProperty("archiveTask")) {
-          !it.archiveTask.enabled
-        } else {
-          !it.delegate.archiveTask.enabled
+        configurations.archives.artifacts.removeIf {
+          if (it.hasProperty("archiveTask")) {
+            !it.archiveTask.enabled
+          } else {
+            !it.delegate.archiveTask.enabled
+          }
         }
       }
 
       springBoot {
         buildInfo()
       }
-      dependencies {
 
+      dependencies {
         implementationDependencies.each { implementation it }
       }
-
     }
+
+    def resolvedBootJarText = bootJarEnabled ? "" : ", bootJar disabled"
+
     return new AuroraReport(
         name: "plugin org.springframework.boot",
         dependenciesAdded: implementationDependencies.collect {
           "implementation $it"
         },
-        description: "Build info, disable fat jar. Optional devtools",
+        description: "Build info${resolvedBootJarText()} Optional devtools",
         pluginsApplied: ["io.spring.dependency-management"])
-
   }
 
   AuroraReport applyDefaultPlugins() {
@@ -311,17 +314,45 @@ class JavaApplicationTools {
         description: "only allow stable versions in upgrade")
   }
 
-  AuroraReport applyDeliveryBundleConfig() {
+  AuroraReport applyDeliveryBundleConfig(Boolean bootJar) {
+    if (bootJar) {
+      project.with {
+        apply plugin: 'distribution'
 
-    project.with {
-      apply plugin: 'application'
+        distributions {
+          main {
+            contents {
+              from("${buildDir}/libs") {
+                into('lib')
+              }
 
-      distZip.classifier = 'Leveransepakke'
-      startScripts.enabled = false
+              from("${projectDir}/src/main/dist/metadata") {
+                into('metadata')
+              }
+            }
+          }
+        }
+
+        distZip {
+          dependsOn 'bootJar'
+          archiveClassifier = 'Leveransepakke'
+        }
+      }
+
+      return new AuroraReport(name: "aurora.applyDeliveryBundleConfig",
+              pluginsApplied: ["distribution"],
+              description: "Configure Leveransepakke for bootJar")
+    } else {
+      project.with {
+        apply plugin: 'application'
+
+        distZip.classifier = 'Leveransepakke'
+        startScripts.enabled = false
+      }
+
+      return new AuroraReport(name: "aurora.applyDeliveryBundleConfig", pluginsApplied: ["application"],
+              description: "Configure Leveransepakke")
     }
-
-    return new AuroraReport(name: "aurora.applyDeliveryBundleConfig", pluginsApplied: ["application"],
-        description: "Configure Leveransepakke")
   }
 
   AuroraReport applyAsciiDocPlugin() {

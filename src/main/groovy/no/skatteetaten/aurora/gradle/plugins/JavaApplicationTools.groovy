@@ -212,14 +212,14 @@ class JavaApplicationTools {
       }
     }
 
-    def resolvedBootJarText = bootJarEnabled ? "" : ", bootJar disabled"
+    def resolvedBootJarText = { enabled -> enabled ? "" : ", bootJar disabled" }
 
     return new AuroraReport(
         name: "plugin org.springframework.boot",
         dependenciesAdded: implementationDependencies.collect {
           "implementation $it"
         },
-        description: "Build info${resolvedBootJarText()} Optional devtools",
+        description: "Build info${resolvedBootJarText(bootJarEnabled)} Optional devtools",
         pluginsApplied: ["io.spring.dependency-management"])
   }
 

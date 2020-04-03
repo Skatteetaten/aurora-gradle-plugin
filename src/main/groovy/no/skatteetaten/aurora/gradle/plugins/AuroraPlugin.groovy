@@ -22,6 +22,7 @@ class AuroraPlugin implements Plugin<Project> {
       applyJacocoTestReport         : true,
       applyMavenDeployer            : true,
       auroraSpringBootStarterVersion: "2.4.0",
+      useBootJar                    : false,
       springCloudContractVersion    : "2.2.1.RELEASE",
       kotlinLoggingVersion          : "1.7.8",
       checkstyleConfigVersion       : "2.2.4",
@@ -60,11 +61,11 @@ class AuroraPlugin implements Plugin<Project> {
       }
 
       if (config.applyDeliveryBundleConfig.toBoolean()) {
-        reports.add(java.applyDeliveryBundleConfig())
+        reports.add(java.applyDeliveryBundleConfig(config.useBootJar.toBoolean()))
       }
 
       p.plugins.withId("org.springframework.boot") {
-        reports.add(java.applySpring(config.auroraSpringBootStarterVersion, config.springDevTools.toBoolean()))
+        reports.add(java.applySpring(config.auroraSpringBootStarterVersion, config.springDevTools.toBoolean(), config.useBootJar.toBoolean()))
       }
 
       if (config.applyJunit5Support.toBoolean()) {

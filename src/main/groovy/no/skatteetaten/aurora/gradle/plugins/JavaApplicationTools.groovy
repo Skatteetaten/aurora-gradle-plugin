@@ -176,11 +176,21 @@ class JavaApplicationTools {
         ])
   }
 
-  AuroraReport applySpring(String starterVersion, Boolean devTools, Boolean bootJarEnabled) {
+  AuroraReport applySpring(
+    String mvcStarterVersion,
+    String webFluxStarterVersion,
+    Boolean devTools,
+    Boolean webFluxEnabled,
+    Boolean bootJarEnabled
+  ) {
     def implementationDependencies = [
         "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
-        "no.skatteetaten.aurora.springboot:aurora-spring-boot2-starter:$starterVersion",
     ]
+    if (webFluxEnabled) {
+      implementationDependencies.add("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter:$webFluxStarterVersion")
+    } else {
+      implementationDependencies.add("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:$mvcStarterVersion")
+    }
     if (devTools) {
       implementationDependencies.add("org.springframework.boot:spring-boot-devtools")
     }
@@ -203,23 +213,33 @@ class JavaApplicationTools {
         }
       }
 
+      if (webFluxEnabled) {
+        configurations.implementation {
+          exclude group: "org.springframework", module: "spring-webmvc"
+          exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
+        }
+      }
+
       springBoot {
         buildInfo()
       }
 
       dependencies {
-        implementationDependencies.each { implementation it }
+        implementationDependencies.each {
+          implementation it
+        }
       }
     }
 
-    def resolvedBootJarText = { enabled -> enabled ? "" : ", bootJar disabled" }
+    def resolvedBootJarText = bootJarEnabled ? ", bootJar enabled" : ", bootJar disabled"
+    def resolvedWebFluxText = webFluxEnabled ? ", webflux enabled and webmvc + tomcat excluded" : ", webFlux disabled"
 
     return new AuroraReport(
         name: "plugin org.springframework.boot",
         dependenciesAdded: implementationDependencies.collect {
           "implementation $it"
         },
-        description: "Build info${resolvedBootJarText(bootJarEnabled)} Optional devtools",
+        description: "Build info$resolvedBootJarText$resolvedWebFluxText, Optional devtools",
         pluginsApplied: ["io.spring.dependency-management"])
   }
 

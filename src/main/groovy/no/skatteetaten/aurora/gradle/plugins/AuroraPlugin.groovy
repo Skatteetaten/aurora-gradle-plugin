@@ -9,26 +9,28 @@ import groovy.util.logging.Slf4j
 class AuroraPlugin implements Plugin<Project> {
 
   private static DEFAULT_CONFIG = [
-      applyDefaultPlugins           : true,
-      applyJavaDefaults             : true,
-      javaSourceCompatibility       : "1.8",
-      applyDeliveryBundleConfig     : true,
-      applySpockSupport             : false,
-      groovyVersion                 : '3.0.1',
-      spockVersion                  : '1.3-groovy-2.5',
-      cglibVersion                  : '3.3.0',
-      objenesisVersion              : '3.1',
-      applyCheckstylePlugin         : true,
-      applyJacocoTestReport         : true,
-      applyMavenDeployer            : true,
-      auroraSpringBootStarterVersion: "2.4.0",
-      useBootJar                    : false,
-      springCloudContractVersion    : "2.2.1.RELEASE",
-      kotlinLoggingVersion          : "1.7.8",
-      checkstyleConfigVersion       : "2.2.4",
-      checkstyleConfigFile          : 'checkstyle/checkstyle-with-metrics.xml',
-      applyJunit5Support            : true,
-      springDevTools : false
+      applyDefaultPlugins                   : true,
+      applyJavaDefaults                     : true,
+      javaSourceCompatibility               : "1.8",
+      applyDeliveryBundleConfig             : true,
+      applySpockSupport                     : false,
+      groovyVersion                         : '3.0.5',
+      spockVersion                          : '1.3-groovy-2.5',
+      cglibVersion                          : '3.3.0',
+      objenesisVersion                      : '3.1',
+      applyCheckstylePlugin                 : true,
+      applyJacocoTestReport                 : true,
+      applyMavenDeployer                    : true,
+      auroraSpringBootMvcStarterVersion     : "1.0.8",
+      auroraSpringBootWebFluxStarterVersion : "1.0.7",
+      useWebFlux                            : false,
+      useBootJar                            : false,
+      springCloudContractVersion            : "2.2.3.RELEASE",
+      kotlinLoggingVersion                  : "1.8.3",
+      checkstyleConfigVersion               : "2.2.5",
+      checkstyleConfigFile                  : 'checkstyle/checkstyle-with-metrics.xml',
+      applyJunit5Support                    : true,
+      springDevTools                        : false
   ]
 
   void apply(Project p) {
@@ -44,12 +46,12 @@ class AuroraPlugin implements Plugin<Project> {
 
       mavenTools.setDefaultTasks()
 
-      if (config.applyJavaDefaults.toBoolean()) {
-        reports.add(java.applyJavaDefaults(config.javaSourceCompatibility))
-      }
-
       if (config.applyDefaultPlugins.toBoolean()) {
         reports.add(java.applyDefaultPlugins())
+      }
+
+      if (config.applyJavaDefaults.toBoolean()) {
+        reports.add(java.applyJavaDefaults(config.javaSourceCompatibility))
       }
 
       p.plugins.withId("org.asciidoctor.convert") {
@@ -65,7 +67,13 @@ class AuroraPlugin implements Plugin<Project> {
       }
 
       p.plugins.withId("org.springframework.boot") {
-        reports.add(java.applySpring(config.auroraSpringBootStarterVersion, config.springDevTools.toBoolean(), config.useBootJar.toBoolean()))
+        reports.add(java.applySpring(
+          config.auroraSpringBootMvcStarterVersion,
+          config.auroraSpringBootWebFluxStarterVersion,
+          config.springDevTools.toBoolean(),
+          config.useWebFlux.toBoolean(),
+          config.useBootJar.toBoolean())
+        )
       }
 
       if (config.applyJunit5Support.toBoolean()) {
@@ -130,10 +138,6 @@ class AuroraPlugin implements Plugin<Project> {
 
   private printReport(List<AuroraReport> reports) {
     if (!reports.isEmpty()) {
-
-      reports.each {
-        println(it)
-      }
       def sortedReport=reports.sort { it.name}
       log.lifecycle("----- Aurora Plugin Report -----")
       log.lifecycle("The aurora plugin can be configured via aurora.* feature flags in .gradle.properties or reacting on applied plugins.\n")
@@ -141,7 +145,6 @@ class AuroraPlugin implements Plugin<Project> {
       sortedReport.each { log.lifecycle(it.toString() + "\n") }
       log.lifecycle("--------------------------------")
     }
-
   }
 
   private static Map<String, Object> getConfiguration(Project p) {

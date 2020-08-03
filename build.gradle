@@ -1,7 +1,7 @@
 plugins {
   id "groovy"
   id "com.gradle.plugin-publish" version "0.12.0"
-  id "com.github.ben-manes.versions" version "0.28.0"
+  id "com.github.ben-manes.versions" version "0.29.0"
   id "java-gradle-plugin"
   id "maven-publish"
 }
@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
   testImplementation gradleTestKit()
-  testImplementation 'org.codehaus.groovy:groovy-all:2.5.7'
+  testImplementation 'org.codehaus.groovy:groovy-all:3.0.5'
   testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 }
 

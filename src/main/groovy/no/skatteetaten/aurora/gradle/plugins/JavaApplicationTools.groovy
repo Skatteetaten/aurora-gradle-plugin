@@ -207,8 +207,10 @@ class JavaApplicationTools {
         configurations.archives.artifacts.removeIf {
           if (it.hasProperty("archiveTask")) {
             !it.archiveTask.enabled
-          } else {
+          } else if (it.hasProperty("delegate") && it.delegate.hasProperty("archiveTask")) {
             !it.delegate.archiveTask.enabled
+          } else {
+            true
           }
         }
       }

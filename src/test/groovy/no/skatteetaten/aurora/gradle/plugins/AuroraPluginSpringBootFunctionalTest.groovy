@@ -16,7 +16,7 @@ class AuroraPluginSpringBootFunctionalTest extends Specification {
         buildFile << """
             plugins {
                 id 'no.skatteetaten.gradle.aurora'
-                id 'org.springframework.boot' version '2.3.0.RELEASE'
+                id 'org.springframework.boot' version '2.3.2.RELEASE'
             }
         """
     }

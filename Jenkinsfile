@@ -8,6 +8,7 @@ def overrides = [
     disableAllReports: true,
     pipelineScript: 'https://git.aurora.skead.no/scm/ao/aurora-pipeline-scripts.git',
     credentialsId: "github",
+    javaVersion: 11,
     jiraFiksetIKomponentversjon: true,
     deployTo: "gradle-plugin-portal",
     chatRoom: "#aos-notifications",

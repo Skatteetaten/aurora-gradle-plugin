@@ -52,6 +52,7 @@ class JavaApplicationTools {
       }
       contracts {
         packageWithBaseClasses = "${groupId}.${artifactId}.contracts"
+        failOnNoContracts = false
 
         if (junit5) {
           testFramework = "JUNIT5"

@@ -1,9 +1,9 @@
 package no.skatteetaten.aurora.gradle.plugins.functional
 
 import assertk.assertThat
-import assertk.assertions.isTrue
+import assertk.assertions.contains
+import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -41,7 +41,7 @@ class AuroraPluginGradleToolsFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.task(":build")?.outcome == SUCCESS).isTrue()
+        result.taskStatus()
     }
 
     @Test
@@ -52,9 +52,9 @@ class AuroraPluginGradleToolsFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("----- Aurora Plugin Report -----")).isTrue()
-        assertThat(result.output.contains("plugin com.github.ben-manes.versions")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).contains("plugin com.github.ben-manes.versions")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -72,12 +72,12 @@ class AuroraPluginGradleToolsFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("----- Aurora Plugin Report -----")).isTrue()
-        assertThat(result.output.contains("org.codehaus.groovy:groovy-all")).isTrue()
-        assertThat(result.output.contains("org.spockframework:spock-core")).isTrue()
-        assertThat(result.output.contains("cglib:cglib-nodep")).isTrue()
-        assertThat(result.output.contains("org.objenesis:objenesis")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).contains("org.codehaus.groovy:groovy-all")
+        assertThat(result.output).contains("org.spockframework:spock-core")
+        assertThat(result.output).contains("cglib:cglib-nodep")
+        assertThat(result.output).contains("org.objenesis:objenesis")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -89,9 +89,9 @@ class AuroraPluginGradleToolsFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("----- Aurora Plugin Report -----")).isTrue()
-        assertThat(result.output.contains("output format xml and html")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).contains("output format xml and html")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -102,8 +102,8 @@ class AuroraPluginGradleToolsFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("----- Aurora Plugin Report -----")).isTrue()
-        assertThat(result.output.contains("configure html5 report in static/docs")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).contains("configure html5 report in static/docs")
+        result.taskStatus(taskName = ":aurora")
     }
 }

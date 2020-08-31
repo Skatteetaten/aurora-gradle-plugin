@@ -6,6 +6,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.withGroovyBuilder
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @ExperimentalStdlibApi
 class JavaApplicationTools(private val project: Project) {
@@ -360,11 +361,18 @@ class JavaApplicationTools(private val project: Project) {
                 apply("groovy")
 
                 withId("org.jetbrains.kotlin.jvm") {
+                    val kotlinTestCompile = (tasks.getByName("compileTestKotlin") as KotlinCompile)
+
                     withGroovyBuilder {
                         "compileTestGroovy" {
                             "dependsOn" to "compileTestKotlin"
+                            "classpath" {
+                                invokeMethod(
+                                    "+=",
+                                    files(kotlinTestCompile.destinationDir)
+                                )
+                            }
                         }
-                        "compileTestGroovy.classpath += files(compileTestKotlin.destinationDir)"
                         "testClasses" {
                             "dependsOn" to "compileTestGroovy"
                         }
@@ -473,7 +481,7 @@ class JavaApplicationTools(private val project: Project) {
                 "ext.snippetsDir" to "file"("$buildDir/generated-snippets")
 
                 "asciidoctor" {
-                    "attributes([ snippets: snippetsDir, version : version ])"
+                    "attributes" to "[ snippets: snippetsDir, version : version ]"
                     "inputs.dir" to "snippetsDir"
                     "outputDir" to "$buildDir/asciidoc"
                     "dependsOn" to "test"

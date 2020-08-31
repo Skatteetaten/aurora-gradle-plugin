@@ -1,10 +1,10 @@
 package no.skatteetaten.aurora.gradle.plugins.functional
 
 import assertk.assertThat
-import assertk.assertions.isFalse
-import assertk.assertions.isTrue
+import assertk.assertions.contains
+import assertk.assertions.doesNotContain
+import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -44,7 +44,7 @@ class AuroraPluginSpringBootFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.task(":build")?.outcome == SUCCESS).isTrue()
+        result.taskStatus()
     }
 
     @Test
@@ -55,8 +55,8 @@ class AuroraPluginSpringBootFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("----- Aurora Plugin Report -----")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -67,9 +67,9 @@ class AuroraPluginSpringBootFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")).isTrue()
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")).isFalse()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
+        assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -84,10 +84,10 @@ class AuroraPluginSpringBootFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")).isFalse()
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")).isTrue()
-        assertThat(result.output.contains("webflux enabled and webmvc + tomcat excluded")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
+        assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
+        assertThat(result.output).contains("webflux enabled and webmvc + tomcat excluded")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -102,11 +102,11 @@ class AuroraPluginSpringBootFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")).isTrue()
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")).isFalse()
-        assertThat(result.output.contains("bootJar enabled")).isTrue()
-        assertThat(result.output.contains("bootJar disabled")).isFalse()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
+        assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
+        assertThat(result.output).contains("bootJar enabled")
+        assertThat(result.output).doesNotContain("bootJar disabled")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -126,11 +126,11 @@ class AuroraPluginSpringBootFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")).isTrue()
-        assertThat(result.output.contains("org.springframework.boot:spring-boot-devtools")).isTrue()
-        assertThat(result.output.contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")).isFalse()
-        assertThat(result.output.contains("bootJar enabled")).isTrue()
-        assertThat(result.output.contains("bootJar disabled")).isFalse()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
+        assertThat(result.output).contains("org.springframework.boot:spring-boot-devtools")
+        assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
+        assertThat(result.output).contains("bootJar enabled")
+        assertThat(result.output).doesNotContain("bootJar disabled")
+        result.taskStatus(taskName = ":aurora")
     }
 }

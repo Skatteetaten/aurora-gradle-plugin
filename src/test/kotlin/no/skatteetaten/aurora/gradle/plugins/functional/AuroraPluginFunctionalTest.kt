@@ -1,9 +1,9 @@
 package no.skatteetaten.aurora.gradle.plugins.functional
 
 import assertk.assertThat
-import assertk.assertions.isTrue
+import assertk.assertions.contains
+import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -40,7 +40,7 @@ class AuroraPluginFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.task(":build")?.outcome == SUCCESS).isTrue()
+        result.taskStatus()
     }
 
     @Test
@@ -51,7 +51,7 @@ class AuroraPluginFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.output.contains("----- Aurora Plugin Report -----")).isTrue()
-        assertThat(result.task(":aurora")?.outcome == SUCCESS).isTrue()
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        result.taskStatus(taskName = ":aurora")
     }
 }

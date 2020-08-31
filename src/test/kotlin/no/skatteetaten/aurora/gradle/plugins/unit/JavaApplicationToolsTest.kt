@@ -11,6 +11,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaApplicationTools
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.asciidoctor.gradle.AsciidoctorTask
@@ -20,8 +21,10 @@ import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.withType
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -184,6 +187,64 @@ class JavaApplicationToolsTest {
 
         assertThat(distZip.archiveClassifier.get()).isEqualTo("Leveransepakke")
         assertThat(report.description).isEqualTo("Configure Leveransepakke for bootJar")
+    }
+
+    @Test
+    fun `kotlin configured correctly`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+                id 'org.jetbrains.kotlin.plugin.spring' version '1.3.72'
+            }
+            """.trimIndent()
+        )
+        (project as ProjectInternal).evaluate()
+        val config = project.getConfig()
+        val springReport = javaApplicationTools.applyKotlinSpringSupport()
+        val report = javaApplicationTools.applyKotlinSupport(config.kotlinLoggingVersion)
+
+        project.tasks.withType(KotlinCompile::class).forEach {
+            with(it.kotlinOptions) {
+                assertThat(suppressWarnings).isTrue()
+                assertThat(jvmTarget).isEqualTo("1.8")
+                assertThat(freeCompilerArgs).isEqualTo(listOf("-Xjsr305=strict"))
+            }
+        }
+
+        with(project.configurations.getByName("implementation").allDependencies) {
+            assertThat(
+                find {
+                    it.group == "com.fasterxml.jackson.module" &&
+                        it.name == "jackson-module-kotlin" &&
+                        it.version == null
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.jetbrains.kotlin" &&
+                        it.name == "kotlin-reflect" &&
+                        it.version == null
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.jetbrains.kotlin" &&
+                        it.name == "kotlin-stdlib-jdk8" &&
+                        it.version == null
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "io.github.microutils" &&
+                        it.name == "kotlin-logging" &&
+                        it.version == config.kotlinLoggingVersion
+                }
+            ).isNotNull()
+        }
+
+        assertThat(springReport.name).isEqualTo("plugin org.jetbrains.kotlin.plugin.spring")
+        assertThat(report.description).isEqualTo("jsr305 strict, jvmTarget 1.8, supress warnings")
     }
 
     @Test

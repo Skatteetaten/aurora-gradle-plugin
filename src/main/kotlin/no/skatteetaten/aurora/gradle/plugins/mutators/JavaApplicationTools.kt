@@ -2,6 +2,7 @@
 
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.asciidoctor.gradle.AsciidoctorTask
 import org.gradle.api.Project
@@ -9,6 +10,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -393,19 +395,20 @@ class JavaApplicationTools(private val project: Project) {
         project.logger.lifecycle("Apply versions support")
 
         with(project) {
-            withGroovyBuilder {
-                "dependencyUpdates" {
-                    "revision" to "release"
-                    "checkForGradleUpdate" to true
-                    "outputFormatter" to "json"
-                    "outputDir" to "build/dependencyUpdates"
-                    "reportfileName" to "report"
-                    "resolutionStrategy" {
-                        "componentSelection" {
-                            "all" {
-                                "boolean rejected = ['alpha', 'beta', 'pr', 'rc', 'cr', 'm', 'preview'].any { " +
-                                    "qualifier -> candidate.version ==~ /(?i).*[.-]\${qualifier}[.\\d-]*/ }"
-                                "if (rejected) { reject('Release candidate') }"
+            with(tasks.named("dependencyUpdates", DependencyUpdatesTask::class).get()) {
+                revision = "release"
+                checkForGradleUpdate = true
+                outputFormatter = "json"
+                outputDir = "build/dependencyUpdates"
+                reportfileName = "report"
+                resolutionStrategy {
+                    componentSelection {
+                        all {
+                            val rejectionPatterns = listOf("alpha", "beta", "pr", "rc", "cr", "m", "preview")
+                            val regex: (String) -> Regex = { Regex("(?i).*[.-]$it[.\\d-]*") }
+
+                            if (rejectionPatterns.any { candidate.version.matches(regex(it)) }) {
+                                reject("Release candidate")
                             }
                         }
                     }

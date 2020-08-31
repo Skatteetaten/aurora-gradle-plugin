@@ -8,6 +8,7 @@ import assertk.assertions.containsOnly
 import assertk.assertions.endsWith
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaApplicationTools
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.asciidoctor.gradle.AsciidoctorTask
@@ -108,13 +109,66 @@ class JavaApplicationToolsTest {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("build")
-            .forwardOutput()
             .withPluginClasspath()
             .build()
         val jar = testProjectDir.resolve("build/libs").list()?.first() ?: "bogus"
 
         assertThat(jar).endsWith("-local.jar")
         result.taskStatus()
+    }
+
+    @Test
+    fun `ben-manes versions configured correctly`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id 'com.github.ben-manes.versions' version '0.29.0'
+            }
+            """.trimIndent()
+        )
+        (project as ProjectInternal).evaluate()
+        val report = javaApplicationTools.applyVersions()
+        val dependencyUpdates = project.tasks.named("dependencyUpdates", DependencyUpdatesTask::class.java).get()
+
+        assertThat(dependencyUpdates.revision).isEqualTo("release")
+        assertThat(dependencyUpdates.checkForGradleUpdate).isEqualTo(true)
+        assertThat(dependencyUpdates.outputFormatter).isEqualTo("json")
+        assertThat(dependencyUpdates.outputDir).isEqualTo("build/dependencyUpdates")
+        assertThat(dependencyUpdates.reportfileName).isEqualTo("report")
+        assertThat(report.description).isEqualTo("only allow stable versions in upgrade")
+    }
+
+    @Test
+    fun `ben-manes versions test resolutionStrategy`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id 'java'
+                id 'no.skatteetaten.gradle.aurora'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            aurora {
+                useVersions
+            }
+            
+            dependencies { 
+                compile group: 'org.seleniumhq.selenium', name: 'selenium-leg-rc', version: '4.0.0-alpha-6'
+            }
+            """.trimIndent()
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("dependencyUpdates")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.output).contains("The following dependencies exceed the version found at the release revision level")
+        assertThat(result.output).contains("org.seleniumhq.selenium:selenium-leg-rc [4.0.0-alpha-6 <- ")
+        result.taskStatus(taskName = ":dependencyUpdates")
     }
 
     @Test

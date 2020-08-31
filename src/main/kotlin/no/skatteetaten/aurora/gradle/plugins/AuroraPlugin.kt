@@ -38,7 +38,7 @@ class AuroraPlugin : Plugin<Project> {
             if (config.applyJavaDefaults) {
                 reports.add(
                     java.applyJavaDefaults(
-                        compability = config.javaSourceCompatibility
+                        compatibility = config.javaSourceCompatibility
                     )
                 )
             }

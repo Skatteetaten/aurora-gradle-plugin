@@ -320,19 +320,12 @@ class JavaApplicationTools(private val project: Project) {
         )
     }
 
-    fun applyJavaDefaults(compability: String): AuroraReport {
+    fun applyJavaDefaults(compatibility: String): AuroraReport {
         with(project) {
-            withGroovyBuilder {
-                "sourceCompatibility" to compability
-            }
+            setProperty("sourceCompatibility", compatibility)
 
-            if (extensions.extraProperties.has("version")) {
-                version = extensions.extraProperties["version"] as String
-            }
-
-            if (extensions.extraProperties.has("groupId")) {
-                group = extensions.extraProperties["groupId"] as String
-            }
+            extensions.extraProperties.properties["version"]?.let { version = extensions.extraProperties.properties["version"] as String }
+            extensions.extraProperties.properties["groupId"]?.let { group = extensions.extraProperties.properties["groupId"] as String }
         }
 
         return AuroraReport(

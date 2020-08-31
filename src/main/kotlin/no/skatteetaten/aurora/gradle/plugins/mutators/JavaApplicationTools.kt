@@ -1,10 +1,14 @@
+@file:Suppress("DEPRECATION")
+
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
+import org.asciidoctor.gradle.AsciidoctorTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.exclude
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -477,23 +481,31 @@ class JavaApplicationTools(private val project: Project) {
         project.logger.lifecycle("Apply asciiDoctor support")
 
         with(project) {
-            withGroovyBuilder {
-                "ext.snippetsDir" to "file"("$buildDir/generated-snippets")
+            val snippetsDir = project.file("${project.buildDir}/generated-snippets")
+            extra.set("snippetsDir", snippetsDir)
 
-                "asciidoctor" {
-                    "attributes" to "[ snippets: snippetsDir, version : version ]"
-                    "inputs.dir" to "snippetsDir"
-                    "outputDir" to "$buildDir/asciidoc"
-                    "dependsOn" to "test"
-                    "sourceDir" to "src/main/asciidoc"
+            with(tasks.named("asciidoctor", AsciidoctorTask::class.java).get()) {
+                attributes(
+                    mapOf(
+                        "snippets" to snippetsDir,
+                        "version" to project.version
+                    )
+                )
+                inputs.dir(snippetsDir)
+                outputDir = project.file("${project.buildDir}/asciidoc")
+                sourceDir = project.file("src/main/asciidoc")
+
+                dependsOn("test")
+            }
+
+            val asciidoctor = tasks.named("asciidoctor", AsciidoctorTask::class.java).get()
+
+            with(tasks.named("jar", Jar::class.java).get()) {
+                from("${asciidoctor.outputDir}/html5") {
+                    into("static/docs")
                 }
 
-                "jar" {
-                    "dependsOn" to "asciidoctor"
-                    "from"("\${asciidoctor.outputDir}/html5") {
-                        "into" to "static/docs"
-                    }
-                }
+                dependsOn("asciidoctor")
             }
         }
 

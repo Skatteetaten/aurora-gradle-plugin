@@ -1,10 +1,10 @@
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
+import info.solidsoft.gradle.pitest.PitestPluginExtension
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
 class CodeAnalysisTools(private val project: Project) {
@@ -45,10 +45,8 @@ class CodeAnalysisTools(private val project: Project) {
         return when {
             project.plugins.hasPlugin("java") -> {
                 with(project) {
-                    withGroovyBuilder {
-                        "pitest" {
-                            "outputFormats" to listOf("XML", "HTML")
-                        }
+                    with(extensions.getByName("pitest") as PitestPluginExtension) {
+                        outputFormats.set(listOf("XML", "HTML"))
                     }
                 }
 

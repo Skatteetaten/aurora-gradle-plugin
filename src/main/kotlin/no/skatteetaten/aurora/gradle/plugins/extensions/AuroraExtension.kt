@@ -20,12 +20,28 @@ open class AuroraExtension(private val project: Project) {
     private fun configureAuroraDefaults() {
         useVersions()
         useSonar()
+        useGradleLogger()
         useKotlin {
             useKtLint()
         }
         useSpringBoot {
             useWebFlux()
             useCloudContract()
+        }
+    }
+
+    val useGradleLogger: AuroraExtension
+        get() {
+            configureGradleLogger()
+
+            return this
+        }
+
+    fun useGradleLogger() = configureGradleLogger()
+
+    private fun configureGradleLogger() {
+        if (!project.plugins.hasPlugin("com.adarshr.test-logger")) {
+            project.plugins.apply("com.adarshr.test-logger")
         }
     }
 

@@ -54,7 +54,7 @@ class AuroraPlugin : Plugin<Project> {
             if (config.applyDeliveryBundleConfig) {
                 reports.add(
                     java.applyDeliveryBundleConfig(
-                        bootJar = config.useBootJar
+                        bootJar = project.isBootJarSetByExtension() || config.useBootJar
                     )
                 )
             }
@@ -66,7 +66,7 @@ class AuroraPlugin : Plugin<Project> {
                         webFluxStarterVersion = config.auroraSpringBootWebFluxStarterVersion,
                         devTools = config.springDevTools,
                         webFluxEnabled = project.isWebFluxSetByExtension() || config.useWebFlux,
-                        bootJarEnabled = config.useBootJar
+                        bootJarEnabled = project.isBootJarSetByExtension() || config.useBootJar
                     )
                 )
             }
@@ -161,6 +161,9 @@ class AuroraPlugin : Plugin<Project> {
 
     private fun Project.isWebFluxSetByExtension() = (extensions.getByType(AuroraExtension::class) as ExtensionAware)
         .extensions.getByType(UseSpringBoot::class).webFluxEnabled
+
+    private fun Project.isBootJarSetByExtension() = (extensions.getByType(AuroraExtension::class) as ExtensionAware)
+        .extensions.getByType(UseSpringBoot::class).bootJarEnabled
 
     private fun configureExtensions(project: Project): AuroraExtension {
         val extension = project.extensions.create(

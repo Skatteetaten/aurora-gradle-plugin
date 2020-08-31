@@ -5,6 +5,7 @@ import org.gradle.api.Project
 @Suppress("unused")
 open class UseSpringBoot(private val project: Project) {
     var webFluxEnabled: Boolean = false
+    var bootJarEnabled: Boolean = false
 
     val useWebFlux: UseSpringBoot
         get() {
@@ -17,6 +18,19 @@ open class UseSpringBoot(private val project: Project) {
 
     private fun enableWebFlux() {
         webFluxEnabled = true
+    }
+
+    val useBootJar: UseSpringBoot
+        get() {
+            enableBootJar()
+
+            return this
+        }
+
+    fun useBootJar() = enableBootJar()
+
+    private fun enableBootJar() {
+        bootJarEnabled = true
     }
 
     val useCloudContract: UseSpringBoot

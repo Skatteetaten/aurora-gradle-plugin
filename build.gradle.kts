@@ -33,7 +33,9 @@ dependencies {
     implementation("info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.5.2")
     implementation("org.jlleitschuh.gradle:ktlint-gradle:9.3.0")
     implementation("gradle.plugin.org.springframework.cloud:spring-cloud-contract-gradle-plugin:2.2.4.RELEASE")
+    implementation("io.spring.gradle:dependency-management-plugin:1.0.10.RELEASE")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0")
+    implementation("com.adarshr:gradle-test-logger-plugin:2.1.0")
 
     testImplementation(gradleTestKit())
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.22")

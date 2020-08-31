@@ -6,8 +6,10 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.endsWith
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaApplicationTools
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
@@ -16,6 +18,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.tasks.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
@@ -25,6 +28,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
 import java.io.File
+import java.util.zip.ZipFile
 
 @ExperimentalStdlibApi
 @Execution(CONCURRENT)
@@ -77,16 +81,169 @@ class JavaApplicationToolsTest {
         )
         buildFile.writeText(
             """
-            plugins {
-                id 'java'
-            }
             """.trimIndent()
         )
         (project as ProjectInternal).evaluate()
+        javaApplicationTools.applyDefaultPlugins()
         val report = javaApplicationTools.applyJavaDefaults("1.8")
 
         assertThat(report.description).isEqualTo("Set groupId, version and add sourceCompability")
         assertThat(project.property("sourceCompatibility") as JavaVersion).isEqualTo(VERSION_1_8)
+    }
+
+    @Test
+    fun `deliveryBundleConfig built correctly for bootJar`() {
+        testProjectDir.resolve("src/main/java").mkdirs()
+        testProjectDir.resolve("src/main/dist/metadata").mkdirs()
+        val openshiftMeta = testProjectDir.resolve("src/main/dist/metadata/openshift.json")
+        openshiftMeta.createNewFile()
+        openshiftMeta.writeText(
+            """
+            {}
+            """.trimIndent()
+        )
+        val application = testProjectDir.resolve("src/main/java/Application.kt")
+        application.createNewFile()
+        application.writeText(
+            """
+            import org.springframework.boot.SpringApplication.run
+            import org.springframework.boot.autoconfigure.SpringBootApplication
+
+            @SpringBootApplication
+            class Application
+
+            fun main(args: Array<String>) {
+                run(Application::class.java, *args)
+            }
+            """.trimIndent()
+        )
+        buildFile.writeText(
+            """
+            plugins {
+                id 'no.skatteetaten.gradle.aurora'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            aurora {
+                useKotlin
+                useSpringBoot {
+                    useBootJar
+                }
+            }
+            """.trimIndent()
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("build")
+            .withPluginClasspath()
+            .build()
+        val jar = testProjectDir.resolve("build/distributions").listFiles()
+            ?.find { it.path.contains("Leveransepakke") }
+        val jarAsZip = ZipFile(jar)
+        val zipEntries = jarAsZip.entries().toList()
+
+        jarAsZip.entries().toList().forEach {
+            println(it.name)
+        }
+
+        val libEntry = zipEntries.find { it.name.endsWith("lib/") }
+        val libEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/lib") }
+        val metaEntry = zipEntries.find { it.name.endsWith("metadata/") }
+        val metaEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/metadata") }
+
+        assertThat(libEntry?.isDirectory ?: false).isTrue()
+        assertThat(libEntryCount).hasSize(2)
+        assertThat(metaEntry?.isDirectory ?: false).isTrue()
+        assertThat(metaEntryCount).hasSize(2)
+        result.taskStatus()
+    }
+
+    @Test
+    fun `deliveryBundleConfig configured correctly for bootJar`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id 'java'
+                id 'org.springframework.boot' version '2.3.3.RELEASE'
+            }
+            """.trimIndent()
+        )
+        (project as ProjectInternal).evaluate()
+        javaApplicationTools.applySpring(
+            "1.0.9",
+            "1.0.8",
+            devTools = false,
+            webFluxEnabled = false,
+            bootJarEnabled = true
+        )
+        val report = javaApplicationTools.applyDeliveryBundleConfig(true)
+        val distZip = project.tasks.named("distZip", Zip::class.java).get()
+
+        assertThat(distZip.archiveClassifier.get()).isEqualTo("Leveransepakke")
+        assertThat(report.description).isEqualTo("Configure Leveransepakke for bootJar")
+    }
+
+    @Test
+    fun `deliveryBundleConfig built correctly for non-bootJar`() {
+        testProjectDir.resolve("src/main/java").mkdirs()
+        testProjectDir.resolve("src/main/dist/metadata").mkdirs()
+        val openshiftMeta = testProjectDir.resolve("src/main/dist/metadata/openshift.json")
+        openshiftMeta.createNewFile()
+        openshiftMeta.writeText(
+            """
+            {}
+            """.trimIndent()
+        )
+        val application = testProjectDir.resolve("src/main/java/Application.kt")
+        application.createNewFile()
+        application.writeText(
+            """
+            import org.springframework.boot.SpringApplication.run
+            import org.springframework.boot.autoconfigure.SpringBootApplication
+
+            @SpringBootApplication
+            class Application
+
+            fun main(args: Array<String>) {
+                run(Application::class.java, *args)
+            }
+            """.trimIndent()
+        )
+        buildFile.writeText(
+            """
+            plugins {
+                id 'no.skatteetaten.gradle.aurora'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            aurora {
+                useKotlin
+                useSpringBoot
+            }
+            """.trimIndent()
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("build")
+            .withPluginClasspath()
+            .build()
+        val jar = testProjectDir.resolve("build/distributions").listFiles()
+            ?.find { it.path.contains("Leveransepakke") }
+        val jarAsZip = ZipFile(jar)
+        val libEntry = jarAsZip.entries().toList().find { it.name.endsWith("lib/") }
+        val metaEntry = jarAsZip.entries().toList().find { it.name.endsWith("metadata/") }
+
+        assertThat(libEntry).isNotNull()
+        assertThat(libEntry?.isDirectory ?: false).isTrue()
+        assertThat(metaEntry).isNotNull()
+        assertThat(metaEntry?.isDirectory ?: false).isTrue()
+        result.taskStatus()
     }
 
     @Test

@@ -3,30 +3,36 @@
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.asciidoctor.gradle.AsciidoctorTask
 import org.gradle.api.Project
+import org.gradle.api.distribution.DistributionContainer
+import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
+import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.withGroovyBuilder
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.springframework.boot.gradle.dsl.SpringBootExtension
+import org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
+import org.springframework.cloud.contract.verifier.config.TestFramework.SPOCK
+import org.springframework.cloud.contract.verifier.plugin.ContractVerifierExtension
 
 @ExperimentalStdlibApi
 class JavaApplicationTools(private val project: Project) {
     fun applyKtLint(): AuroraReport {
         project.logger.lifecycle("Apply ktlint support")
 
-        val rulesToDisable = listOf("import-ordering")
-
         with(project) {
-            withGroovyBuilder {
-                "ktlint" {
-                    "android" to false
-                    "disabledRules" to rulesToDisable
-                }
+            with(extensions.getByName("ktlint") as KtlintExtension) {
+                android.set(false)
+                disabledRules.set(listOf("import-ordering"))
             }
 
             with(tasks) {
@@ -62,25 +68,21 @@ class JavaApplicationTools(private val project: Project) {
             val springCloudDep =
                 "org.springframework.cloud:spring-cloud-contract-dependencies:$springCloudContractVersion"
 
-            withGroovyBuilder {
-                "dependencyManagement" {
-                    "imports" {
-                        "mavenBom" to springCloudDep
-                    }
+            with(extensions.getByName("dependencyManagement") as DependencyManagementExtension) {
+                imports {
+                    mavenBom(springCloudDep)
                 }
             }
 
-            val testFramework = when {
-                junit5 -> "JUNIT5"
-                else -> "SPOCK"
+            val testFrameworkToSet = when {
+                junit5 -> JUNIT5
+                else -> SPOCK
             }
 
-            withGroovyBuilder {
-                "contracts" {
-                    "packageWithBaseClasses" to "$group.${project.name}.contracts"
-                    "failOnNoContracts"(false)
-                    "testFramework" to testFramework
-                }
+            with(extensions.getByName("contracts") as ContractVerifierExtension) {
+                packageWithBaseClasses.set("$group.${project.name}.contracts")
+                failOnNoContracts.set(false)
+                testFramework.set(testFrameworkToSet)
             }
 
             with(dependencies) {
@@ -98,16 +100,12 @@ class JavaApplicationTools(private val project: Project) {
                 dependsOn("test")
             }
 
-            withGroovyBuilder {
-                "verifierStubsJar" {
-                    "enabled" to false
-                }
+            with(tasks.named("verifierStubsJar", Jar::class).get()) {
+                enabled = false
             }
 
             artifacts {
-                withGroovyBuilder {
-                    "archives" to stubsJar
-                }
+                add("archives", stubsJar)
             }
         }
 
@@ -153,21 +151,11 @@ class JavaApplicationTools(private val project: Project) {
                 implementationDependencies.forEach { add("implementation", it) }
             }
 
-            withGroovyBuilder {
-                "compileKotlin" {
-                    "kotlinOptions" {
-                        "suppressWarnings" to true
-                        "jvmTarget" to 1.8
-                        "freeCompilerArgs" to listOf("-Xjsr305=strict")
-                    }
-                }
-
-                "compileTestKotlin" {
-                    "kotlinOptions" {
-                        "suppressWarnings" to true
-                        "jvmTarget" to 1.8
-                        "freeCompilerArgs" to listOf("-Xjsr305=strict")
-                    }
+            tasks.withType(KotlinCompile::class).configureEach {
+                kotlinOptions {
+                    suppressWarnings = true
+                    jvmTarget = "1.8"
+                    freeCompilerArgs = listOf("-Xjsr305=strict")
                 }
             }
         }
@@ -255,18 +243,6 @@ class JavaApplicationTools(private val project: Project) {
                     getByName("bootDistTar") { enabled = false }
                     getByName("bootDistZip") { enabled = false }
                 }
-
-                withGroovyBuilder {
-                    """configurations.archives.artifacts.removeIf {
-                        if (it.hasProperty("archiveTask")) {
-                            !it.archiveTask.enabled
-                        } else if (it.hasProperty("delegate") && it.delegate.hasProperty("archiveTask")) {
-                            !it.delegate.archiveTask.enabled
-                        } else {
-                            true
-                        }
-                    }"""
-                }
             }
 
             if (webFluxEnabled) {
@@ -280,10 +256,8 @@ class JavaApplicationTools(private val project: Project) {
                 }
             }
 
-            withGroovyBuilder {
-                "springBoot" {
-                    "buildInfo()"
-                }
+            with(extensions.getByName("springBoot") as SpringBootExtension) {
+                buildInfo()
             }
 
             with(dependencies) {
@@ -361,20 +335,16 @@ class JavaApplicationTools(private val project: Project) {
 
                 withId("org.jetbrains.kotlin.jvm") {
                     val kotlinTestCompile = (tasks.getByName("compileTestKotlin") as KotlinCompile)
+                    val compileTestGroovy = tasks.named("compileTestGroovy", GroovyCompile::class).get()
 
-                    withGroovyBuilder {
-                        "compileTestGroovy" {
-                            "dependsOn" to "compileTestKotlin"
-                            "classpath" {
-                                invokeMethod(
-                                    "+=",
-                                    files(kotlinTestCompile.destinationDir)
-                                )
-                            }
-                        }
-                        "testClasses" {
-                            "dependsOn" to "compileTestGroovy"
-                        }
+                    with(compileTestGroovy) {
+                        classpath += files(kotlinTestCompile.destinationDir)
+
+                        dependsOn(kotlinTestCompile)
+                    }
+
+                    with(tasks.getByName("testClasses")) {
+                        dependsOn(compileTestGroovy)
                     }
                 }
             }
@@ -427,25 +397,25 @@ class JavaApplicationTools(private val project: Project) {
             with(project) {
                 plugins.apply("distribution")
 
-                withGroovyBuilder {
-                    "distributions" {
-                        "main" {
-                            "contents" {
-                                "from"("$buildDir/libs") {
-                                    "into"("lib")
-                                }
+                with(extensions.getByName("distributions") as DistributionContainer) {
+                    with(getByName("main")) {
+                        contents {
+                            from("${project.buildDir}/libs") {
+                                into("lib")
+                            }
 
-                                "from"("$projectDir/src/main/dist/metadata") {
-                                    "into"("metadata")
-                                }
+                            from("${project.projectDir}/src/main/dist/metadata") {
+                                into("metadata")
                             }
                         }
                     }
+                }
 
-                    "distZip" {
-                        "dependsOn" to "bootJar"
-                        "archiveClassifier" to "Leveransepakke"
-                    }
+                with(tasks.named("distZip", Zip::class).get()) {
+                    archiveClassifier.set("Leveransepakke")
+                    duplicatesStrategy = EXCLUDE
+
+                    dependsOn("bootJar")
                 }
             }
 
@@ -459,9 +429,12 @@ class JavaApplicationTools(private val project: Project) {
             with(project) {
                 plugins.apply("application")
 
-                withGroovyBuilder {
-                    "distZip.classifier" to "Leveransepakke"
-                    "startScripts.enabled" to false
+                with(tasks.named("distZip", Zip::class).get()) {
+                    archiveClassifier.set("Leveransepakke")
+                }
+
+                with(tasks.getByName("startScripts")) {
+                    enabled = false
                 }
             }
 

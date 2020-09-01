@@ -214,7 +214,7 @@ The Aurora plugin will add the sonar plugin on demand [Sonar](https://docs.sonar
  
 ### Ben Manes Versions
 
-The Aurora plugin will add the gradle test logger on demand [Ben Manes Versions](https://github.com/ben-manes/gradle-versions-plugin).
+The Aurora plugin will add the ben manes versions plugin on demand [Ben Manes Versions](https://github.com/ben-manes/gradle-versions-plugin).
 
     aurora {
         useVersions

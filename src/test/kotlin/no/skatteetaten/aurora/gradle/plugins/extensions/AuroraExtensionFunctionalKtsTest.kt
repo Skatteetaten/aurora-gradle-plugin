@@ -3,6 +3,7 @@ package no.skatteetaten.aurora.gradle.plugins.extensions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import no.skatteetaten.aurora.gradle.plugins.model.AuroraConfiguration
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
@@ -332,6 +333,23 @@ class AuroraExtensionFunctionalKtsTest {
     }
 
     @Test
+    fun `output computed config`() {
+        buildFile.appendText(
+            """
+            aurora {}
+        """
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("auroraConfiguration")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.output).contains(AuroraConfiguration().toString())
+        result.taskStatus(taskName = ":auroraConfiguration")
+    }
+
+    @Test
     fun sunshineTest() {
         buildFile.appendText(
             """
@@ -345,6 +363,7 @@ class AuroraExtensionFunctionalKtsTest {
             .build()
 
         assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).contains("Use task :aurora to get full report on how AuroraPlugin modifies your gradle setup")
         result.taskStatus(taskName = ":aurora")
     }
 }

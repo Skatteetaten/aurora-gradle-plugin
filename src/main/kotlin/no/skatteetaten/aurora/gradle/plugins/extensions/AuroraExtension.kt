@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package no.skatteetaten.aurora.gradle.plugins.extensions
 
 import groovy.lang.Closure

@@ -31,7 +31,33 @@ data class AuroraConfiguration(
     val springDevTools: Boolean = Features.springDevTools,
     val useWebFlux: Boolean = Features.useWebFlux,
     val useBootJar: Boolean = Features.useBootJar
-)
+) {
+    override fun toString(): String =
+        "AuroraConfiguration(" +
+            "javaSourceCompatibility='$javaSourceCompatibility',\n" +
+            "groovyVersion='$groovyVersion',\n" +
+            "spockVersion='$spockVersion',\n" +
+            "junit5Version='$junit5Version',\n" +
+            "cglibVersion='$cglibVersion',\n" +
+            "objenesisVersion='$objenesisVersion',\n" +
+            "auroraSpringBootMvcStarterVersion='$auroraSpringBootMvcStarterVersion',\n" +
+            "auroraSpringBootWebFluxStarterVersion='$auroraSpringBootWebFluxStarterVersion',\n" +
+            "springCloudContractVersion='$springCloudContractVersion',\n" +
+            "kotlinLoggingVersion='$kotlinLoggingVersion',\n" +
+            "checkstyleConfigVersion='$checkstyleConfigVersion',\n" +
+            "checkstyleConfigFile='$checkstyleConfigFile',\n" +
+            "applyDefaultPlugins=$applyDefaultPlugins,\n" +
+            "applyJavaDefaults=$applyJavaDefaults,\n" +
+            "applyDeliveryBundleConfig=$applyDeliveryBundleConfig,\n" +
+            "applySpockSupport=$applySpockSupport,\n" +
+            "applyCheckstylePlugin=$applyCheckstylePlugin,\n" +
+            "applyJacocoTestReport=$applyJacocoTestReport,\n" +
+            "applyMavenDeployer=$applyMavenDeployer,\n" +
+            "applyJunit5Support=$applyJunit5Support,\n" +
+            "springDevTools=$springDevTools,\n" +
+            "useWebFlux=$useWebFlux,\n" +
+            "useBootJar=$useBootJar)"
+}
 
 private fun Map<String, Any>.asString(key: String): String? = get(key) as? String
 private fun Map<String, Any>.asBoolean(key: String): Boolean? = (get(key) as? String)?.toBoolean()

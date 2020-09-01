@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package no.skatteetaten.aurora.gradle.plugins.extensions
 
 open class VersionsConfiguration {

@@ -1,5 +1,6 @@
 package no.skatteetaten.aurora.gradle.plugins.functional
 
+import PluginVersions
 import assertk.assertThat
 import assertk.assertions.contains
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
@@ -25,9 +26,9 @@ class AuroraPluginGradleToolsFunctionalTest {
             """
             plugins {
                 id 'no.skatteetaten.gradle.aurora'
-                id 'com.github.ben-manes.versions' version '0.29.0'
-                id 'info.solidsoft.pitest' version '1.5.2'
-                id 'org.asciidoctor.convert' version '2.4.0'
+                id 'com.github.ben-manes.versions' version '${PluginVersions.ben_manes_versions}'
+                id 'info.solidsoft.pitest' version '${PluginVersions.pitest}'
+                id 'org.asciidoctor.convert' version '${PluginVersions.asciidoctor}'
             }
         """
         )
@@ -85,7 +86,6 @@ class AuroraPluginGradleToolsFunctionalTest {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("aurora")
-            .forwardOutput()
             .withPluginClasspath()
             .build()
 

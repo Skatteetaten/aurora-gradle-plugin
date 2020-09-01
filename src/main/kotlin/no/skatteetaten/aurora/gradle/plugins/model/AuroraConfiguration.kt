@@ -1,32 +1,40 @@
 package no.skatteetaten.aurora.gradle.plugins.model
 
+import Features
+import Versions
+import no.skatteetaten.aurora.gradle.plugins.extensions.getFeaturesExtension
+import no.skatteetaten.aurora.gradle.plugins.extensions.getUseSpringBootExtension
+import no.skatteetaten.aurora.gradle.plugins.extensions.getVersionsExtension
 import org.gradle.api.Project
 
 data class AuroraConfiguration(
-    val applyDefaultPlugins: Boolean = true,
-    val applyJavaDefaults: Boolean = true,
-    val javaSourceCompatibility: String = "1.8",
-    val applyDeliveryBundleConfig: Boolean = true,
-    val applySpockSupport: Boolean = false,
-    val groovyVersion: String = "3.0.5",
-    val spockVersion: String = "1.3-groovy-2.5",
-    val junit5Version: String = "5.6.2",
-    val cglibVersion: String = "3.3.0",
-    val objenesisVersion: String = "3.1",
-    val applyCheckstylePlugin: Boolean = true,
-    val applyJacocoTestReport: Boolean = true,
-    val applyMavenDeployer: Boolean = true,
-    val auroraSpringBootMvcStarterVersion: String = "1.0.+",
-    val auroraSpringBootWebFluxStarterVersion: String = "1.0.+",
-    val useWebFlux: Boolean = false,
-    val useBootJar: Boolean = false,
-    val springCloudContractVersion: String = "2.2.4.RELEASE",
-    val kotlinLoggingVersion: String = "1.8.3",
-    val checkstyleConfigVersion: String = "2.2.5",
-    val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml",
-    val applyJunit5Support: Boolean = true,
-    val springDevTools: Boolean = false
+    val javaSourceCompatibility: String = Versions.javaSourceCompatibility,
+    val groovyVersion: String = Versions.groovy,
+    val spockVersion: String = Versions.spock,
+    val junit5Version: String = Versions.junit5,
+    val cglibVersion: String = Versions.cglib,
+    val objenesisVersion: String = Versions.objenesis,
+    val auroraSpringBootMvcStarterVersion: String = Versions.auroraSpringBootMvcStarter,
+    val auroraSpringBootWebFluxStarterVersion: String = Versions.auroraSpringBootWebFluxStarter,
+    val springCloudContractVersion: String = Versions.springCloudContract,
+    val kotlinLoggingVersion: String = Versions.kotlinLogging,
+    val checkstyleConfigVersion: String = Versions.checkstyleConfig,
+    val checkstyleConfigFile: String = Versions.checkstyleConfigFile,
+    val applyDefaultPlugins: Boolean = Features.applyDefaultPlugins,
+    val applyJavaDefaults: Boolean = Features.applyDefaultPlugins,
+    val applyDeliveryBundleConfig: Boolean = Features.applyDeliveryBundleConfig,
+    val applySpockSupport: Boolean = Features.applySpockSupport,
+    val applyCheckstylePlugin: Boolean = Features.applyCheckstylePlugin,
+    val applyJacocoTestReport: Boolean = Features.applyJacocoTestReport,
+    val applyMavenDeployer: Boolean = Features.applyMavenDeployer,
+    val applyJunit5Support: Boolean = Features.applyJunit5Support,
+    val springDevTools: Boolean = Features.springDevTools,
+    val useWebFlux: Boolean = Features.useWebFlux,
+    val useBootJar: Boolean = Features.useBootJar
 )
+
+private fun Map<String, Any>.asString(key: String): String? = get(key) as? String
+private fun Map<String, Any>.asBoolean(key: String): Boolean? = (get(key) as? String)?.toBoolean()
 
 fun Project.getConfig(): AuroraConfiguration {
     val prefix = "aurora."
@@ -35,30 +43,33 @@ fun Project.getConfig(): AuroraConfiguration {
         .map { (k, v) -> k.substring(prefix.length) to v }
         .toMap()
     props.forEach { (k, v) -> logger.lifecycle("overrides -> $k:$v") }
+    val spring = getUseSpringBootExtension()
+    val versions = getVersionsExtension()
+    val features = getFeaturesExtension()
 
     return AuroraConfiguration(
-        applyDefaultPlugins = (props["applyDefaultPlugins"] as? String)?.toBoolean() ?: true,
-        applyJavaDefaults = (props["applyJavaDefaults"] as? String)?.toBoolean() ?: true,
-        javaSourceCompatibility = props["javaSourceCompatibility"] as? String ?: "1.8",
-        applyDeliveryBundleConfig = (props["applyDeliveryBundleConfig"] as? String)?.toBoolean() ?: true,
-        applySpockSupport = (props["applySpockSupport"] as? String)?.toBoolean() ?: false,
-        groovyVersion = props["groovyVersion"] as? String ?: "3.0.5",
-        spockVersion = props["spockVersion"] as? String ?: "1.3-groovy-2.5",
-        junit5Version = props["junit5Version"] as? String ?: "5.6.2",
-        cglibVersion = props["cglibVersion"] as? String ?: "3.3.0",
-        objenesisVersion = props["objenesisVersion"] as? String ?: "3.1",
-        applyCheckstylePlugin = (props["applyCheckstylePlugin"] as? String)?.toBoolean() ?: true,
-        applyJacocoTestReport = (props["applyJacocoTestReport"] as? String)?.toBoolean() ?: true,
-        applyMavenDeployer = (props["applyMavenDeployer"] as? String)?.toBoolean() ?: true,
-        auroraSpringBootMvcStarterVersion = props["auroraSpringBootMvcStarterVersion"] as? String ?: "1.0.+",
-        auroraSpringBootWebFluxStarterVersion = props["auroraSpringBootWebFluxStarterVersion"] as? String ?: "1.0.+",
-        useWebFlux = (props["useWebFlux"] as? String)?.toBoolean() ?: false,
-        useBootJar = (props["useBootJar"] as? String)?.toBoolean() ?: false,
-        springCloudContractVersion = props["springCloudContractVersion"] as? String ?: "2.2.4.RELEASE",
-        kotlinLoggingVersion = props["kotlinLoggingVersion"] as? String ?: "1.8.3",
-        checkstyleConfigVersion = props["checkstyleConfigVersion"] as? String ?: "2.2.5",
-        checkstyleConfigFile = props["checkstyleConfigFile"] as? String ?: "checkstyle/checkstyle-with-metrics.xml",
-        applyJunit5Support = (props["applyJunit5Support"] as? String)?.toBoolean() ?: true,
-        springDevTools = (props["springDevTools"] as? String)?.toBoolean() ?: false
+        javaSourceCompatibility = versions.javaSourceCompatibility ?: props.asString("javaSourceCompatibility") ?: Versions.javaSourceCompatibility,
+        groovyVersion = versions.javaSourceCompatibility ?: props.asString("groovyVersion") ?: Versions.groovy,
+        spockVersion = versions.spock ?: props.asString("spockVersion") ?: Versions.spock,
+        junit5Version = versions.junit5 ?: props.asString("junit5Version") ?: Versions.junit5,
+        cglibVersion = versions.cglib ?: props.asString("cglibVersion") ?: Versions.cglib,
+        objenesisVersion = versions.objenesis ?: props.asString("objenesisVersion") ?: Versions.objenesis,
+        auroraSpringBootMvcStarterVersion = versions.auroraSpringBootMvcStarter ?: props.asString("auroraSpringBootMvcStarterVersion") ?: Versions.auroraSpringBootMvcStarter,
+        auroraSpringBootWebFluxStarterVersion = versions.auroraSpringBootWebFluxStarter ?: props.asString("auroraSpringBootWebFluxStarterVersion") ?: Versions.auroraSpringBootWebFluxStarter,
+        springCloudContractVersion = versions.springCloudContract ?: props.asString("springCloudContractVersion") ?: Versions.springCloudContract,
+        kotlinLoggingVersion = versions.kotlinLogging ?: props.asString("kotlinLoggingVersion") ?: Versions.kotlinLogging,
+        checkstyleConfigVersion = versions.checkstyleConfig ?: props.asString("checkstyleConfigVersion") ?: Versions.checkstyleConfig,
+        checkstyleConfigFile = versions.checkstyleConfigFile ?: props.asString("checkstyleConfigFile") ?: Versions.checkstyleConfigFile,
+        applyDefaultPlugins = features.defaultPlugins ?: props.asBoolean("applyDefaultPlugins") ?: Features.applyDefaultPlugins,
+        applyJavaDefaults = features.javaDefaults ?: props.asBoolean("applyJavaDefaults") ?: Features.applyJavaDefaults,
+        applyDeliveryBundleConfig = features.deliveryBundle ?: props.asBoolean("applyDeliveryBundleConfig") ?: Features.applyDeliveryBundleConfig,
+        applySpockSupport = features.spock ?: props.asBoolean("applySpockSupport") ?: Features.applySpockSupport,
+        applyCheckstylePlugin = features.checkstylePlugin ?: props.asBoolean("applyCheckstylePlugin") ?: Features.applyCheckstylePlugin,
+        applyJacocoTestReport = features.jacocoTestReport ?: props.asBoolean("applyJacocoTestReport") ?: Features.applyJacocoTestReport,
+        applyMavenDeployer = features.mavenDeployer ?: props.asBoolean("applyMavenDeployer") ?: Features.applyMavenDeployer,
+        applyJunit5Support = features.junit5Support ?: props.asBoolean("applyJunit5Support") ?: Features.applyJunit5Support,
+        springDevTools = features.springDevTools ?: props.asBoolean("springDevTools") ?: Features.springDevTools,
+        useWebFlux = spring.webFluxEnabled ?: props.asBoolean("useWebFlux") ?: Features.useWebFlux,
+        useBootJar = spring.bootJarEnabled ?: props.asBoolean("useBootJar") ?: Features.useBootJar
     )
 }

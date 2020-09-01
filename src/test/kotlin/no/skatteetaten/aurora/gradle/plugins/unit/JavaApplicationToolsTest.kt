@@ -2,6 +2,8 @@
 
 package no.skatteetaten.aurora.gradle.plugins.unit
 
+import PluginVersions
+import Versions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsOnly
@@ -13,6 +15,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import no.skatteetaten.aurora.gradle.plugins.AuroraPlugin
+import no.skatteetaten.aurora.gradle.plugins.configureExtensions
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaApplicationTools
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
@@ -64,8 +67,8 @@ class JavaApplicationToolsTest {
         buildFile.writeText(
             """
             plugins {
-                id 'org.jetbrains.kotlin.jvm' version '1.4.0'
-                id 'org.jlleitschuh.gradle.ktlint' version '9.3.0'
+                id 'org.jetbrains.kotlin.jvm' version '${Versions.kotlin}'
+                id 'org.jlleitschuh.gradle.ktlint' version '${PluginVersions.ktlint}'
             }
             """.trimIndent()
         )
@@ -95,7 +98,7 @@ class JavaApplicationToolsTest {
         )
         (project as ProjectInternal).evaluate()
         javaApplicationTools.applyDefaultPlugins()
-        val report = javaApplicationTools.applyJavaDefaults("1.8")
+        val report = javaApplicationTools.applyJavaDefaults(Versions.javaSourceCompatibility)
 
         assertThat(report.description).isEqualTo("Set groupId, version and add sourceCompability")
         assertThat(project.property("sourceCompatibility") as JavaVersion).isEqualTo(VERSION_1_8)
@@ -154,11 +157,6 @@ class JavaApplicationToolsTest {
             ?.find { it.path.contains("Leveransepakke") }
         val jarAsZip = ZipFile(jar)
         val zipEntries = jarAsZip.entries().toList()
-
-        jarAsZip.entries().toList().forEach {
-            println(it.name)
-        }
-
         val libEntry = zipEntries.find { it.name.endsWith("lib/") }
         val libEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/lib") }
         val metaEntry = zipEntries.find { it.name.endsWith("metadata/") }
@@ -177,7 +175,7 @@ class JavaApplicationToolsTest {
             """
             plugins {
                 id 'java'
-                id 'org.springframework.boot' version '2.3.3.RELEASE'
+                id 'org.springframework.boot' version '${PluginVersions.spring_boot}'
             }
             
             repositories {
@@ -205,11 +203,12 @@ class JavaApplicationToolsTest {
         buildFile.writeText(
             """
             plugins {
-                id 'org.jetbrains.kotlin.jvm' version '1.3.72'
-                id 'org.jetbrains.kotlin.plugin.spring' version '1.3.72'
+                id 'org.jetbrains.kotlin.jvm' version '${Versions.kotlin}'
+                id 'org.jetbrains.kotlin.plugin.spring' version '${Versions.kotlin}'
             }
             """.trimIndent()
         )
+        project.configureExtensions()
         (project as ProjectInternal).evaluate()
         val config = project.getConfig()
         val springReport = javaApplicationTools.applyKotlinSpringSupport()
@@ -351,7 +350,7 @@ class JavaApplicationToolsTest {
         buildFile.writeText(
             """
             plugins {
-                id 'com.github.ben-manes.versions' version '0.29.0'
+                id 'com.github.ben-manes.versions' version '${PluginVersions.ben_manes_versions}'
             }
             """.trimIndent()
         )
@@ -406,7 +405,7 @@ class JavaApplicationToolsTest {
             """
             plugins {
                 id 'java'
-                id 'org.asciidoctor.convert' version '2.4.0'
+                id 'org.asciidoctor.convert' version '${PluginVersions.asciidoctor}'
             }
             """.trimIndent()
         )
@@ -436,9 +435,9 @@ class JavaApplicationToolsTest {
             plugins {
                 id 'java'
                 id 'distribution'
-                id 'org.springframework.boot' version '2.3.3.RELEASE'
-                id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-                id 'org.springframework.cloud.contract' version '2.2.4.RELEASE'
+                id 'org.springframework.boot' version '${PluginVersions.spring_boot}'
+                id 'io.spring.dependency-management' version '${PluginVersions.dependency_management}'
+                id 'org.springframework.cloud.contract' version '${PluginVersions.cloud_contract}'
             }
             
             repositories {
@@ -448,6 +447,7 @@ class JavaApplicationToolsTest {
         )
         project.tasks.create("bootDistTar")
         project.tasks.create("bootDistZip")
+        project.configureExtensions()
         (project as ProjectInternal).evaluate()
         val config = project.getConfig()
         javaApplicationTools.applySpring(
@@ -520,7 +520,7 @@ class JavaApplicationToolsTest {
             """
             plugins {
                 id 'java'
-                id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+                id 'org.jetbrains.kotlin.jvm' version '${Versions.kotlin}'
             }
             
             repositories {
@@ -528,6 +528,7 @@ class JavaApplicationToolsTest {
             }
             """.trimIndent()
         )
+        project.configureExtensions()
         (project as ProjectInternal).evaluate()
         val config = project.getConfig()
         val report = javaApplicationTools.applySpockSupport(
@@ -584,7 +585,7 @@ class JavaApplicationToolsTest {
         buildFile.writeText(
             """
             plugins {
-                id("org.jetbrains.kotlin.jvm") version("1.4.0")
+                id("org.jetbrains.kotlin.jvm") version("1.3.70")
             }
         """
         )
@@ -596,7 +597,7 @@ class JavaApplicationToolsTest {
 
         assertThat(
             project.buildscript.scriptClassPath.asURLs.any {
-                it.toString().endsWith("kotlin-gradle-plugin-1.4.0.jar")
+                it.toString().endsWith("kotlin-gradle-plugin-1.3.70.jar")
             }
         ).isTrue()
     }

@@ -124,7 +124,6 @@ class AuroraExtensionFunctionalTest {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("ktlintKotlinScriptFormat", "build")
-            .forwardOutput()
             .withPluginClasspath()
             .build()
 
@@ -155,7 +154,6 @@ class AuroraExtensionFunctionalTest {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("ktlintKotlinScriptFormat", "build")
-            .forwardOutput()
             .withPluginClasspath()
             .build()
 
@@ -295,6 +293,33 @@ class AuroraExtensionFunctionalTest {
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).contains("webflux enabled and webmvc + tomcat excluded")
+        result.taskStatus(taskName = ":aurora")
+    }
+
+    @Test
+    fun `configuration overload is respected`() {
+        buildFile.appendText(
+            """
+            aurora {
+                useSpringBoot
+                versions {
+                    auroraSpringBootMvcStarter = "1.0.7"
+                }
+                features {
+                    spock = true
+                }
+            }
+        """
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("aurora")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:1.0.7")
+        assertThat(result.output).contains("testImplementation org.codehaus.groovy:groovy-all:3.0.5")
         result.taskStatus(taskName = ":aurora")
     }
 

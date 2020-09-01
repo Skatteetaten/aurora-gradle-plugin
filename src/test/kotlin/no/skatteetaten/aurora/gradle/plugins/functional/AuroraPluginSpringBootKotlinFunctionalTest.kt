@@ -1,5 +1,7 @@
 package no.skatteetaten.aurora.gradle.plugins.functional
 
+import PluginVersions
+import Versions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
@@ -26,9 +28,9 @@ class AuroraPluginSpringBootKotlinFunctionalTest {
             """
             plugins {
                 id 'no.skatteetaten.gradle.aurora'
-                id 'org.springframework.boot' version '2.3.3.RELEASE'
-                id 'org.jetbrains.kotlin.jvm' version '1.3.72'
-                id 'org.jetbrains.kotlin.plugin.spring' version '1.3.72'
+                id 'org.springframework.boot' version '${PluginVersions.spring_boot}'
+                id 'org.jetbrains.kotlin.jvm' version '${Versions.kotlin}'
+                id 'org.jetbrains.kotlin.plugin.spring' version '${Versions.kotlin}'
             }
  
             repositories {

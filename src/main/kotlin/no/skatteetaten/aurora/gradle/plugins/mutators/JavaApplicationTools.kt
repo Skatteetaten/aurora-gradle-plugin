@@ -357,7 +357,7 @@ class JavaApplicationTools(private val project: Project) {
         return AuroraReport(
             name = "aurora.applySpockSupport",
             pluginsApplied = listOf("groovy"),
-            dependenciesAdded = testDependencies.map { "testImplemenation $it" }
+            dependenciesAdded = testDependencies.map { "testImplementation $it" }
         )
     }
 

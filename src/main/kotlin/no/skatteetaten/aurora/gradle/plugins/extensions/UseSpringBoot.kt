@@ -4,8 +4,8 @@ import org.gradle.api.Project
 
 @Suppress("unused")
 open class UseSpringBoot(private val project: Project) {
-    var webFluxEnabled: Boolean = false
-    var bootJarEnabled: Boolean = false
+    var webFluxEnabled: Boolean? = null
+    var bootJarEnabled: Boolean? = null
 
     val useWebFlux: UseSpringBoot
         get() {

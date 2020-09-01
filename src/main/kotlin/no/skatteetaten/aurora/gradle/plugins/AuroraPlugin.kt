@@ -1,8 +1,10 @@
 package no.skatteetaten.aurora.gradle.plugins
 
 import no.skatteetaten.aurora.gradle.plugins.extensions.AuroraExtension
+import no.skatteetaten.aurora.gradle.plugins.extensions.FeaturesConfiguration
 import no.skatteetaten.aurora.gradle.plugins.extensions.UseKotlin
 import no.skatteetaten.aurora.gradle.plugins.extensions.UseSpringBoot
+import no.skatteetaten.aurora.gradle.plugins.extensions.VersionsConfiguration
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.CodeAnalysisTools
@@ -18,8 +20,7 @@ import org.gradle.kotlin.dsl.getByType
 @ExperimentalStdlibApi
 class AuroraPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        configureExtensions(project)
-
+        project.configureExtensions()
         project.afterEvaluate {
             logger.lifecycle("After evaluate")
 
@@ -54,7 +55,7 @@ class AuroraPlugin : Plugin<Project> {
             if (config.applyDeliveryBundleConfig) {
                 reports.add(
                     java.applyDeliveryBundleConfig(
-                        bootJar = project.isBootJarSetByExtension() || config.useBootJar
+                        bootJar = config.useBootJar
                     )
                 )
             }
@@ -65,8 +66,8 @@ class AuroraPlugin : Plugin<Project> {
                         mvcStarterVersion = config.auroraSpringBootMvcStarterVersion,
                         webFluxStarterVersion = config.auroraSpringBootWebFluxStarterVersion,
                         devTools = config.springDevTools,
-                        webFluxEnabled = project.isWebFluxSetByExtension() || config.useWebFlux,
-                        bootJarEnabled = project.isBootJarSetByExtension() || config.useBootJar
+                        webFluxEnabled = config.useWebFlux,
+                        bootJarEnabled = config.useBootJar
                     )
                 )
             }
@@ -155,6 +156,12 @@ class AuroraPlugin : Plugin<Project> {
                 }
             }
 
+            tasks.register("auroraConfiguration") {
+                doLast {
+                    logger.lifecycle(config.toString())
+                }
+            }
+
             logger.lifecycle("Use task :aurora to get full report on how AuroraPlugin modify your gradle setup")
         }
     }
@@ -164,24 +171,32 @@ class AuroraPlugin : Plugin<Project> {
 
     private fun Project.isBootJarSetByExtension() = (extensions.getByType(AuroraExtension::class) as ExtensionAware)
         .extensions.getByType(UseSpringBoot::class).bootJarEnabled
+}
 
-    private fun configureExtensions(project: Project): AuroraExtension {
-        val extension = project.extensions.create(
-            "aurora",
-            AuroraExtension::class,
-            project
-        )
-        (extension as ExtensionAware).extensions.create(
-            "useSpringBoot",
-            UseSpringBoot::class,
-            project
-        )
-        (extension as ExtensionAware).extensions.create(
-            "useKotlin",
-            UseKotlin::class,
-            project
-        )
+fun Project.configureExtensions(): AuroraExtension {
+    val extension = extensions.create(
+        "aurora",
+        AuroraExtension::class,
+        project
+    )
+    (extension as ExtensionAware).extensions.create(
+        "useSpringBoot",
+        UseSpringBoot::class,
+        project
+    )
+    (extension as ExtensionAware).extensions.create(
+        "useKotlin",
+        UseKotlin::class,
+        project
+    )
+    (extension as ExtensionAware).extensions.create(
+        "versions",
+        VersionsConfiguration::class
+    )
+    (extension as ExtensionAware).extensions.create(
+        "features",
+        FeaturesConfiguration::class
+    )
 
-        return extension
-    }
+    return extension
 }

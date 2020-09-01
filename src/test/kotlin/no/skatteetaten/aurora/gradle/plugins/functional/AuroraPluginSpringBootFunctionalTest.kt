@@ -1,5 +1,6 @@
 package no.skatteetaten.aurora.gradle.plugins.functional
 
+import PluginVersions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
@@ -26,7 +27,7 @@ class AuroraPluginSpringBootFunctionalTest {
             """
             plugins {
                 id 'no.skatteetaten.gradle.aurora'
-                id 'org.springframework.boot' version '2.3.3.RELEASE'
+                id 'org.springframework.boot' version '${PluginVersions.spring_boot}'
             }
  
             repositories {

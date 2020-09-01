@@ -8,9 +8,11 @@ import assertk.assertions.containsOnly
 import assertk.assertions.endsWith
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import no.skatteetaten.aurora.gradle.plugins.AuroraPlugin
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaApplicationTools
 import no.skatteetaten.aurora.gradle.plugins.taskStatus
@@ -20,7 +22,10 @@ import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
@@ -30,6 +35,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
+import org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
+import org.springframework.cloud.contract.verifier.plugin.ContractVerifierExtension
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -171,6 +178,10 @@ class JavaApplicationToolsTest {
             plugins {
                 id 'java'
                 id 'org.springframework.boot' version '2.3.3.RELEASE'
+            }
+            
+            repositories {
+                mavenCentral()
             }
             """.trimIndent()
         )
@@ -410,5 +421,183 @@ class JavaApplicationToolsTest {
         assertThat(asciiDoctor.dependsOn).contains("test")
         assertThat(jar).isNotNull()
         assertThat(jar.dependsOn).contains("asciidoctor")
+    }
+
+    @Test
+    fun `spring cloud contract configured correctly`() {
+        buildFile.writeText(
+            """
+            buildscript {
+                repositories {
+                    mavenCentral()
+                }
+            }
+            
+            plugins {
+                id 'java'
+                id 'distribution'
+                id 'org.springframework.boot' version '2.3.3.RELEASE'
+                id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+                id 'org.springframework.cloud.contract' version '2.2.4.RELEASE'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            """.trimIndent()
+        )
+        project.tasks.create("bootDistTar")
+        project.tasks.create("bootDistZip")
+        (project as ProjectInternal).evaluate()
+        val config = project.getConfig()
+        javaApplicationTools.applySpring(
+            "1.0.9",
+            "1.0.8",
+            devTools = false,
+            webFluxEnabled = false,
+            bootJarEnabled = false
+        )
+        val report = javaApplicationTools.applySpringCloudContract(true, config.springCloudContractVersion)
+        val stubsJar = project.tasks.named("stubsJar", Jar::class.java).get()
+
+        with(project.configurations.getByName("testImplementation").allDependencies) {
+            assertThat(
+                find {
+                    it.group == "org.springframework.cloud" &&
+                        it.name == "spring-cloud-starter-contract-stub-runner" &&
+                        it.version == null
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.springframework.cloud" &&
+                        it.name == "spring-cloud-starter-contract-verifier" &&
+                        it.version == null
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.springframework.cloud" &&
+                        it.name == "spring-cloud-contract-wiremock" &&
+                        it.version == null
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.springframework.restdocs" &&
+                        it.name == "spring-restdocs-mockmvc" &&
+                        it.version == null
+                }
+            ).isNotNull()
+        }
+        with(project.extensions.getByName("contracts") as ContractVerifierExtension) {
+            assertThat(packageWithBaseClasses.get()).isEqualTo("${project.group}.${project.name}.contracts")
+            assertThat(failOnNoContracts.get()).isFalse()
+            assertThat(testFramework.get()).isEqualTo(JUNIT5)
+        }
+        with(stubsJar) {
+            assertThat(archiveClassifier.get()).isEqualTo("stubs")
+            assertThat(dependsOn).contains("test")
+        }
+        with(project.tasks.named("verifierStubsJar", Jar::class).get()) {
+            assertThat(enabled).isFalse()
+        }
+        with(project) {
+            artifacts {
+                assertThat(
+                    configurations.getByName("archives").artifacts.any {
+                        it.classifier === stubsJar.archiveClassifier.get()
+                    }
+                ).isTrue()
+            }
+        }
+        assertThat(report.description).isEqualTo("Configure stubs, testframework")
+    }
+
+    @Test
+    fun `spock configured correctly`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id 'java'
+                id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            """.trimIndent()
+        )
+        (project as ProjectInternal).evaluate()
+        val config = project.getConfig()
+        val report = javaApplicationTools.applySpockSupport(
+            groovyVersion = config.groovyVersion,
+            spockVersion = config.spockVersion,
+            cglibVersion = config.cglibVersion,
+            objenesisVersion = config.objenesisVersion
+        )
+        val kotlinTestCompile = (project.tasks.getByName("compileTestKotlin") as KotlinCompile)
+        val compileTestGroovy = project.tasks.named("compileTestGroovy", GroovyCompile::class).get()
+
+        assertThat(project.plugins.hasPlugin("groovy")).isTrue()
+        with(project.configurations.getByName("testImplementation").allDependencies) {
+            assertThat(
+                find {
+                    it.group == "org.codehaus.groovy" &&
+                        it.name == "groovy-all" &&
+                        it.version == config.groovyVersion
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.spockframework" &&
+                        it.name == "spock-core" &&
+                        it.version == config.spockVersion
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "cglib" &&
+                        it.name == "cglib-nodep" &&
+                        it.version == config.cglibVersion
+                }
+            ).isNotNull()
+            assertThat(
+                find {
+                    it.group == "org.objenesis" &&
+                        it.name == "objenesis" &&
+                        it.version == config.objenesisVersion
+                }
+            ).isNotNull()
+        }
+        with(compileTestGroovy) {
+            assertThat(dependsOn).contains(kotlinTestCompile)
+        }
+        with(project.tasks.getByName("testClasses")) {
+            assertThat(dependsOn).contains(compileTestGroovy)
+        }
+        assertThat(report.name).contains("aurora.applySpockSupport")
+    }
+
+    @Test
+    fun `override plugin test`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("org.jetbrains.kotlin.jvm") version("1.4.0")
+            }
+        """
+        )
+        val project = ProjectBuilder.builder()
+            .withProjectDir(testProjectDir)
+            .build()
+        project.plugins.apply(AuroraPlugin::class)
+        (project as ProjectInternal).evaluate()
+
+        assertThat(
+            project.buildscript.scriptClassPath.asURLs.any {
+                it.toString().endsWith("kotlin-gradle-plugin-1.4.0.jar")
+            }
+        ).isTrue()
     }
 }

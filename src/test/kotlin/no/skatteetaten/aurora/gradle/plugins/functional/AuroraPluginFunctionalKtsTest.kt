@@ -21,6 +21,10 @@ class AuroraPluginFunctionalKtsTest {
     fun setup() {
         buildFile = testProjectDir.resolve("build.gradle.kts")
         buildFile.createNewFile()
+    }
+
+    @Test
+    fun `build test`() {
         buildFile.writeText(
             """
             plugins {
@@ -30,10 +34,6 @@ class AuroraPluginFunctionalKtsTest {
             aurora {}
         """
         )
-    }
-
-    @Test
-    fun `build test`() {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("build")
@@ -45,6 +45,15 @@ class AuroraPluginFunctionalKtsTest {
 
     @Test
     fun sunshineTest() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("no.skatteetaten.gradle.aurora")
+            }
+            
+            aurora {}
+        """
+        )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("aurora")

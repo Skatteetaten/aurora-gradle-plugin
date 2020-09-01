@@ -89,11 +89,15 @@ A complete example `build.gradle.kts` file can look like this
 The following plugins will be reacted upon by this Aurora Plugin
  - spring-cloud-contract
  - info.solidsoft.pitest
+ - com.adarshr.test-logger
+ - org.sonarqube
  - org.asciidoctor.convert
- - com.github.ben-manves.versions
+ - com.github.ben-manes.versions
  - org.springframework.boot
+ - org.springframework.cloud.contract
  - org.jetbrains.kotlin.jvm
  - org.jetbrains.kotlin.plugin.spring
+ - org.jlleitschuh.gradle.ktlint
  
 ### Default Plugins and Repository Configuration
 

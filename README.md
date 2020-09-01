@@ -313,8 +313,8 @@ correct packet with base class and test framework.
 It will also create a proper stubs jar file based on contracts. The dependencies added are wiremock and verifier. Enable like so:
 
     aurora {
-        versions {
-            kotlinLogging = 'some.version.here'
+        useSpringBoot {
+            useCloudContract
         }
     }
 

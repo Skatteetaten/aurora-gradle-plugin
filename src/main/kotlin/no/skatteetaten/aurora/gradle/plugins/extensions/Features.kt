@@ -1,6 +1,6 @@
 package no.skatteetaten.aurora.gradle.plugins.extensions
 
-open class FeaturesConfiguration {
+open class Features {
     var defaultPlugins: Boolean? = null
     var javaDefaults: Boolean? = null
     var deliveryBundle: Boolean? = null

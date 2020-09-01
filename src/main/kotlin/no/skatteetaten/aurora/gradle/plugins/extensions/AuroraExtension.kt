@@ -10,15 +10,15 @@ import org.gradle.util.ConfigureUtil.configure
 
 @Suppress("unused")
 open class AuroraExtension(private val project: Project) {
-    val versions: VersionsConfiguration
+    val versions: Versions
         get() = project.getVersionsExtension()
-    val features: FeaturesConfiguration
+    val features: Features
         get() = project.getFeaturesExtension()
 
-    fun versions(config: Closure<VersionsConfiguration>) = configure(config, project.getVersionsExtension())
-    fun versions(configuration: Action<VersionsConfiguration>) = configuration.execute(project.getVersionsExtension())
-    fun features(config: Closure<FeaturesConfiguration>) = configure(config, project.getFeaturesExtension())
-    fun features(configuration: Action<FeaturesConfiguration>) = configuration.execute(project.getFeaturesExtension())
+    fun versions(config: Closure<Versions>) = configure(config, project.getVersionsExtension())
+    fun versions(configuration: Action<Versions>) = configuration.execute(project.getVersionsExtension())
+    fun features(config: Closure<Features>) = configure(config, project.getFeaturesExtension())
+    fun features(configuration: Action<Features>) = configuration.execute(project.getFeaturesExtension())
 
     val useAuroraDefaults: AuroraExtension
         get() = configureAuroraDefaults()
@@ -190,14 +190,14 @@ fun Project.getUseSpringBootExtension(): UseSpringBoot {
     return (extension as ExtensionAware).extensions.getByType(UseSpringBoot::class.java)
 }
 
-fun Project.getVersionsExtension(): VersionsConfiguration {
+fun Project.getVersionsExtension(): Versions {
     val extension = project.extensions.getByType(AuroraExtension::class.java)
 
-    return (extension as ExtensionAware).extensions.getByType(VersionsConfiguration::class.java)
+    return (extension as ExtensionAware).extensions.getByType(Versions::class.java)
 }
 
-fun Project.getFeaturesExtension(): FeaturesConfiguration {
+fun Project.getFeaturesExtension(): Features {
     val extension = project.extensions.getByType(AuroraExtension::class.java)
 
-    return (extension as ExtensionAware).extensions.getByType(FeaturesConfiguration::class.java)
+    return (extension as ExtensionAware).extensions.getByType(Features::class.java)
 }

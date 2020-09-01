@@ -9,10 +9,10 @@ import no.skatteetaten.aurora.gradle.plugins.configurators.Miscellaneous
 import no.skatteetaten.aurora.gradle.plugins.configurators.Spring
 import no.skatteetaten.aurora.gradle.plugins.configurators.Test
 import no.skatteetaten.aurora.gradle.plugins.extensions.AuroraExtension
-import no.skatteetaten.aurora.gradle.plugins.extensions.FeaturesConfiguration
+import no.skatteetaten.aurora.gradle.plugins.extensions.Features
 import no.skatteetaten.aurora.gradle.plugins.extensions.UseKotlin
 import no.skatteetaten.aurora.gradle.plugins.extensions.UseSpringBoot
-import no.skatteetaten.aurora.gradle.plugins.extensions.VersionsConfiguration
+import no.skatteetaten.aurora.gradle.plugins.extensions.Versions
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import org.gradle.api.Plugin
@@ -113,11 +113,11 @@ fun Project.configureExtensions(): AuroraExtension {
     )
     (extension as ExtensionAware).extensions.create(
         "versions",
-        VersionsConfiguration::class
+        Versions::class
     )
     (extension as ExtensionAware).extensions.create(
         "features",
-        FeaturesConfiguration::class
+        Features::class
     )
 
     return extension

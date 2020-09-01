@@ -2,7 +2,7 @@
 
 package no.skatteetaten.aurora.gradle.plugins.extensions
 
-open class VersionsConfiguration {
+open class Versions {
     var javaSourceCompatibility: String? = null
     var groovy: String? = null
     var spock: String? = null

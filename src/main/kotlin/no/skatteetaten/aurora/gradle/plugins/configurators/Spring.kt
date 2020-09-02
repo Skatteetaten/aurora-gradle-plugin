@@ -20,7 +20,8 @@ class Spring(
                     webFluxStarterVersion = config.auroraSpringBootWebFluxStarterVersion,
                     devTools = config.springDevTools,
                     webFluxEnabled = config.useWebFlux,
-                    bootJarEnabled = config.useBootJar
+                    bootJarEnabled = config.useBootJar,
+                    startersEnabled = config.useAuroraStarters
                 )
             )
         }

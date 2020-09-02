@@ -17,18 +17,21 @@ class SpringTools(private val project: Project) {
         webFluxStarterVersion: String,
         devTools: Boolean,
         webFluxEnabled: Boolean,
-        bootJarEnabled: Boolean
+        bootJarEnabled: Boolean,
+        startersEnabled: Boolean
     ): AuroraReport {
         val implementationDependencies = buildList {
             add("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-            add(
-                when {
-                    webFluxEnabled ->
-                        "no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter:$webFluxStarterVersion"
-                    else -> "no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:$mvcStarterVersion"
-                }
-            )
+            if (startersEnabled) {
+                add(
+                    when {
+                        webFluxEnabled ->
+                            "no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter:$webFluxStarterVersion"
+                        else -> "no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:$mvcStarterVersion"
+                    }
+                )
+            }
 
             if (devTools) add("org.springframework.boot:spring-boot-devtools")
         }
@@ -76,6 +79,7 @@ class SpringTools(private val project: Project) {
             else -> ", bootJar disabled"
         }
         val resolvedWebFluxText = when {
+            !startersEnabled -> ", starters disabled"
             webFluxEnabled -> ", webflux enabled and webmvc + tomcat excluded"
             else -> ", webFlux disabled"
         }

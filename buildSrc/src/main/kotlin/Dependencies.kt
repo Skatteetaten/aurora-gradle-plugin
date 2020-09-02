@@ -40,4 +40,5 @@ object Features {
     const val springDevTools: Boolean = false
     const val useWebFlux: Boolean = false
     const val useBootJar: Boolean = false
+    const val useAuroraStarters: Boolean = true
 }

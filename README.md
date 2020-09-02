@@ -52,7 +52,7 @@ Put the following snippet in your `gradle.properties` file
 
     version=local-SNAPSHOT
     groupId=no.skatteetaten.<you>.<groupId>
-    artifactId= <your artifact name>    
+    artifactId=<your artifact name>    
    
 If you want to configure this plugin you can do so in the `aurora` block in your build file 
 
@@ -194,11 +194,11 @@ parameters (All versions are optional, run :auroraConfiguration to see what vers
 The Aurora plugin will react to the Asciidoc plugin
 
 The jar task is modified to include the generated documentation into static/docs and also registers an attribute
-snippetsDir for integration with [Spring Rest Docs](https://projects.spring.io/spring-restdocs/).
+snippetsDir at `${project.buildDir}/generated-snippets` for integration with [Spring Rest Docs](https://projects.spring.io/spring-restdocs/).
 
 ### Gradle test logger
 
-The Aurora plugin will add the gradle test logger plugin on demand [Gradle Test Logger](https://github.com/radarsh/gradle-test-logger-plugin).
+The Aurora plugin will add the gradle test logger plugin on demand [Gradle Test Logger](https://github.com/radarsh/gradle-test-logger-plugin). It is enabled with default configuration, check docs for configuration.
 
     aurora {
         useGradleLogger
@@ -206,7 +206,7 @@ The Aurora plugin will add the gradle test logger plugin on demand [Gradle Test 
  
 ### Sonar
 
-The Aurora plugin will add the sonar plugin on demand [Sonar](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-gradle/).
+The Aurora plugin will add the sonar plugin on demand [Sonar](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-gradle/). It is enabled with default configuration, check docs for configuration.
 
     aurora {
         useSonar
@@ -215,6 +215,8 @@ The Aurora plugin will add the sonar plugin on demand [Sonar](https://docs.sonar
 ### Ben Manes Versions
 
 The Aurora plugin will add the ben manes versions plugin on demand [Ben Manes Versions](https://github.com/ben-manes/gradle-versions-plugin).
+
+Check out [MiscellaneousTools](src/main/kotlin/no/skatteetaten/aurora/gradle/plugins/mutators/MiscellaneousTools.kt) to see configurations - most important of which is rejecting all non-release versions.
 
     aurora {
         useVersions
@@ -251,12 +253,12 @@ I.e.
 
 **Jacoco**
 
-By default the [jacoco plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html) will be activated. Default value for xml.destination = file("${buildDir}/reports/jacoco/report.xml"). It can
-be disabled with;
+By default the [jacoco plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html) will be activated. Xml is enabled, csv is disabled. Default value for xml.destination = file("${buildDir}/reports/jacoco/report.xml"). It can
+be disabled with:
 
     aurora {
         features {
-            jacocoTestReport = true
+            jacocoTestReport = false
         }
     }
     
@@ -276,12 +278,26 @@ the webmvc or webflux starters from Skatteetaten. Support for JSR310 to get date
     aurora {
         useSpringBoot
     }
-    
+ 
+By default the plugin will include [Skatteetaten MVC Starter](https://github.com/Skatteetaten/aurora-spring-boot-mvc-starter), if you are running a webflux setup include [Skatteetaten WebFlux Starter](https://github.com/Skatteetaten/aurora-spring-boot-webflux-starter) with this configuration:
+
     aurora {
         useSpringBoot {
             useWebFlux
         }
     }
+    
+Should you choose to not use the starters or have other needs that perclude them, you can disable them like this:
+
+    aurora {
+        useSpringBoot
+        
+        features {
+            auroraStarters = false
+        }
+    }
+    
+Remove that you can use the `versions` block within `aurora` to downgrade a version of the starter if you experience issues.
 
 If devtools are enabled they will be included in the generated app. This instruction should be set globally
 in your `~/.gradle/gradle.properties` file and be turned of in ci server. They can also be enabled on a project basis like this:

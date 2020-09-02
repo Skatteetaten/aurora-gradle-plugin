@@ -5,6 +5,7 @@ package no.skatteetaten.aurora.gradle.plugins.unit
 import PluginVersions
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
@@ -12,11 +13,13 @@ import assertk.assertions.isTrue
 import no.skatteetaten.aurora.gradle.plugins.configureExtensions
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.SpringTools
+import no.skatteetaten.aurora.gradle.plugins.taskStatus
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.named
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -43,6 +46,39 @@ class SpringToolsTest {
             .withProjectDir(testProjectDir)
             .build()
         springTools = SpringTools(project)
+    }
+
+    @Test
+    fun `disable starters ok`() {
+        buildFile.appendText(
+            """
+            plugins {
+                id 'no.skatteetaten.gradle.aurora'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            aurora {
+                useSpringBoot
+                
+                features {
+                    auroraStarters = false
+                }
+            }
+        """
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("aurora")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.output).contains("----- Aurora Plugin Report -----")
+        assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
+        assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
+        result.taskStatus(taskName = ":aurora")
     }
 
     @Test
@@ -78,7 +114,8 @@ class SpringToolsTest {
             "1.0.8",
             devTools = false,
             webFluxEnabled = false,
-            bootJarEnabled = false
+            bootJarEnabled = false,
+            startersEnabled = config.useAuroraStarters
         )
         val report = springTools.applySpringCloudContract(true, config.springCloudContractVersion)
         val stubsJar = project.tasks.named("stubsJar", Jar::class.java).get()

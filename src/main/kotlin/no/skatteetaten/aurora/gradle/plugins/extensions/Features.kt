@@ -10,4 +10,5 @@ open class Features {
     var mavenDeployer: Boolean? = null
     var junit5Support: Boolean? = null
     var springDevTools: Boolean? = null
+    var auroraStarters: Boolean? = null
 }

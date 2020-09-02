@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD_PARALLEL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintFormatTask
@@ -71,6 +73,16 @@ testlogger {
     showPassedStandardStreams = false
     showSkippedStandardStreams = false
     showFailedStandardStreams = true
+}
+
+java {
+    withSourcesJar()
+}
+
+val sourcesJar by tasks.getting(Jar::class)
+
+artifacts {
+    add("archives", sourcesJar)
 }
 
 tasks {

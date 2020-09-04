@@ -1,5 +1,7 @@
 # Aurora Gradle Plugin
 
+[See This Section For Development](#Development)
+
 The Aurora Gradle Plugin is a plugin that will apply a sensible yet configurable base line for JVM applications developed by the Norwegian
 Tax Authority. The base line will make sure that applications will comply with most of the requirements set forth by
 the Aurora team for applications that are to be deployed to the [Aurora OpenShift Platform](https://skatteetaten.github.io/aurora-openshift/).
@@ -427,3 +429,19 @@ For version questions around bundled plugins you can verify it on a git tag of y
 ### Configuration Reference
 
 To see specifics on how plugins are mutated please check out our [Mutators](src/main/kotlin/no/skatteetaten/aurora/gradle/plugins/mutators)
+
+### Development
+
+* Run `./gradlew build publishToMavenLocal` to add the plugin to your local repository.
+* Add this block to `settings.gradle` in the project in which you want to test the plugin:
+
+    ```groovy
+    pluginManagement {
+        repositories {
+            mavenLocal()
+            gradlePluginPortal()
+        }
+    }
+    ```
+
+* Add `id("no.skatteetaten.gradle.aurora") version("local-SNAPSHOT")` to your `build.gradle.kts` file

@@ -7,8 +7,9 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.mutators.MiscellaneousTools
-import no.skatteetaten.aurora.gradle.plugins.taskStatus
+import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.testfixtures.ProjectBuilder
@@ -90,6 +91,6 @@ class MiscellaneousToolsTest {
 
         assertThat(result.output).contains("The following dependencies exceed the version found at the release revision level")
         assertThat(result.output).contains("org.seleniumhq.selenium:selenium-leg-rc [4.0.0-alpha-6 <- ")
-        result.taskStatus(taskName = ":dependencyUpdates")
+        assertThat(result.taskOutcome(taskName = ":dependencyUpdates")).isSuccessOrEqualTo()
     }
 }

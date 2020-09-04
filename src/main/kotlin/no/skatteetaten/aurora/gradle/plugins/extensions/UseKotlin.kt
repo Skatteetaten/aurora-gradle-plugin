@@ -16,6 +16,8 @@ open class UseKotlin(private val project: Project) {
     private fun configureKtLint() {
         if (!project.plugins.hasPlugin("org.jlleitschuh.gradle.ktlint")) {
             project.plugins.apply("org.jlleitschuh.gradle.ktlint")
+
+            project.logger.lifecycle("Applied missing plugin: KtLint")
         }
     }
 }

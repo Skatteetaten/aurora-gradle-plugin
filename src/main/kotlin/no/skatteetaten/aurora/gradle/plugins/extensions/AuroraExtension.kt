@@ -6,6 +6,7 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.util.ConfigureUtil.configure
 
 @Suppress("unused")
@@ -48,6 +49,8 @@ open class AuroraExtension(private val project: Project) {
     private fun configureGradleLogger(): AuroraExtension {
         if (!project.plugins.hasPlugin("com.adarshr.test-logger")) {
             project.plugins.apply("com.adarshr.test-logger")
+
+            project.logger.lifecycle("Applied missing plugin: Gradle Test Logger")
         }
 
         return this
@@ -61,6 +64,8 @@ open class AuroraExtension(private val project: Project) {
     private fun configureSonar(): AuroraExtension {
         if (!project.plugins.hasPlugin("org.sonarqube")) {
             project.plugins.apply("org.sonarqube")
+
+            project.logger.lifecycle("Applied missing plugin: SonarQube")
         }
 
         return this
@@ -74,6 +79,8 @@ open class AuroraExtension(private val project: Project) {
     private fun configureAsciiDoctor(): AuroraExtension {
         if (!project.plugins.hasPlugin("org.asciidoctor.convert")) {
             project.plugins.apply("org.asciidoctor.convert")
+
+            project.logger.lifecycle("Applied missing plugin: AsciiDoctor")
         }
 
         return this
@@ -87,6 +94,8 @@ open class AuroraExtension(private val project: Project) {
     private fun configureVersions(): AuroraExtension {
         if (!project.plugins.hasPlugin("com.github.ben-manes.versions")) {
             project.plugins.apply("com.github.ben-manes.versions")
+
+            project.logger.lifecycle("Applied missing plugin: Ben Manes Versions")
         }
 
         return this
@@ -100,6 +109,8 @@ open class AuroraExtension(private val project: Project) {
     private fun configurePitest(): AuroraExtension {
         if (!project.plugins.hasPlugin("info.solidsoft.pitest")) {
             project.plugins.apply("info.solidsoft.pitest")
+
+            project.logger.lifecycle("Applied missing plugin: PiTest")
         }
 
         return this
@@ -129,10 +140,14 @@ open class AuroraExtension(private val project: Project) {
     private fun configureKotlin(): UseKotlin {
         if (!project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
             project.plugins.apply("org.jetbrains.kotlin.jvm")
+
+            project.logger.lifecycle("Applied missing plugin: Kotlin")
         }
 
         if (project.hasSpringBootButNotKotlinSpringPlugin()) {
             project.plugins.apply("org.jetbrains.kotlin.plugin.spring")
+
+            project.logger.lifecycle("Applied missing plugin: Kotlin Spring")
         }
 
         return project.getUseKotlinExtension()
@@ -162,10 +177,14 @@ open class AuroraExtension(private val project: Project) {
     private fun configureSpringBoot(): UseSpringBoot {
         if (!project.plugins.hasPlugin("org.springframework.boot")) {
             project.plugins.apply("org.springframework.boot")
+
+            project.logger.lifecycle("Applied missing plugin: Spring Boot")
         }
 
         if (project.hasKotlinButNotKotlinSpringPlugin()) {
             project.plugins.apply("org.jetbrains.kotlin.plugin.spring")
+
+            project.logger.lifecycle("Applied missing plugin: Kotlin Spring")
         }
 
         return project.getUseSpringBootExtension()

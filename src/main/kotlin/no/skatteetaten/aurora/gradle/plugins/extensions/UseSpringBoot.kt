@@ -45,6 +45,8 @@ open class UseSpringBoot(private val project: Project) {
     private fun configureCloudContract() {
         if (!project.plugins.hasPlugin("org.springframework.cloud.contract")) {
             project.plugins.apply("org.springframework.cloud.contract")
+
+            project.logger.lifecycle("Applied missing plugin: Spring cloud contract")
         }
     }
 }

@@ -22,6 +22,7 @@ version = properties["version"] as String
 
 repositories {
     jcenter()
+    gradlePluginPortal()
 }
 
 dependencies {

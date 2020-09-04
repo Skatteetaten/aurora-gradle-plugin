@@ -4,7 +4,8 @@ import PluginVersions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
-import no.skatteetaten.aurora.gradle.plugins.taskStatus
+import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
+import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +47,7 @@ class AuroraPluginSpringBootCloudContractFunctionalTest {
             .withPluginClasspath()
             .build()
 
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -63,7 +64,7 @@ class AuroraPluginSpringBootCloudContractFunctionalTest {
         assertThat(result.output).contains("org.springframework.cloud:spring-cloud-contract-wiremock")
         assertThat(result.output).contains("org.springframework.restdocs:spring-restdocs-mockmvc")
         assertThat(result.output).contains("Configure stubs, testframework")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -76,7 +77,7 @@ class AuroraPluginSpringBootCloudContractFunctionalTest {
 
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -94,7 +95,7 @@ class AuroraPluginSpringBootCloudContractFunctionalTest {
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).contains("webflux enabled and webmvc + tomcat excluded")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -113,7 +114,7 @@ class AuroraPluginSpringBootCloudContractFunctionalTest {
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).contains("bootJar enabled")
         assertThat(result.output).doesNotContain("bootJar disabled")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -138,6 +139,6 @@ class AuroraPluginSpringBootCloudContractFunctionalTest {
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).contains("bootJar enabled")
         assertThat(result.output).doesNotContain("bootJar disabled")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 }

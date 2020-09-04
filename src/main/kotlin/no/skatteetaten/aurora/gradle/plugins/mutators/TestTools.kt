@@ -53,6 +53,8 @@ class TestTools(private val project: Project) {
         cglibVersion: String,
         objenesisVersion: String
     ): AuroraReport {
+        project.logger.lifecycle("Applying spock support")
+
         val testDependencies = mutableListOf(
             "org.codehaus.groovy:groovy-all:$groovyVersion",
             "org.spockframework:spock-core:$spockVersion",
@@ -63,8 +65,6 @@ class TestTools(private val project: Project) {
         project.plugins.withId("org.springframework.boot") {
             testDependencies.add("org.spockframework:spock-spring:$spockVersion")
         }
-
-        project.logger.lifecycle("Applying spock support")
 
         with(project) {
             with(plugins) {

@@ -20,6 +20,8 @@ class AnalysisTools(private val project: Project) {
         checkstyleConfigFile: String
     ): AuroraReport = when {
         project.plugins.hasPlugin("java") -> {
+            project.logger.lifecycle("Apply checkstyle support")
+
             val auroraCheckstyleConfig = project.configurations.create("auroraCheckstyleConfig")
             val dep = project.dependencies.create(
                 "no.skatteetaten.aurora.checkstyle:checkstyle-config:$checkstyleConfigVersion"

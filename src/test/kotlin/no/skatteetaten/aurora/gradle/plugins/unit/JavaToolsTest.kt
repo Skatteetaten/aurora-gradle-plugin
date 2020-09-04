@@ -11,8 +11,9 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
+import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaTools
-import no.skatteetaten.aurora.gradle.plugins.taskStatus
+import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.asciidoctor.gradle.AsciidoctorTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -132,7 +133,7 @@ class JavaToolsTest {
         assertThat(libEntryCount).hasSize(2)
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
         assertThat(metaEntryCount).hasSize(2)
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -192,7 +193,7 @@ class JavaToolsTest {
         assertThat(libEntry?.isDirectory ?: false).isTrue()
         assertThat(metaEntry).isNotNull()
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -220,7 +221,7 @@ class JavaToolsTest {
         val jar = testProjectDir.resolve("build/libs").list()?.first() ?: "bogus"
 
         assertThat(jar).endsWith("-local.jar")
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test

@@ -11,6 +11,8 @@ import org.gradle.kotlin.dsl.extra
 @ExperimentalStdlibApi
 class JavaTools(private val project: Project) {
     fun applyDefaultPlugins(): AuroraReport {
+        project.logger.lifecycle("Apply java and maven-publish plugins")
+
         with(project) {
             plugins.apply("java")
             plugins.apply("maven")
@@ -26,8 +28,12 @@ class JavaTools(private val project: Project) {
         with(project) {
             setProperty("sourceCompatibility", compatibility)
 
-            extensions.extraProperties.properties["version"]?.let { version = extensions.extraProperties.properties["version"] as String }
-            extensions.extraProperties.properties["groupId"]?.let { group = extensions.extraProperties.properties["groupId"] as String }
+            extensions.extraProperties.properties["version"]?.let {
+                version = extensions.extraProperties.properties["version"] as String
+            }
+            extensions.extraProperties.properties["groupId"]?.let {
+                group = extensions.extraProperties.properties["groupId"] as String
+            }
         }
 
         return AuroraReport(

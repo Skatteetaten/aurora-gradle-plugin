@@ -15,6 +15,8 @@ class MavenTools(private val project: Project) {
             description = MISSING_REPO_CREDS_MESSAGE
         )
         else -> {
+            project.logger.lifecycle("Apply maven deployment support")
+
             val exProps = project.extensions.extraProperties.properties
             val repositoryReleaseUrl = exProps["repositoryReleaseUrl"] as String
             val repositorySnapshotUrl = exProps["repositorySnapshotUrl"] as String
@@ -87,7 +89,11 @@ class MavenTools(private val project: Project) {
             )
 
     fun setDefaultTasks() {
-        if (project.defaultTasks.isEmpty()) project.defaultTasks = listOf("clean", "install")
+        if (project.defaultTasks.isEmpty()) {
+            project.logger.lifecycle("Apply clean and install as default tasks")
+
+            project.defaultTasks = listOf("clean", "install")
+        }
     }
 
     companion object {

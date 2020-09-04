@@ -20,6 +20,8 @@ class SpringTools(private val project: Project) {
         bootJarEnabled: Boolean,
         startersEnabled: Boolean
     ): AuroraReport {
+        project.logger.lifecycle("Apply Spring support")
+
         val implementationDependencies = buildList {
             add("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 

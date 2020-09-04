@@ -11,9 +11,10 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import no.skatteetaten.aurora.gradle.plugins.configureExtensions
+import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.SpringTools
-import no.skatteetaten.aurora.gradle.plugins.taskStatus
+import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.jvm.tasks.Jar
@@ -78,7 +79,7 @@ class SpringToolsTest {
         assertThat(result.output).contains("----- Aurora Plugin Report -----")
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test

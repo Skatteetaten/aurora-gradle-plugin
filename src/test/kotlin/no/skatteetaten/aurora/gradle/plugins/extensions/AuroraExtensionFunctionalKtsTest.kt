@@ -3,8 +3,9 @@ package no.skatteetaten.aurora.gradle.plugins.extensions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraConfiguration
-import no.skatteetaten.aurora.gradle.plugins.taskStatus
+import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,7 +46,7 @@ class AuroraExtensionFunctionalKtsTest {
             .withPluginClasspath()
             .build()
 
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -73,7 +74,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("Apply Spring support")
         assertThat(result.output).contains("Apply spring kotlin support")
         assertThat(result.output).contains("Apply kotlin support")
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -101,13 +102,20 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("Apply Spring support")
         assertThat(result.output).contains("Apply spring kotlin support")
         assertThat(result.output).contains("Apply kotlin support")
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
     fun `build test with kotlin with everything added`() {
-        buildFile.appendText(
+        buildFile.writeText(
             """
+            import com.adarshr.gradle.testlogger.TestLoggerExtension
+            import com.adarshr.gradle.testlogger.theme.ThemeType
+            
+            plugins {
+                id("no.skatteetaten.gradle.aurora")
+            }
+            
             repositories {
                 mavenCentral()
             }
@@ -116,6 +124,7 @@ class AuroraExtensionFunctionalKtsTest {
                 useAsciiDoctor
                 usePitest
                 useVersions
+                useGradleLogger
                 useKotlin {
                     useKtLint
                 }
@@ -124,7 +133,18 @@ class AuroraExtensionFunctionalKtsTest {
                     useCloudContract
                 }
             }
-            """.trimMargin()
+            
+            configure<TestLoggerExtension> {
+                theme = ThemeType.STANDARD_PARALLEL
+                showStandardStreams = true
+                showPassedStandardStreams = false
+                showSkippedStandardStreams = false
+                showFailedStandardStreams = true
+            }
+            """
+                .trimIndent()
+                .trimMargin()
+                .trim()
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
@@ -140,7 +160,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("Apply versions support")
         assertThat(result.output).contains("Apply asciiDoctor support")
         assertThat(result.output).contains("Apply spring-cloud-contract support")
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -168,7 +188,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("Apply ktlint support")
         assertThat(result.output).contains("Apply versions support")
         assertThat(result.output).contains("Apply spring-cloud-contract support")
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -196,7 +216,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).contains("webflux enabled and webmvc + tomcat excluded")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -222,7 +242,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).doesNotContain("webflux enabled and webmvc + tomcat excluded")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -248,7 +268,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).doesNotContain("webflux enabled and webmvc + tomcat excluded")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -274,7 +294,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).doesNotContain("webflux enabled and webmvc + tomcat excluded")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -302,7 +322,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).doesNotContain("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter")
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter")
         assertThat(result.output).contains("webflux enabled and webmvc + tomcat excluded")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -329,7 +349,7 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("----- Aurora Plugin Report -----")
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:1.0.7")
         assertThat(result.output).contains("testImplementation org.codehaus.groovy:groovy-all:3.0.5")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -346,7 +366,7 @@ class AuroraExtensionFunctionalKtsTest {
             .build()
 
         assertThat(result.output).contains(AuroraConfiguration().toString())
-        result.taskStatus(taskName = ":auroraConfiguration")
+        assertThat(result.taskOutcome(taskName = ":auroraConfiguration")).isSuccessOrEqualTo()
     }
 
     @Test
@@ -364,6 +384,6 @@ class AuroraExtensionFunctionalKtsTest {
 
         assertThat(result.output).contains("----- Aurora Plugin Report -----")
         assertThat(result.output).contains("Use task :aurora to get full report on how AuroraPlugin modifies your gradle setup")
-        result.taskStatus(taskName = ":aurora")
+        assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 }

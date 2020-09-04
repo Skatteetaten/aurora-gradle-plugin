@@ -9,8 +9,9 @@ import assertk.assertions.hasSize
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import no.skatteetaten.aurora.gradle.plugins.AuroraPlugin
+import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.mutators.AuroraTools
-import no.skatteetaten.aurora.gradle.plugins.taskStatus
+import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.kotlin.dsl.apply
@@ -105,7 +106,7 @@ class AuroraToolsTest {
         assertThat(libEntryCount).hasSize(2)
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
         assertThat(metaEntryCount).hasSize(2)
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -165,7 +166,7 @@ class AuroraToolsTest {
         assertThat(libEntry?.isDirectory ?: false).isTrue()
         assertThat(metaEntry).isNotNull()
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -193,7 +194,7 @@ class AuroraToolsTest {
         val jar = testProjectDir.resolve("build/libs").list()?.first() ?: "bogus"
 
         assertThat(jar).endsWith("-local.jar")
-        result.taskStatus()
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test
@@ -226,7 +227,7 @@ class AuroraToolsTest {
 
         assertThat(result.output).contains("The following dependencies exceed the version found at the release revision level")
         assertThat(result.output).contains("org.seleniumhq.selenium:selenium-leg-rc [4.0.0-alpha-6 <- ")
-        result.taskStatus(taskName = ":dependencyUpdates")
+        assertThat(result.taskOutcome(taskName = ":dependencyUpdates")).isSuccessOrEqualTo()
     }
 
     @Test

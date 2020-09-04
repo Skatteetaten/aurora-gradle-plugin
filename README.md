@@ -106,9 +106,18 @@ We bundled plugins corresponding to all use cases in this plugin, so all you hav
     plugins {
         id 'no.skatteetaten.gradle.aurora' version '<version>'
     }
+    
+One cavet with this approach is that type-safe accessors will not be generated for plugins applied in extensions, so for any of these you will have to use a configure block like so:
 
-However any plugins specified with a version that differs from the compiled plugins - will be respected. As an example lets look at how you can override the version used for the kotlin jvm plugin:
+    configure<TestLoggerExtension> {}
+    
+as opposed to:
 
+    testlogger {}
+    
+This is a [Known Issue](https://docs.gradle.org/current/userguide/kotlin_dsl.html#type-safe-accessors) in Gradle and will be fixed in a future release.
+
+However any plugins specified with a version that differs from the compiled plugins - will be respected, and type-safe accessors will be available. As an example lets look at how you can override the version used for the kotlin jvm plugin:
 
     plugins {
         id 'no.skatteetaten.gradle.aurora' version '<version>'

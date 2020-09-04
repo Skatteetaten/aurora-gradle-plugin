@@ -8,13 +8,13 @@ import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 class KotlinTools(private val project: Project) {
     fun applyKotlinSupport(kotlinLoggingVersion: String): AuroraReport {
+        project.logger.lifecycle("Apply kotlin support")
+
         val implementationDependencies = listOf(
             "org.jetbrains.kotlin:kotlin-reflect",
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
             "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
         )
-
-        project.logger.lifecycle("Apply kotlin support")
 
         with(project) {
             with(dependencies) {

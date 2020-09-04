@@ -8,6 +8,8 @@ import org.gradle.kotlin.dsl.named
 class AuroraTools(private val project: Project) {
     fun applyDeliveryBundleConfig(bootJar: Boolean): AuroraReport = when {
         bootJar -> {
+            project.logger.lifecycle("Apply bootjar delivery bundle")
+
             with(project) {
                 plugins.apply("distribution")
 
@@ -40,6 +42,8 @@ class AuroraTools(private val project: Project) {
             )
         }
         else -> {
+            project.logger.lifecycle("Apply standard delivery bundle")
+
             with(project) {
                 plugins.apply("application")
 

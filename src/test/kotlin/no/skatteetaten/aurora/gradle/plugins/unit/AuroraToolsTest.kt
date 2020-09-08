@@ -44,6 +44,7 @@ class AuroraToolsTest {
         auroraTools = AuroraTools(project)
     }
 
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     @Test
     fun `deliveryBundleConfig built correctly for bootJar`() {
         testProjectDir.resolve("src/main/java").mkdirs()
@@ -101,14 +102,18 @@ class AuroraToolsTest {
         val libEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/lib") }
         val metaEntry = zipEntries.find { it.name.endsWith("metadata/") }
         val metaEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/metadata") }
+        val distDir = testProjectDir.resolve("build/distributions")
 
         assertThat(libEntry?.isDirectory ?: false).isTrue()
         assertThat(libEntryCount).hasSize(2)
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
         assertThat(metaEntryCount).hasSize(2)
+        assertThat(distDir.listFiles()).hasSize(1)
+        assertThat(distDir.listFiles().first().name).contains("Leveransepakke")
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     @Test
     fun `deliveryBundleConfig built correctly for non-bootJar`() {
         testProjectDir.resolve("src/main/java").mkdirs()
@@ -161,12 +166,15 @@ class AuroraToolsTest {
         val jarAsZip = ZipFile(jar)
         val libEntry = jarAsZip.entries().toList().find { it.name.endsWith("lib/") }
         val metaEntry = jarAsZip.entries().toList().find { it.name.endsWith("metadata/") }
+        val distDir = testProjectDir.resolve("build/distributions")
 
         assertThat(libEntry).isNotNull()
         assertThat(libEntry?.isDirectory ?: false).isTrue()
         assertThat(metaEntry).isNotNull()
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
+        assertThat(distDir.listFiles()).hasSize(1)
+        assertThat(distDir.listFiles().first().name).contains("Leveransepakke")
     }
 
     @Test

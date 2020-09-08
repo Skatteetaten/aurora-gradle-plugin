@@ -33,6 +33,10 @@ class AuroraTools(private val project: Project) {
 
                     dependsOn("bootJar")
                 }
+
+                with(tasks.named("distTar", org.gradle.api.tasks.bundling.Tar::class).get()) {
+                    enabled = false
+                }
             }
 
             AuroraReport(
@@ -49,6 +53,10 @@ class AuroraTools(private val project: Project) {
 
                 with(tasks.named("distZip", org.gradle.api.tasks.bundling.Zip::class).get()) {
                     archiveClassifier.set("Leveransepakke")
+                }
+
+                with(tasks.named("distTar", org.gradle.api.tasks.bundling.Tar::class).get()) {
+                    enabled = false
                 }
 
                 with(tasks.getByName("startScripts")) {

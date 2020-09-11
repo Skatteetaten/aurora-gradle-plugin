@@ -15,6 +15,7 @@ plugins {
     id("com.github.ben-manes.versions") version(PluginVersions.ben_manes_versions)
     id("org.jlleitschuh.gradle.ktlint") version(PluginVersions.ktlint)
     id("com.adarshr.test-logger") version(PluginVersions.gradle_test_logger)
+    id("se.patrikerdes.use-latest-versions") version(PluginVersions.latest_versions)
 }
 
 group = properties["groupId"] as String
@@ -40,6 +41,8 @@ dependencies {
     implementation("io.spring.gradle:dependency-management-plugin:${PluginVersions.dependency_management}")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${PluginVersions.sonar}")
     implementation("com.adarshr:gradle-test-logger-plugin:${PluginVersions.gradle_test_logger}")
+    implementation("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:${PluginVersions.git_properties}")
+    implementation("se.patrikerdes:gradle-use-latest-versions-plugin:${PluginVersions.latest_versions}")
 
     testImplementation(gradleTestKit())
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:${Versions.assertk}")

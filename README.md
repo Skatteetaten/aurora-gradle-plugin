@@ -95,6 +95,8 @@ The following plugins will be reacted upon by this Aurora Plugin
  - org.sonarqube
  - org.asciidoctor.convert
  - com.github.ben-manes.versions
+ - se.patrikerdes.use-latest-versions
+ - com.gorylenko.gradle-git-properties
  - org.springframework.boot
  - org.springframework.cloud.contract
  - org.jetbrains.kotlin.jvm
@@ -232,6 +234,22 @@ Check out [MiscellaneousTools](src/main/kotlin/no/skatteetaten/aurora/gradle/plu
     aurora {
         useVersions
     }
+    
+### Patrikerdes Use Latest Versions
+
+The Aurora plugin will add the use-latest-versions plugin on demand [Use Latest Versions](https://github.com/patrikerdes/gradle-use-latest-versions-plugin/blob/master/README.md).
+
+    aurora {
+        useLatestVersions
+    }
+    
+### Gorylenko Git Properties
+
+The Aurora plugin will add the git properties plugin on demand [Git Properties](https://github.com/n0mer/gradle-git-properties).
+
+    aurora {
+        useGitProperties
+    }
  
 ### Source Code Analysis
 
@@ -355,6 +373,8 @@ All configuration options and their default values are shown by running `:aurora
 Complete configuration options for the `aurora` block looks like this:
 
     aurora { 
+        useGitProperties
+        useLatestVersions
         useAsciiDoctor
         useGradleLogger
         useSonar
@@ -408,17 +428,15 @@ In addition there exists the sensible default for Aurora applications. It is ena
 and corresponds to this
 
     aurora {
+        useGitProperties
+        useLatestVersions
         useVersions
         useSonar
         useGradleLogger
+        useSpringBoot
         
-        useKotlin {
-            useKtLint
-        }
-        
-        useSpringBoot {
-            useWebFlux
-            useCloudContract
+        features {
+            checkstylePlugin = true
         }
     }
     

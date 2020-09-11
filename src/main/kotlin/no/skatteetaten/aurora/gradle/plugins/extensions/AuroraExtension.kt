@@ -27,15 +27,49 @@ open class AuroraExtension(private val project: Project) {
     fun useAuroraDefaults(): AuroraExtension = configureAuroraDefaults()
 
     private fun configureAuroraDefaults(): AuroraExtension {
+        useGitProperties()
+        useLatestVersions()
         useVersions()
         useSonar()
         useGradleLogger()
-        useKotlin {
-            useKtLint()
+        useSpringBoot()
+
+        features {
+            checkstylePlugin = true
         }
-        useSpringBoot {
-            useWebFlux()
-            useCloudContract()
+
+        return this
+    }
+
+    val useLatestVersions: AuroraExtension
+        get() = configureLatestVersions()
+
+    fun useLatestVersions(): AuroraExtension = configureLatestVersions()
+
+    private fun configureLatestVersions(): AuroraExtension {
+        if (!project.plugins.hasPlugin("se.patrikerdes.use-latest-versions")) {
+            project.plugins.apply("se.patrikerdes.use-latest-versions")
+
+            project.logger.lifecycle("Applied missing plugin: Patrikerdes Use Latest Versions")
+        }
+
+        return this
+    }
+
+    val useGitProperties: AuroraExtension
+        get() = configureGitProperties()
+
+    fun useGitProperties(): AuroraExtension = configureGitProperties()
+
+    private fun configureGitProperties(): AuroraExtension {
+        if (!project.plugins.hasPlugin("com.gorylenko.gradle-git-properties")) {
+            if (project.file(".git").exists()) {
+                project.plugins.apply("com.gorylenko.gradle-git-properties")
+
+                project.logger.lifecycle("Applied missing plugin: Gorylenko Git Properties")
+            } else {
+                project.logger.lifecycle("Cannot apply Gorylenko Git Properties! No .git Directory!")
+            }
         }
 
         return this

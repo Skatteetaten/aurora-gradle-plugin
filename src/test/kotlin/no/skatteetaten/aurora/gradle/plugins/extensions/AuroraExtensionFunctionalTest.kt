@@ -167,16 +167,12 @@ class AuroraExtensionFunctionalTest {
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments("ktlintKotlinScriptFormat", "build")
+            .withArguments("build")
             .withPluginClasspath()
             .build()
 
         assertThat(result.output).contains("Apply Spring support")
-        assertThat(result.output).contains("Apply spring kotlin support")
-        assertThat(result.output).contains("Apply kotlin support")
-        assertThat(result.output).contains("Apply ktlint support")
         assertThat(result.output).contains("Apply versions support")
-        assertThat(result.output).contains("Apply spring-cloud-contract support")
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 

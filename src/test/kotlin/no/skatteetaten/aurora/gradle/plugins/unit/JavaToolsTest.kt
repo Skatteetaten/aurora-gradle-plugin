@@ -16,7 +16,7 @@ import no.skatteetaten.aurora.gradle.plugins.mutators.JavaTools
 import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.asciidoctor.gradle.AsciidoctorTask
 import org.gradle.api.JavaVersion
-import org.gradle.api.JavaVersion.VERSION_1_8
+import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.jvm.tasks.Jar
@@ -68,7 +68,7 @@ class JavaToolsTest {
         val report = javaTools.applyJavaDefaults(Versions.javaSourceCompatibility)
 
         assertThat(report.description).isEqualTo("Set groupId, version and add sourceCompatibility")
-        assertThat(project.property("sourceCompatibility") as JavaVersion).isEqualTo(VERSION_1_8)
+        assertThat(project.property("sourceCompatibility") as JavaVersion).isEqualTo(VERSION_11)
     }
 
     @Test

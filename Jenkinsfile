@@ -14,7 +14,7 @@ def overrides = [
     chatRoom: "#aos-notifications",
     deployGoal : "publishPlugins",
     versionStrategy: [
-      [branch: 'master', versionHint: '3']
+      [branch: 'master', versionHint: '4']
     ]
 ]
 

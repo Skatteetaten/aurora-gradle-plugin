@@ -5,8 +5,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintFormatTask
 
 plugins {
-    `kotlin-dsl`
     kotlin("jvm") version(Versions.kotlin)
+    `kotlin-dsl`
 
     id("idea")
     id("java-gradle-plugin")
@@ -28,7 +28,6 @@ repositories {
 
 dependencies {
     implementation(fileTree("$rootDir/buildSrc/build/libs") { include("*.jar") })
-    implementation(kotlin("stdlib", Versions.kotlin))
     implementation("io.github.microutils:kotlin-logging:${Versions.kotlinLogging}")
     implementation("org.springframework.boot:spring-boot-gradle-plugin:${PluginVersions.spring_boot}")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")

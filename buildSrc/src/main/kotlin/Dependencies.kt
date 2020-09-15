@@ -1,7 +1,5 @@
-import org.gradle.api.JavaVersion
-
 object Versions {
-    val javaSourceCompatibility: String = JavaVersion.VERSION_11.toString()
+    const val javaSourceCompatibility: String = "1.11"
     const val groovy: String = "3.0.5"
     const val spock: String = "1.3-groovy-2.5"
     const val junit5: String = "5.7.0"

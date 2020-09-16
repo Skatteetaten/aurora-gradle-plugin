@@ -56,6 +56,10 @@ class SpringTools(private val project: Project) {
                 }
             }
 
+            configurations.getByName("archives").artifacts.removeAll {
+                it.extension == "tar" || it.name.endsWith("boot")
+            }
+
             if (webFluxEnabled) {
                 with(project) {
                     with(configurations) {

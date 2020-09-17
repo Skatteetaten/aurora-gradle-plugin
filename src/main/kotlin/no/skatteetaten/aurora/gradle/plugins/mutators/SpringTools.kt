@@ -56,6 +56,8 @@ class SpringTools(private val project: Project) {
                 }
             }
 
+            disableSuperfluousArtifacts()
+
             if (webFluxEnabled) {
                 with(project) {
                     with(configurations) {

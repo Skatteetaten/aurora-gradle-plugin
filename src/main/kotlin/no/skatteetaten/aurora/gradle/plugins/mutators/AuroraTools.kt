@@ -3,6 +3,7 @@ package no.skatteetaten.aurora.gradle.plugins.mutators
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.api.distribution.DistributionContainer
+import org.gradle.api.tasks.bundling.Tar
 import org.gradle.kotlin.dsl.named
 
 class AuroraTools(private val project: Project) {
@@ -34,9 +35,7 @@ class AuroraTools(private val project: Project) {
                     dependsOn("bootJar")
                 }
 
-                with(tasks.named("distTar", org.gradle.api.tasks.bundling.Tar::class).get()) {
-                    enabled = false
-                }
+                disableSuperfluousArtifacts()
             }
 
             AuroraReport(
@@ -55,9 +54,7 @@ class AuroraTools(private val project: Project) {
                     archiveClassifier.set("Leveransepakke")
                 }
 
-                with(tasks.named("distTar", org.gradle.api.tasks.bundling.Tar::class).get()) {
-                    enabled = false
-                }
+                disableSuperfluousArtifacts()
 
                 with(tasks.getByName("startScripts")) {
                     enabled = false
@@ -70,5 +67,15 @@ class AuroraTools(private val project: Project) {
                 description = "Configure Leveransepakke"
             )
         }
+    }
+}
+
+fun Project.disableSuperfluousArtifacts() {
+    with(tasks.named("distTar", Tar::class).get()) {
+        enabled = false
+    }
+
+    configurations.getByName("archives").artifacts.removeIf {
+        it.extension == "tar" || it.name.endsWith("boot")
     }
 }

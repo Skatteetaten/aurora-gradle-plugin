@@ -49,8 +49,17 @@ class KotlinTools(private val project: Project) {
             }
 
             with(tasks) {
+                with(named("ktlintKotlinScriptCheck").get()) {
+                    dependsOn("ktlintKotlinScriptFormat")
+                }
+                with(named("ktlintMainSourceSetCheck").get()) {
+                    dependsOn("ktlintMainSourceSetFormat")
+                }
                 with(named("compileKotlin").get()) {
-                    dependsOn("ktlintMainSourceSetCheck")
+                    dependsOn("ktlintKotlinScriptCheck", "ktlintMainSourceSetCheck")
+                }
+                with(named("ktlintTestSourceSetCheck").get()) {
+                    dependsOn("ktlintTestSourceSetFormat")
                 }
                 with(named("compileTestKotlin").get()) {
                     dependsOn("ktlintTestSourceSetCheck")

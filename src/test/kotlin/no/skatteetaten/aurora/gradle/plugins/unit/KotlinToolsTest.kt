@@ -113,15 +113,21 @@ class KotlinToolsTest {
                 id 'org.jetbrains.kotlin.jvm' version '${Versions.kotlin}'
                 id 'org.jlleitschuh.gradle.ktlint' version '${PluginVersions.ktlint}'
             }
-            """.trimIndent()
+            """
         )
         (project as ProjectInternal).evaluate()
         val report = kotlinTools.applyKtLint()
         val compileKotlin = project.tasks.getByName("compileKotlin")
         val compileTestKotlin = project.tasks.getByName("compileTestKotlin")
+        val ktlintKotlinScriptCheck = project.tasks.getByName("ktlintKotlinScriptCheck")
+        val ktlintMainSourceSetCheck = project.tasks.getByName("ktlintMainSourceSetCheck")
+        val ktlintTestSourceSetCheck = project.tasks.getByName("ktlintTestSourceSetCheck")
 
         assertThat(report.description).isEqualTo("disable android")
-        assertThat(compileKotlin.dependsOn).containsOnly("ktlintMainSourceSetCheck")
+        assertThat(compileKotlin.dependsOn).containsOnly("ktlintMainSourceSetCheck", "ktlintKotlinScriptCheck")
         assertThat(compileTestKotlin.dependsOn).containsOnly("ktlintTestSourceSetCheck")
+        assertThat(ktlintKotlinScriptCheck.dependsOn).containsOnly("ktlintKotlinScriptFormat")
+        assertThat(ktlintTestSourceSetCheck.dependsOn).containsOnly("ktlintTestSourceSetFormat")
+        assertThat(ktlintMainSourceSetCheck.dependsOn).containsOnly("ktlintMainSourceSetFormat")
     }
 }

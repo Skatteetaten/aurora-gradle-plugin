@@ -142,13 +142,10 @@ class AuroraExtensionFunctionalKtsTest {
                 showFailedStandardStreams = true
             }
             """
-                .trimIndent()
-                .trimMargin()
-                .trim()
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments("ktlintKotlinScriptFormat", "build")
+            .withArguments("build")
             .withPluginClasspath()
             .build()
 

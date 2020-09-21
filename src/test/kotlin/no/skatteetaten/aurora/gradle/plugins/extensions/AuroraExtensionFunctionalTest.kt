@@ -123,21 +123,17 @@ class AuroraExtensionFunctionalTest {
                 }
             }
             
-            ktlint {
-                version.set("0.38.0")
-            }
-            
             testlogger {
                 showStandardStreams = true
                 showPassedStandardStreams = false
                 showSkippedStandardStreams = false
                 showFailedStandardStreams = true
             }
-            """.trimMargin()
+            """
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments("ktlintKotlinScriptFormat", "build")
+            .withArguments("build")
             .withPluginClasspath()
             .build()
 

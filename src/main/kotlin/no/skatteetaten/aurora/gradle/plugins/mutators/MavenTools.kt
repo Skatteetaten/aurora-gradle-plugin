@@ -58,21 +58,23 @@ class MavenTools(private val project: Project) {
         repositoryPassword: String,
         repositorySnapshotUrl: String
     ) = named("uploadArchives", Upload::class.java) {
-        repositories {
-            withConvention(MavenRepositoryHandlerConvention::class) {
-                mavenDeployer {
-                    withGroovyBuilder {
-                        "repository"("url" to repositoryReleaseUrl) {
-                            "authentication"(
-                                "userName" to repositoryUsername,
-                                "password" to repositoryPassword
-                            )
-                        }
-                        "snapshotRepository"("url" to repositorySnapshotUrl) {
-                            "authentication"(
-                                "userName" to repositoryUsername,
-                                "password" to repositoryPassword
-                            )
+        with(it) {
+            with(repositories) {
+                withConvention(MavenRepositoryHandlerConvention::class) {
+                    with(mavenDeployer()) {
+                        withGroovyBuilder {
+                            "repository"("url" to repositoryReleaseUrl) {
+                                "authentication"(
+                                    "userName" to repositoryUsername,
+                                    "password" to repositoryPassword
+                                )
+                            }
+                            "snapshotRepository"("url" to repositorySnapshotUrl) {
+                                "authentication"(
+                                    "userName" to repositoryUsername,
+                                    "password" to repositoryPassword
+                                )
+                            }
                         }
                     }
                 }

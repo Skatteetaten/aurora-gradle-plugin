@@ -16,14 +16,14 @@ class MiscellaneousTools(private val project: Project) {
                 outputFormatter = "json"
                 outputDir = "build/dependencyUpdates"
                 reportfileName = "report"
-                resolutionStrategy {
-                    componentSelection {
-                        all {
+                resolutionStrategy { strategy ->
+                    strategy.componentSelection { selection ->
+                        selection.all { all ->
                             val rejectionPatterns = listOf("alpha", "beta", "pr", "rc", "cr", "m", "preview")
                             val regex: (String) -> Regex = { Regex("(?i).*[.-]$it[.\\d-]*") }
 
-                            if (rejectionPatterns.any { candidate.version.matches(regex(it)) }) {
-                                reject("Release candidate")
+                            if (rejectionPatterns.any { all.candidate.version.matches(regex(it)) }) {
+                                all.reject("Release candidate")
                             }
                         }
                     }

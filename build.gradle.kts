@@ -6,7 +6,6 @@ import org.jlleitschuh.gradle.ktlint.KtlintFormatTask
 
 plugins {
     kotlin("jvm") version(Versions.kotlin)
-    `kotlin-dsl`
 
     id("idea")
     id("java-gradle-plugin")
@@ -27,6 +26,9 @@ repositories {
 }
 
 dependencies {
+    implementation(gradleKotlinDsl())
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
     implementation(fileTree("$rootDir/buildSrc/build/libs") { include("*.jar") })
     implementation("io.github.microutils:kotlin-logging:${Versions.kotlinLogging}")
     implementation("org.springframework.boot:spring-boot-gradle-plugin:${PluginVersions.spring_boot}")
@@ -66,10 +68,6 @@ pluginBundle {
     tags = setOf("skatteetaten", "corporate")
 }
 
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
-}
-
 testlogger {
     theme = STANDARD_PARALLEL
     showStandardStreams = true
@@ -96,10 +94,12 @@ tasks {
         distributionType = Wrapper.DistributionType.ALL
     }
 
-    @Suppress("UNUSED_VARIABLE")
-    val compileKotlin by existing(KotlinCompile::class) {
+    withType(KotlinCompile::class).configureEach {
         kotlinOptions {
-            languageVersion = Versions.kotlin
+            suppressWarnings = true
+            jvmTarget = Versions.javaSourceCompatibility
+            freeCompilerArgs = listOf("-nowarn")
+            languageVersion = Versions.kotlin.substringBeforeLast(".")
         }
 
         dependsOn(listOf(ktlintKotlinScriptFormat, ktlintFormat))

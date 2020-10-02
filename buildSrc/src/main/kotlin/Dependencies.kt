@@ -1,5 +1,5 @@
 object Versions {
-    const val javaSourceCompatibility: String = "1.11"
+    const val javaSourceCompatibility: String = "11"
     const val groovy: String = "3.0.5"
     const val spock: String = "1.3-groovy-2.5"
     const val junit5: String = "5.7.0"
@@ -8,17 +8,17 @@ object Versions {
     const val auroraSpringBootMvcStarter: String = "1.0.+"
     const val auroraSpringBootWebFluxStarter: String = "1.0.+"
     const val springCloudContract: String = "2.2.4.RELEASE"
-    const val kotlinLogging: String = "1.11.3"
+    const val kotlinLogging: String = "2.0.3"
     const val checkstyleConfig: String = "2.2.5"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.10"
     const val assertk = "0.22"
 }
 
 object PluginVersions {
     const val gradle_test_logger = "2.1.0"
-    const val ktlint = "9.3.0"
-    const val spring_boot = "2.3.3.RELEASE"
+    const val ktlint = "9.4.0"
+    const val spring_boot = "2.3.4.RELEASE"
     const val ben_manes_versions = "0.33.0"
     const val gradle_plugin_publish = "0.12.0"
     const val asciidoctor = "2.4.0"
@@ -27,7 +27,7 @@ object PluginVersions {
     const val dependency_management = "1.0.10.RELEASE"
     const val sonar = "3.0"
     const val git_properties = "2.2.3"
-    const val latest_versions = "0.2.14"
+    const val latest_versions = "0.2.15"
 }
 
 object Features {

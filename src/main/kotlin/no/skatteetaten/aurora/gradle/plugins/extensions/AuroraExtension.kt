@@ -35,7 +35,9 @@ open class AuroraExtension(private val project: Project) {
         useSpringBoot()
 
         features {
-            checkstylePlugin = true
+            with(it) {
+                checkstylePlugin = true
+            }
         }
 
         return this

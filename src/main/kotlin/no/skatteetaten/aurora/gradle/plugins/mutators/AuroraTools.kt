@@ -16,13 +16,13 @@ class AuroraTools(private val project: Project) {
 
                 with(extensions.getByName("distributions") as DistributionContainer) {
                     with(getByName("main")) {
-                        contents {
+                        with(contents) {
                             from("${project.buildDir}/libs") {
-                                into("lib")
+                                it.into("lib")
                             }
 
                             from("${project.projectDir}/src/main/dist/metadata") {
-                                into("metadata")
+                                it.into("metadata")
                             }
                         }
                     }

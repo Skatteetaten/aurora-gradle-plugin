@@ -25,10 +25,10 @@ import org.gradle.kotlin.dsl.getByType
 @Suppress("unused")
 @ExperimentalStdlibApi
 class AuroraPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        project.configureExtensions()
-        project.afterEvaluate {
-            logger.lifecycle("After evaluate")
+    override fun apply(p: Project) {
+        p.configureExtensions()
+        p.afterEvaluate { project ->
+            project.logger.lifecycle("After evaluate")
 
             val config = project.getConfig()
             val java = Java(project, config)
@@ -51,20 +51,24 @@ class AuroraPlugin : Plugin<Project> {
                 miscellaneous.configure()
             ).flatten()
 
-            with(tasks) {
+            with(project.tasks) {
                 register("aurora") {
-                    logger.lifecycle(
-                        "Use task :aurora to get full report on how AuroraPlugin modifies your gradle setup"
-                    )
+                    with(it) {
+                        project.logger.lifecycle(
+                            "Use task :aurora to get full report on how AuroraPlugin modifies your gradle setup"
+                        )
 
-                    doLast {
-                        printReport(reports)
+                        doLast {
+                            printReport(reports)
+                        }
                     }
                 }
 
                 register("auroraConfiguration") {
-                    doLast {
-                        logger.lifecycle(config.toString())
+                    with(it) {
+                        doLast {
+                            project.logger.lifecycle(config.toString())
+                        }
                     }
                 }
             }

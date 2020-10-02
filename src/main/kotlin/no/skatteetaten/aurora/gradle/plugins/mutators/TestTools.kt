@@ -31,8 +31,8 @@ class TestTools(private val project: Project) {
             }
 
             tasks.withType(Test::class.java) {
-                useJUnitPlatform()
-                failFast = true
+                it.useJUnitPlatform()
+                it.failFast = true
             }
         }
 
@@ -107,7 +107,7 @@ class TestTools(private val project: Project) {
                     plugins.apply("jacoco")
 
                     tasks.named("jacocoTestReport", JacocoReport::class.java) {
-                        with(reports) {
+                        with(it.reports) {
                             xml.isEnabled = true
                             xml.destination = file("$buildDir/reports/jacoco/report.xml")
                             csv.isEnabled = false

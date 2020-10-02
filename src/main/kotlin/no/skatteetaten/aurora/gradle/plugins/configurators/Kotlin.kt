@@ -16,7 +16,8 @@ class Kotlin(
         project.plugins.withId("org.jetbrains.kotlin.jvm") {
             add(
                 tools.applyKotlinSupport(
-                    kotlinLoggingVersion = config.kotlinLoggingVersion
+                    kotlinLoggingVersion = config.kotlinLoggingVersion,
+                    sourceCompatibility = config.javaSourceCompatibility
                 )
             )
         }

@@ -59,13 +59,13 @@ class KotlinToolsTest {
         project.configureExtensions()
         (project as ProjectInternal).evaluate()
         val config = project.getConfig()
-        val report = kotlinTools.applyKotlinSupport(config.kotlinLoggingVersion)
+        val report = kotlinTools.applyKotlinSupport(config.kotlinLoggingVersion, config.javaSourceCompatibility)
         val springReport = springTools.applyKotlinSpringSupport()
 
         project.tasks.withType(KotlinCompile::class).forEach {
             with(it.kotlinOptions) {
                 assertThat(suppressWarnings).isTrue()
-                assertThat(jvmTarget).isEqualTo("1.8")
+                assertThat(jvmTarget).isEqualTo("11")
                 assertThat(freeCompilerArgs).isEqualTo(listOf("-Xjsr305=strict"))
             }
         }

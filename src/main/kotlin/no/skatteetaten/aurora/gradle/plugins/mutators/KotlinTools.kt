@@ -7,7 +7,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 class KotlinTools(private val project: Project) {
-    fun applyKotlinSupport(kotlinLoggingVersion: String): AuroraReport {
+    fun applyKotlinSupport(
+        kotlinLoggingVersion: String,
+        sourceCompatibility: String
+    ): AuroraReport {
         project.logger.lifecycle("Apply kotlin support")
 
         val implementationDependencies = listOf(
@@ -22,9 +25,9 @@ class KotlinTools(private val project: Project) {
             }
 
             tasks.withType(KotlinCompile::class).configureEach {
-                kotlinOptions {
+                with(it.kotlinOptions) {
                     suppressWarnings = true
-                    jvmTarget = "1.8"
+                    jvmTarget = sourceCompatibility
                     freeCompilerArgs = listOf("-Xjsr305=strict")
                 }
             }

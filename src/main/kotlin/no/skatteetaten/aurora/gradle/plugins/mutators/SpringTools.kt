@@ -47,12 +47,12 @@ class SpringTools(private val project: Project) {
 
             if (!bootJarEnabled) {
                 with(tasks) {
-                    getByName("jar") { enabled = true }
-                    getByName("distZip") { enabled = true }
-                    getByName("bootJar") { enabled = false }
-                    getByName("distTar") { enabled = false }
-                    getByName("bootDistTar") { enabled = false }
-                    getByName("bootDistZip") { enabled = false }
+                    getByName("jar") { it.enabled = true }
+                    getByName("distZip") { it.enabled = true }
+                    getByName("bootJar") { it.enabled = false }
+                    getByName("distTar") { it.enabled = false }
+                    getByName("bootDistTar") { it.enabled = false }
+                    getByName("bootDistZip") { it.enabled = false }
                 }
             }
 
@@ -117,7 +117,7 @@ class SpringTools(private val project: Project) {
 
             with(extensions.getByName("dependencyManagement") as DependencyManagementExtension) {
                 imports {
-                    mavenBom(springCloudDep)
+                    it.mavenBom(springCloudDep)
                 }
             }
 
@@ -137,14 +137,16 @@ class SpringTools(private val project: Project) {
             }
 
             val stubsJar = tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) {
-                archiveClassifier.set("stubs")
+                with(it) {
+                    archiveClassifier.set("stubs")
 
-                into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
-                    include("**/*.*")
-                    from("${project.buildDir}/generated-snippets/stubs")
+                    into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
+                        include("**/*.*")
+                        from("${project.buildDir}/generated-snippets/stubs")
+                    }
+
+                    dependsOn("test")
                 }
-
-                dependsOn("test")
             }
 
             with(tasks.named("verifierStubsJar", org.gradle.jvm.tasks.Jar::class).get()) {
@@ -152,7 +154,7 @@ class SpringTools(private val project: Project) {
             }
 
             artifacts {
-                add("archives", stubsJar)
+                it.add("archives", stubsJar)
             }
         }
 

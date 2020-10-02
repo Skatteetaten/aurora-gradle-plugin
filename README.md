@@ -130,7 +130,7 @@ However any plugins specified with a version that differs from the compiled plug
 
 Since this plugin is intended for use by JVM based applications, and since the NTA heavily relies on Nexus for artifact
 dependency management and artifact distribution, both the java and maven plugin will be applied automatically. The
-```sourceCompatibility``` will be set to 1.8 by default. This can be changed in the `aurora` block like this:
+```sourceCompatibility``` will be set to 11 by default. This can be changed in the `aurora` block like this:
 
     aurora {
         versions {
@@ -138,7 +138,7 @@ dependency management and artifact distribution, both the java and maven plugin 
         }
     }
 
-If you set the properties ```repositoryUsername```, ```repositoryPassword```, ```repositoryReleaseUrl``` and ```repositorySnapshotUrl``` in your ```~/gradle/.gradle.properties```-file the plugin will register Maven deployer for both snapshots and releases.
+If you set the properties ```repositoryUsername```, ```repositoryPassword```, ```repositoryReleaseUrl``` and ```repositorySnapshotUrl``` in your ```~/.gradle/gradle.properties```-file the plugin will register Maven deployer for both snapshots and releases.
 
 These features can be opted out of with the following config;
 

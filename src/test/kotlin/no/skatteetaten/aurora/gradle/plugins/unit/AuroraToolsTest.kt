@@ -6,6 +6,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.endsWith
 import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import no.skatteetaten.aurora.gradle.plugins.AuroraPlugin
@@ -105,10 +106,10 @@ class AuroraToolsTest {
         val distDir = testProjectDir.resolve("build/distributions")
 
         assertThat(libEntry?.isDirectory ?: false).isTrue()
-        assertThat(libEntryCount).hasSize(2)
+        assertThat(libEntryCount.size).isEqualTo(2)
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
-        assertThat(metaEntryCount).hasSize(2)
-        assertThat(distDir.listFiles()).hasSize(1)
+        assertThat(metaEntryCount.size).isEqualTo(2)
+        assertThat(distDir.listFiles().size).isEqualTo(1)
         assertThat(distDir.listFiles().first().name).contains("Leveransepakke")
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }

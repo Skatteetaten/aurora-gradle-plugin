@@ -1,7 +1,6 @@
 package no.skatteetaten.aurora.gradle.plugins.unit
 
 import assertk.assertThat
-import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
@@ -61,7 +60,7 @@ class AnalysisToolsTest {
         val auroraCheckstyleConfig = project.configurations.getByName("auroraCheckstyleConfig")
 
         assertThat(auroraCheckstyleConfig).isNotNull()
-        assertThat(auroraCheckstyleConfig.dependencies).hasSize(1)
+        assertThat(auroraCheckstyleConfig.dependencies.size).isEqualTo(1)
 
         val deps = auroraCheckstyleConfig.dependencies
         val auroraDep = deps.first()

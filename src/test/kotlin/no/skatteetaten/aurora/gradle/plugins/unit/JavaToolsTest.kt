@@ -7,7 +7,6 @@ import Versions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.endsWith
-import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
@@ -130,9 +129,9 @@ class JavaToolsTest {
         val metaEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/metadata") }
 
         assertThat(libEntry?.isDirectory ?: false).isTrue()
-        assertThat(libEntryCount).hasSize(2)
+        assertThat(libEntryCount.size).isEqualTo(2)
         assertThat(metaEntry?.isDirectory ?: false).isTrue()
-        assertThat(metaEntryCount).hasSize(2)
+        assertThat(metaEntryCount.size).isEqualTo(2)
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 

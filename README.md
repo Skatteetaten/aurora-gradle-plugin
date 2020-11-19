@@ -169,7 +169,13 @@ You can disable this with;
             deliveryBundle = false
         }
     }
-  
+
+If you are building a python app your delivery bundle will have this format:
+
+    <artifactiId>-<version>-Leveransepakke/
+    <artifactiId>-<version>-Leveransepakke/metadata/<all contents of src/main/dist/metadata>
+    <artifactiId>-<version>-Leveransepakke/src/<all app source from src/main/resources and all deps exploded>
+
 ### Configuration of defaultTasks
 
 defaultTasks will be set to `clean install` if this property has not already been set.
@@ -337,6 +343,13 @@ in your `~/.gradle/gradle.properties` file and be turned of in ci server. They c
         }
     }
 
+### Python
+If python is enabled the jython plugin will be added if missing, and a python leveransepakke will be built, with exploded source:
+
+    aurora {
+        usePython
+    }
+    
 ### Kotlin
 The Aurora plugin will react to Kotlin plugin and add dependencies on kotlin-reflect, stdlib-jdk8 and add 
 kotlinLogging (wrapper for Logback) with the version of. Kotlin will be configured to target
@@ -373,6 +386,7 @@ All configuration options and their default values are shown by running `:aurora
 Complete configuration options for the `aurora` block looks like this:
 
     aurora { 
+        usePython
         useGitProperties
         useLatestVersions
         useAsciiDoctor
@@ -416,6 +430,7 @@ Complete configuration options for the `aurora` block looks like this:
             mavenDeployer = '<enabled>'
             junit5Support = '<enabled>'
             springDevTools = '<enabled>'
+            python = '<enabled>'
         }
     }
 

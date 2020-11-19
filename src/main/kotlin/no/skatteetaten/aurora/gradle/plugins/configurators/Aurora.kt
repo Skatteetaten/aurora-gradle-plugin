@@ -16,6 +16,7 @@ class Aurora(
         if (config.applyDeliveryBundleConfig) {
             add(
                 tools.applyDeliveryBundleConfig(
+                    python = config.usePython,
                     bootJar = config.useBootJar
                 )
             )

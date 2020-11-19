@@ -30,6 +30,7 @@ data class AuroraConfiguration(
     val applyJunit5Support: Boolean = Features.applyJunit5Support,
     val springDevTools: Boolean = Features.springDevTools,
     val useWebFlux: Boolean = Features.useWebFlux,
+    val usePython: Boolean = Features.usePython,
     val useBootJar: Boolean = Features.useBootJar,
     val useAuroraStarters: Boolean = Features.useAuroraStarters
 ) {
@@ -57,6 +58,7 @@ data class AuroraConfiguration(
             "applyJunit5Support=$applyJunit5Support,\n" +
             "springDevTools=$springDevTools,\n" +
             "useWebFlux=$useWebFlux,\n" +
+            "usePython=$usePython,\n" +
             "useBootJar=$useBootJar,\n" +
             "useAuroraStarters=$useAuroraStarters)"
 }
@@ -98,6 +100,7 @@ fun Project.getConfig(): AuroraConfiguration {
         applyJunit5Support = features.junit5Support ?: props.asBoolean("applyJunit5Support") ?: Features.applyJunit5Support,
         springDevTools = features.springDevTools ?: props.asBoolean("springDevTools") ?: Features.springDevTools,
         useWebFlux = spring.webFluxEnabled ?: props.asBoolean("useWebFlux") ?: Features.useWebFlux,
+        usePython = features.python ?: props.asBoolean("usePython") ?: Features.usePython,
         useBootJar = spring.bootJarEnabled ?: props.asBoolean("useBootJar") ?: Features.useBootJar,
         useAuroraStarters = features.auroraStarters ?: props.asBoolean("useAuroraStarters") ?: Features.useAuroraStarters
     )

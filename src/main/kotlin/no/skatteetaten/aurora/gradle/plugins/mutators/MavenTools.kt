@@ -9,7 +9,7 @@ import org.gradle.kotlin.dsl.withConvention
 import org.gradle.kotlin.dsl.withGroovyBuilder
 
 class MavenTools(private val project: Project) {
-    fun addMavenDeployer(): AuroraReport = when {
+    fun addMavenDeployer(python: Boolean = false): AuroraReport = when {
         missingRepositoryConfiguration() -> AuroraReport(
             name = "aurora.applyMavenDeployer",
             description = MISSING_REPO_CREDS_MESSAGE
@@ -26,6 +26,7 @@ class MavenTools(private val project: Project) {
             with(project) {
                 with(tasks) {
                     configureDeployer(
+                        python,
                         repositoryReleaseUrl,
                         repositoryUsername,
                         repositoryPassword,
@@ -53,12 +54,17 @@ class MavenTools(private val project: Project) {
     }
 
     private fun TaskContainer.configureDeployer(
+        python: Boolean,
         repositoryReleaseUrl: String,
         repositoryUsername: String,
         repositoryPassword: String,
         repositorySnapshotUrl: String
     ) = named("uploadArchives", Upload::class.java) {
         with(it) {
+            if (python) {
+                isUploadDescriptor = false
+            }
+
             with(repositories) {
                 withConvention(MavenRepositoryHandlerConvention::class) {
                     with(mavenDeployer()) {

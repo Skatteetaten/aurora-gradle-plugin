@@ -128,9 +128,9 @@ class JavaToolsTest {
         val metaEntry = zipEntries.find { it.name.endsWith("metadata/") }
         val metaEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/metadata") }
 
-        assertThat(libEntry?.isDirectory ?: false).isTrue()
+        assertThat(libEntry?.isDirectory).isNotNull().isTrue()
         assertThat(libEntryCount.size).isEqualTo(2)
-        assertThat(metaEntry?.isDirectory ?: false).isTrue()
+        assertThat(metaEntry?.isDirectory).isNotNull().isTrue()
         assertThat(metaEntryCount.size).isEqualTo(2)
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
@@ -189,9 +189,9 @@ class JavaToolsTest {
         val metaEntry = jarAsZip.entries().toList().find { it.name.endsWith("metadata/") }
 
         assertThat(libEntry).isNotNull()
-        assertThat(libEntry?.isDirectory ?: false).isTrue()
+        assertThat(libEntry?.isDirectory).isNotNull().isTrue()
         assertThat(metaEntry).isNotNull()
-        assertThat(metaEntry?.isDirectory ?: false).isTrue()
+        assertThat(metaEntry?.isDirectory).isNotNull().isTrue()
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 

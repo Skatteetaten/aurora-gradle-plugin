@@ -43,6 +43,21 @@ open class AuroraExtension(private val project: Project) {
         return this
     }
 
+    val usePython: AuroraExtension
+        get() = configurePython()
+
+    fun usePython(): AuroraExtension = configurePython()
+
+    private fun configurePython(): AuroraExtension {
+        features {
+            with(it) {
+                python = true
+            }
+        }
+
+        return this
+    }
+
     val useLatestVersions: AuroraExtension
         get() = configureLatestVersions()
 

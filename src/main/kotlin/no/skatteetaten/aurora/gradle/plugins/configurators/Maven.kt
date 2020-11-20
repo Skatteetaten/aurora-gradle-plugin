@@ -18,7 +18,7 @@ class Maven(
         if (config.applyMavenDeployer) {
             project.logger.lifecycle("Apply maven deployer")
 
-            add(tools.addMavenDeployer())
+            add(tools.addMavenDeployer(python = config.usePython))
         }
     }
 }

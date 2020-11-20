@@ -105,9 +105,9 @@ class AuroraToolsTest {
         val metaEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/metadata") }
         val distDir = testProjectDir.resolve("build/distributions")
 
-        assertThat(libEntry?.isDirectory ?: false).isTrue()
+        assertThat(libEntry?.isDirectory).isNotNull().isTrue()
         assertThat(libEntryCount.size).isEqualTo(2)
-        assertThat(metaEntry?.isDirectory ?: false).isTrue()
+        assertThat(metaEntry?.isDirectory).isNotNull().isTrue()
         assertThat(metaEntryCount.size).isEqualTo(2)
         assertThat(distDir.listFiles().size).isEqualTo(1)
         assertThat(distDir.listFiles().first().name).contains("Leveransepakke")
@@ -170,12 +170,89 @@ class AuroraToolsTest {
         val distDir = testProjectDir.resolve("build/distributions")
 
         assertThat(libEntry).isNotNull()
-        assertThat(libEntry?.isDirectory ?: false).isTrue()
+        assertThat(libEntry?.isDirectory).isNotNull().isTrue()
         assertThat(metaEntry).isNotNull()
-        assertThat(metaEntry?.isDirectory ?: false).isTrue()
+        assertThat(metaEntry?.isDirectory).isNotNull().isTrue()
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
         assertThat(distDir.listFiles()).hasSize(1)
         assertThat(distDir.listFiles().first().name).contains("Leveransepakke")
+    }
+
+    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    @Test
+    fun `deliveryBundleConfig built correctly for python`() {
+        testProjectDir.resolve("src/main/resources").mkdirs()
+        testProjectDir.resolve("src/main/dist/metadata").mkdirs()
+        val openshiftMeta = testProjectDir.resolve("src/main/dist/metadata/openshift.json")
+        openshiftMeta.createNewFile()
+        openshiftMeta.writeText(
+            """
+            {}
+            """.trimIndent()
+        )
+        val application = testProjectDir.resolve("src/main/resources/__run__.py")
+        application.createNewFile()
+        application.writeText(
+            """
+            print("Hello world!")
+            """.trimIndent()
+        )
+        val requirements = testProjectDir.resolve("src/main/resources/req.txt")
+        requirements.createNewFile()
+        requirements.writeText(
+            """
+            certifi==2020.6.20
+            chardet==3.0.4
+            docopt==0.6.2
+            idna==2.10
+            numpy==1.19.2
+            pandas==1.1.3
+            psycopg2-binary==2.8.6
+            python-dateutil==2.8.1
+            pytz==2020.1
+            requests==2.24.0
+            six==1.15.0
+            urllib3==1.25.11
+            yarg==0.1.9
+            """.trimIndent()
+        )
+        buildFile.writeText(
+            """
+            plugins {
+                id 'no.skatteetaten.gradle.aurora'
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            aurora {
+                usePython
+            }
+            """.trimIndent()
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("build")
+            .withPluginClasspath()
+            .build()
+        val jar = testProjectDir.resolve("build/distributions").listFiles()
+            ?.find { it.path.contains("Leveransepakke") }
+        val jarAsZip = ZipFile(jar)
+        val zipEntries = jarAsZip.entries().toList()
+        val libEntry = zipEntries.find { it.name.endsWith("src/") }
+        val libEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/src") }
+        val metaEntry = zipEntries.find { it.name.endsWith("metadata/") }
+        val metaEntryCount = zipEntries.filter { it.name.contains("Leveransepakke/metadata") }
+        val distDir = testProjectDir.resolve("build/distributions")
+
+        assertThat(libEntry?.isDirectory).isNotNull().isTrue()
+        assertThat(libEntryCount.size).isEqualTo(3)
+        assertThat(metaEntry?.isDirectory).isNotNull().isTrue()
+        assertThat(metaEntryCount.size).isEqualTo(2)
+        assertThat(distDir.listFiles().size).isEqualTo(1)
+        assertThat(distDir.listFiles().first().name).contains("Leveransepakke")
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
 
     @Test

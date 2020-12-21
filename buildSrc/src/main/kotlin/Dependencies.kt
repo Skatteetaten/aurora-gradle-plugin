@@ -8,7 +8,7 @@ object Versions {
     const val auroraSpringBootMvcStarter: String = "1.0.+"
     const val auroraSpringBootWebFluxStarter: String = "1.0.+"
     const val springCloudContract: String = "2.2.5.RELEASE"
-    const val kotlinLogging: String = "2.0.3"
+    const val kotlinLogging: String = "2.0.4"
     const val checkstyleConfig: String = "2.2.5"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
     const val kotlin = "1.4.21"
@@ -18,7 +18,7 @@ object Versions {
 object PluginVersions {
     const val gradle_test_logger = "2.1.1"
     const val ktlint = "9.4.1"
-    const val spring_boot = "2.4.1"
+    const val spring_boot = "2.3.7.RELEASE"
     const val ben_manes_versions = "0.36.0"
     const val gradle_plugin_publish = "0.12.0"
     const val asciidoctor = "2.4.0"

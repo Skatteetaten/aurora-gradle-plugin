@@ -95,7 +95,7 @@ class KotlinToolsTest {
             assertThat(
                 find {
                     it.group == "io.github.microutils" &&
-                        it.name == "kotlin-logging" &&
+                        it.name == "kotlin-logging-jvm" &&
                         it.version == config.kotlinLoggingVersion
                 }
             ).isNotNull()

@@ -16,7 +16,7 @@ class KotlinTools(private val project: Project) {
         val implementationDependencies = listOf(
             "org.jetbrains.kotlin:kotlin-reflect",
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
-            "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
+            "io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion"
         )
 
         with(project) {

@@ -30,7 +30,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
     implementation(fileTree("$rootDir/buildSrc/build/libs") { include("*.jar") })
-    implementation("io.github.microutils:kotlin-logging:${Versions.kotlinLogging}")
+    implementation("io.github.microutils:kotlin-logging-jvm:${Versions.kotlinLogging}")
     implementation("org.springframework.boot:spring-boot-gradle-plugin:${PluginVersions.spring_boot}")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
     implementation("org.jetbrains.kotlin:kotlin-allopen:${Versions.kotlin}")

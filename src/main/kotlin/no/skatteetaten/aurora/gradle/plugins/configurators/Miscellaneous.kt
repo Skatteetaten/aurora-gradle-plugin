@@ -7,16 +7,20 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.mutators.MiscellaneousTools
 import org.gradle.api.Project
 
-@ExperimentalStdlibApi
+@OptIn(ExperimentalStdlibApi::class)
 class Miscellaneous(
     private val project: Project,
     private val config: AuroraConfiguration
 ) : Configurator {
     private val tools = MiscellaneousTools(project)
 
-    override fun configure(): List<AuroraReport> = buildList {
+    override fun configure(): List<AuroraReport> {
+        val list = mutableListOf<AuroraReport>()
+
         project.plugins.withId("com.github.ben-manes.versions") {
-            add(tools.applyVersions())
+            list.add(tools.applyVersions())
         }
+
+        return list.toList()
     }
 }

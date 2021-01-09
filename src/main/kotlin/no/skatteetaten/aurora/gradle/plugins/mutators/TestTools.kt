@@ -25,7 +25,7 @@ class TestTools(private val project: Project) {
                 testDeps.forEach { add("testImplementation", it) }
 
                 add(
-                    "testRuntimeOnly",
+                    "testImplementation",
                     "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
                 )
             }
@@ -42,7 +42,7 @@ class TestTools(private val project: Project) {
             dependenciesAdded = listOf(
                 "testImplementation org.junit.jupiter:junit-jupiter-api",
                 "testImplementation org.junit.jupiter:junit-jupiter-params",
-                "testRuntimeOnly org.junit.jupiter:junit-jupiter-engine"
+                "testImplementation org.junit.jupiter:junit-jupiter-engine"
             )
         )
     }

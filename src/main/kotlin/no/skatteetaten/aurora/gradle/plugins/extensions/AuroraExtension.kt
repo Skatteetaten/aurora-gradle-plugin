@@ -6,7 +6,6 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.util.ConfigureUtil.configure
 
 @Suppress("unused")
@@ -27,16 +26,69 @@ open class AuroraExtension(private val project: Project) {
     fun useAuroraDefaults(): AuroraExtension = configureAuroraDefaults()
 
     private fun configureAuroraDefaults(): AuroraExtension {
+        useJavaDefaults
+        useSpringBootDefaults
+
+        return this
+    }
+
+    val useJavaDefaults: AuroraExtension
+        get() = configureJavaDefaults()
+
+    fun useJavaDefaults(): AuroraExtension = configureJavaDefaults()
+
+    private fun configureJavaDefaults(): AuroraExtension {
         useGitProperties()
         useLatestVersions()
         useVersions()
         useSonar()
         useGradleLogger()
-        useSpringBoot()
 
         features {
             with(it) {
                 checkstylePlugin = true
+            }
+        }
+
+        return this
+    }
+
+    val useKotlinDefaults: AuroraExtension
+        get() = configureKotlinDefaults()
+
+    fun useKotlinDefaults(): AuroraExtension = configureKotlinDefaults()
+
+    private fun configureKotlinDefaults(): AuroraExtension {
+        useGitProperties()
+        useLatestVersions()
+        useVersions()
+        useSonar()
+        useGradleLogger()
+
+        useKotlin {
+            with(it) {
+                useKtLint()
+            }
+        }
+
+        features {
+            with(it) {
+                checkstylePlugin = false
+            }
+        }
+
+        return this
+    }
+
+    val useSpringBootDefaults: AuroraExtension
+        get() = configureSpringBootDefaults()
+
+    fun useSpringBootDefaults(): AuroraExtension = configureSpringBootDefaults()
+
+    private fun configureSpringBootDefaults(): AuroraExtension {
+        useSpringBoot {
+            with(it) {
+                useCloudContract
             }
         }
 

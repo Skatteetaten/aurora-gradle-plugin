@@ -5,20 +5,21 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaTools
 import org.gradle.api.Project
 
-@ExperimentalStdlibApi
 class Java(
     private val project: Project,
     private val config: AuroraConfiguration
 ) : Configurator {
     private val tools = JavaTools(project)
 
-    override fun configure(): List<AuroraReport> = buildList {
+    override fun configure(): List<AuroraReport> {
+        val list = mutableListOf<AuroraReport>()
+
         if (config.applyDefaultPlugins) {
-            add(tools.applyDefaultPlugins())
+            list.add(tools.applyDefaultPlugins())
         }
 
         if (config.applyJavaDefaults) {
-            add(
+            list.add(
                 tools.applyJavaDefaults(
                     compatibility = config.javaSourceCompatibility
                 )
@@ -26,7 +27,9 @@ class Java(
         }
 
         project.plugins.withId("org.asciidoctor.convert") {
-            add(tools.applyAsciiDocPlugin())
+            list.add(tools.applyAsciiDocPlugin())
         }
+
+        return list.toList()
     }
 }

@@ -8,7 +8,6 @@ import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
 
-@ExperimentalStdlibApi
 class JavaTools(private val project: Project) {
     fun applyDefaultPlugins(): AuroraReport {
         project.logger.lifecycle("Apply java and maven-publish plugins")

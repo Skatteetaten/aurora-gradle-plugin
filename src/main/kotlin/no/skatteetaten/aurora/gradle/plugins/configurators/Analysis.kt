@@ -5,21 +5,24 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.mutators.AnalysisTools
 import org.gradle.api.Project
 
-@ExperimentalStdlibApi
 class Analysis(
     project: Project,
     private val config: AuroraConfiguration
 ) : Configurator {
     val tools = AnalysisTools(project)
 
-    override fun configure(): List<AuroraReport> = buildList {
+    override fun configure(): List<AuroraReport> {
+        val list = mutableListOf<AuroraReport>()
+
         if (config.applyCheckstylePlugin) {
-            add(
+            list.add(
                 tools.applyCheckstylePlugin(
                     checkstyleConfigVersion = config.checkstyleConfigVersion,
                     checkstyleConfigFile = config.checkstyleConfigFile
                 )
             )
         }
+
+        return list.toList()
     }
 }

@@ -66,7 +66,12 @@ class KotlinToolsTest {
             with(it.kotlinOptions) {
                 assertThat(suppressWarnings).isTrue()
                 assertThat(jvmTarget).isEqualTo("11")
-                assertThat(freeCompilerArgs).isEqualTo(listOf("-Xjsr305=strict"))
+                assertThat(freeCompilerArgs).isEqualTo(
+                    listOf(
+                        "-Xjsr305=strict",
+                        "-nowarn",
+                    )
+                )
             }
         }
 

@@ -98,7 +98,11 @@ tasks {
         kotlinOptions {
             suppressWarnings = true
             jvmTarget = Versions.javaSourceCompatibility
-            freeCompilerArgs = listOf("-nowarn")
+            freeCompilerArgs = listOf(
+                "-nowarn",
+                "-Xopt-in=kotlin.ExperimentalStdlibApi",
+                "-Xopt-in=kotlin.RequiresOptIn"
+            )
             languageVersion = Versions.kotlin.substringBeforeLast(".")
         }
 

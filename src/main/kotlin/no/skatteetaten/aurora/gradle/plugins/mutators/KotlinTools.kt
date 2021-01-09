@@ -28,7 +28,10 @@ class KotlinTools(private val project: Project) {
                 with(it.kotlinOptions) {
                     suppressWarnings = true
                     jvmTarget = sourceCompatibility
-                    freeCompilerArgs = listOf("-Xjsr305=strict")
+                    freeCompilerArgs = listOf(
+                        "-Xjsr305=strict",
+                        "-nowarn",
+                    )
                 }
             }
         }

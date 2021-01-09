@@ -10,7 +10,6 @@ import org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
 import org.springframework.cloud.contract.verifier.config.TestFramework.SPOCK
 import org.springframework.cloud.contract.verifier.plugin.ContractVerifierExtension
 
-@ExperimentalStdlibApi
 class SpringTools(private val project: Project) {
     fun applySpring(
         mvcStarterVersion: String,
@@ -22,21 +21,20 @@ class SpringTools(private val project: Project) {
     ): AuroraReport {
         project.logger.lifecycle("Apply Spring support")
 
-        val implementationDependencies = buildList {
-            add("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+        val implementationDependencies = mutableListOf<String>()
+        implementationDependencies.add("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-            if (startersEnabled) {
-                add(
-                    when {
-                        webFluxEnabled ->
-                            "no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter:$webFluxStarterVersion"
-                        else -> "no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:$mvcStarterVersion"
-                    }
-                )
-            }
-
-            if (devTools) add("org.springframework.boot:spring-boot-devtools")
+        if (startersEnabled) {
+            implementationDependencies.add(
+                when {
+                    webFluxEnabled ->
+                        "no.skatteetaten.aurora.springboot:aurora-spring-boot-webflux-starter:$webFluxStarterVersion"
+                    else -> "no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:$mvcStarterVersion"
+                }
+            )
         }
+
+        if (devTools) implementationDependencies.add("org.springframework.boot:spring-boot-devtools")
 
         project.logger.lifecycle("Apply Spring support")
 

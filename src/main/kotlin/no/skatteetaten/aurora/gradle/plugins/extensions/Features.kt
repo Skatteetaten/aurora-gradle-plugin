@@ -11,5 +11,4 @@ open class Features {
     var junit5Support: Boolean? = null
     var springDevTools: Boolean? = null
     var auroraStarters: Boolean? = null
-    var python: Boolean? = null
 }

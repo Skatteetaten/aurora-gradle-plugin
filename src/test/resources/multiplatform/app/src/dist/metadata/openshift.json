@@ -1,0 +1,14 @@
+{
+  "docker": {
+    "maintainer": "Aurora OpenShift Utvikling <utvpaas@skatteetaten.no>",
+    "labels": {
+      "io.k8s.description": "Gradle Plugin Test App",
+      "io.openshift.tags": "openshift,springboot"
+    }
+  },
+  "java": {
+    "mainClass":  "org.springframework.boot.loader.JarLauncher",
+    "jvmOpts": "",
+    "applicationArgs": "--logging.config=${LOGBACK_FILE}"
+  }
+}

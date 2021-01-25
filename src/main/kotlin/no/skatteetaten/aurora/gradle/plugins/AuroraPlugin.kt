@@ -26,8 +26,20 @@ import org.gradle.kotlin.dsl.getByType
 @ExperimentalStdlibApi
 class AuroraPlugin : Plugin<Project> {
     override fun apply(p: Project) {
-        p.configureExtensions()
-        p.afterEvaluate { project ->
+        if (p.subprojects.isEmpty()) {
+            p.registerProjectConfiguration()
+        } else {
+            p.subprojects {
+                it.group = p.group
+                it.plugins.apply("java")
+                it.registerProjectConfiguration()
+            }
+        }
+    }
+
+    private fun Project.registerProjectConfiguration() {
+        configureExtensions()
+        afterEvaluate { project ->
             project.logger.lifecycle("After evaluate")
 
             val config = project.getConfig()
@@ -52,8 +64,8 @@ class AuroraPlugin : Plugin<Project> {
             ).flatten()
 
             with(project.tasks) {
-                register("aurora") {
-                    with(it) {
+                register("aurora") { task ->
+                    with(task) {
                         project.logger.lifecycle(
                             "Use task :aurora to get full report on how AuroraPlugin modifies your gradle setup"
                         )
@@ -64,8 +76,8 @@ class AuroraPlugin : Plugin<Project> {
                     }
                 }
 
-                register("auroraConfiguration") {
-                    with(it) {
+                register("auroraConfiguration") { task ->
+                    with(task) {
                         doLast {
                             project.logger.lifecycle(config.toString())
                         }

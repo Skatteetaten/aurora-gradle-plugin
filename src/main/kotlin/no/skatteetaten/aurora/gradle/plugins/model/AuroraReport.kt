@@ -19,7 +19,7 @@ data class AuroraReport(
             else -> ""
         }}\n${when {
             dependenciesAdded.isNotEmpty() -> {
-                "\n  Dependencies :\n${dependenciesAdded.joinToString("\n     ") }"
+                "\n  Dependencies :\n     ${dependenciesAdded.joinToString("\n     ") }"
             }
             else -> ""
         }}"

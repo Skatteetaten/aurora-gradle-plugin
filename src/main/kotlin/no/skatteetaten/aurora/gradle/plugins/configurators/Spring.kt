@@ -22,7 +22,7 @@ class Spring(
                     devTools = config.springDevTools,
                     webFluxEnabled = config.useWebFlux,
                     bootJarEnabled = config.useBootJar,
-                    startersEnabled = config.useAuroraStarters
+                    startersEnabled = config.useAuroraStarters,
                 )
             )
         }
@@ -31,7 +31,7 @@ class Spring(
             list.add(
                 tools.applySpringCloudContract(
                     junit5 = config.applyJunit5Support,
-                    springCloudContractVersion = config.springCloudContractVersion
+                    springCloudContractVersion = config.springCloudContractVersion,
                 )
             )
         }

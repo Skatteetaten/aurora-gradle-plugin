@@ -1,0 +1,4 @@
+aurora {
+    useKotlinDefaults
+    useLibDefaults
+}

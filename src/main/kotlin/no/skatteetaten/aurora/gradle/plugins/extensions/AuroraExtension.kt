@@ -32,6 +32,21 @@ open class AuroraExtension(private val project: Project) {
         return this
     }
 
+    val useLibDefaults: AuroraExtension
+        get() = configureLibDefaults()
+
+    fun useLibDefaults(): AuroraExtension = configureLibDefaults()
+
+    private fun configureLibDefaults(): AuroraExtension {
+        features {
+            with(it) {
+                deliveryBundle = false
+            }
+        }
+
+        return this
+    }
+
     val useJavaDefaults: AuroraExtension
         get() = configureJavaDefaults()
 
@@ -89,21 +104,6 @@ open class AuroraExtension(private val project: Project) {
         useSpringBoot {
             with(it) {
                 useCloudContract
-            }
-        }
-
-        return this
-    }
-
-    val usePython: AuroraExtension
-        get() = configurePython()
-
-    fun usePython(): AuroraExtension = configurePython()
-
-    private fun configurePython(): AuroraExtension {
-        features {
-            with(it) {
-                python = true
             }
         }
 
@@ -180,8 +180,8 @@ open class AuroraExtension(private val project: Project) {
     fun useAsciiDoctor(): AuroraExtension = configureAsciiDoctor()
 
     private fun configureAsciiDoctor(): AuroraExtension {
-        if (!project.plugins.hasPlugin("org.asciidoctor.convert")) {
-            project.plugins.apply("org.asciidoctor.convert")
+        if (!project.plugins.hasPlugin("org.asciidoctor.jvm.convert")) {
+            project.plugins.apply("org.asciidoctor.jvm.convert")
 
             project.logger.lifecycle("Applied missing plugin: AsciiDoctor")
         }

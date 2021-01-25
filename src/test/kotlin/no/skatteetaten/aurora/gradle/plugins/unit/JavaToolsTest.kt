@@ -13,7 +13,7 @@ import assertk.assertions.isTrue
 import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaTools
 import no.skatteetaten.aurora.gradle.plugins.taskOutcome
-import org.asciidoctor.gradle.AsciidoctorTask
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.Project
@@ -229,7 +229,7 @@ class JavaToolsTest {
             """
             plugins {
                 id 'java'
-                id 'org.asciidoctor.convert' version '${PluginVersions.asciidoctor}'
+                id 'org.asciidoctor.jvm.convert' version '${PluginVersions.asciidoctor}'
             }
             """.trimIndent()
         )

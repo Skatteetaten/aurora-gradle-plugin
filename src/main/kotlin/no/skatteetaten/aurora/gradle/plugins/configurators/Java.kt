@@ -26,7 +26,7 @@ class Java(
             )
         }
 
-        project.plugins.withId("org.asciidoctor.convert") {
+        project.plugins.withId("org.asciidoctor.jvm.convert") {
             list.add(tools.applyAsciiDocPlugin())
         }
 

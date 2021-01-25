@@ -29,7 +29,7 @@ class AuroraPluginGradleToolsFunctionalTest {
                 id 'no.skatteetaten.gradle.aurora'
                 id 'com.github.ben-manes.versions' version '${PluginVersions.ben_manes_versions}'
                 id 'info.solidsoft.pitest' version '${PluginVersions.pitest}'
-                id 'org.asciidoctor.convert' version '${PluginVersions.asciidoctor}'
+                id 'org.asciidoctor.jvm.convert' version '${PluginVersions.asciidoctor}'
             }
         """
         )

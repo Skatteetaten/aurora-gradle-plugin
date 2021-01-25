@@ -100,7 +100,6 @@ fun Project.getConfig(): AuroraConfiguration {
         applyJunit5Support = features.junit5Support ?: props.asBoolean("applyJunit5Support") ?: Features.applyJunit5Support,
         springDevTools = features.springDevTools ?: props.asBoolean("springDevTools") ?: Features.springDevTools,
         useWebFlux = spring.webFluxEnabled ?: props.asBoolean("useWebFlux") ?: Features.useWebFlux,
-        usePython = features.python ?: props.asBoolean("usePython") ?: Features.usePython,
         useBootJar = spring.bootJarEnabled ?: props.asBoolean("useBootJar") ?: Features.useBootJar,
         useAuroraStarters = features.auroraStarters ?: props.asBoolean("useAuroraStarters") ?: Features.useAuroraStarters
     )

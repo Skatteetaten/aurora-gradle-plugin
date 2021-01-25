@@ -3,7 +3,7 @@
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
-import org.asciidoctor.gradle.AsciidoctorTask
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
@@ -56,8 +56,8 @@ class JavaTools(private val project: Project) {
                     )
                 )
                 inputs.dir(snippetsDir)
-                outputDir = project.file("${project.buildDir}/asciidoc")
-                sourceDir = project.file("src/main/asciidoc")
+                setOutputDir(project.file("${project.buildDir}/asciidoc"))
+                setSourceDir(project.file("src/main/asciidoc"))
 
                 dependsOn("test")
             }
@@ -74,7 +74,7 @@ class JavaTools(private val project: Project) {
         }
 
         return AuroraReport(
-            name = "plugin org.asciidoctor.convert",
+            name = "plugin org.asciidoctor.jvm.convert",
             description = "configure html5 report in static/docs"
         )
     }

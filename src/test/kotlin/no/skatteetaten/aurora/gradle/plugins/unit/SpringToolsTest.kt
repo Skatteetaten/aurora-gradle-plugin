@@ -118,7 +118,10 @@ class SpringToolsTest {
             bootJarEnabled = false,
             startersEnabled = config.useAuroraStarters
         )
-        val report = springTools.applySpringCloudContract(true, config.springCloudContractVersion)
+        val report = springTools.applySpringCloudContract(
+            true,
+            config.springCloudContractVersion,
+        )
         val stubsJar = project.tasks.named("stubsJar", Jar::class.java).get()
 
         with(project.configurations.getByName("testImplementation").allDependencies) {

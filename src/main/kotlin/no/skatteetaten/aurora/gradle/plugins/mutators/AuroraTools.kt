@@ -7,43 +7,7 @@ import org.gradle.api.tasks.bundling.Tar
 import org.gradle.kotlin.dsl.named
 
 class AuroraTools(private val project: Project) {
-    fun applyDeliveryBundleConfig(python: Boolean, bootJar: Boolean): AuroraReport = when {
-        python -> {
-            project.logger.lifecycle("Apply python delivery bundle")
-
-            with(project) {
-                plugins.apply("distribution")
-
-                with(extensions.getByName("distributions") as DistributionContainer) {
-                    with(getByName("main")) {
-                        with(contents) {
-                            from("${project.buildDir}/resources/main") {
-                                it.into("src")
-                            }
-
-                            from("${project.projectDir}/src/main/dist/metadata") {
-                                it.into("metadata")
-                            }
-                        }
-                    }
-                }
-
-                with(tasks.named("distZip", org.gradle.api.tasks.bundling.Zip::class).get()) {
-                    archiveClassifier.set("Leveransepakke")
-                    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
-
-                    dependsOn("processResources")
-                }
-
-                disableSuperfluousArtifacts()
-            }
-
-            AuroraReport(
-                name = "aurora.applyDeliveryBundleConfig",
-                pluginsApplied = listOf("distribution"),
-                description = "Configure Leveransepakke for python"
-            )
-        }
+    fun applyDeliveryBundleConfig(bootJar: Boolean): AuroraReport = when {
         bootJar -> {
             project.logger.lifecycle("Apply bootjar delivery bundle")
 

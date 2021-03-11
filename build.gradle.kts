@@ -2,7 +2,7 @@
 
 import com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD_PARALLEL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jlleitschuh.gradle.ktlint.KtlintFormatTask
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
 
 plugins {
     kotlin("jvm") version(Versions.kotlin)
@@ -87,7 +87,7 @@ artifacts {
 }
 
 tasks {
-    val ktlintKotlinScriptFormat by existing(KtlintFormatTask::class)
+    val ktlintKotlinScriptFormat by existing(GenerateReportsTask::class)
     val ktlintFormat by existing(Task::class)
 
     wrapper {

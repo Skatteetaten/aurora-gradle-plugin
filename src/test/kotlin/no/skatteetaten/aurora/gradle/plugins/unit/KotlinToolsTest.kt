@@ -5,6 +5,7 @@ package no.skatteetaten.aurora.gradle.plugins.unit
 import PluginVersions
 import Versions
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
@@ -131,8 +132,8 @@ class KotlinToolsTest {
         assertThat(report.description).isEqualTo("disable android")
         assertThat(compileKotlin.dependsOn).containsOnly("ktlintMainSourceSetCheck", "ktlintKotlinScriptCheck")
         assertThat(compileTestKotlin.dependsOn).containsOnly("ktlintTestSourceSetCheck")
-        assertThat(ktlintKotlinScriptCheck.dependsOn).containsOnly("ktlintKotlinScriptFormat")
-        assertThat(ktlintTestSourceSetCheck.dependsOn).containsOnly("ktlintTestSourceSetFormat")
-        assertThat(ktlintMainSourceSetCheck.dependsOn).containsOnly("ktlintMainSourceSetFormat")
+        assertThat(ktlintKotlinScriptCheck.dependsOn).contains("ktlintKotlinScriptFormat" as Any)
+        assertThat(ktlintTestSourceSetCheck.dependsOn).contains("ktlintTestSourceSetFormat" as Any)
+        assertThat(ktlintMainSourceSetCheck.dependsOn).contains("ktlintMainSourceSetFormat" as Any)
     }
 }

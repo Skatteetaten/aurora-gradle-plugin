@@ -79,7 +79,7 @@ fun Project.getConfig(): AuroraConfiguration {
 
     return AuroraConfiguration(
         javaSourceCompatibility = versions.javaSourceCompatibility ?: props.asString("javaSourceCompatibility") ?: Versions.javaSourceCompatibility,
-        groovyVersion = versions.javaSourceCompatibility ?: props.asString("groovyVersion") ?: Versions.groovy,
+        groovyVersion = versions.groovy ?: props.asString("groovyVersion") ?: Versions.groovy,
         spockVersion = versions.spock ?: props.asString("spockVersion") ?: Versions.spock,
         junit5Version = versions.junit5 ?: props.asString("junit5Version") ?: Versions.junit5,
         cglibVersion = versions.cglib ?: props.asString("cglibVersion") ?: Versions.cglib,

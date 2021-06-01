@@ -135,6 +135,10 @@ open class AuroraExtension(private val project: Project) {
             if (project.file(".git").exists()) {
                 project.plugins.apply("com.gorylenko.gradle-git-properties")
 
+                with(project.tasks.named("generateGitProperties").get()) {
+                    dependsOn("runKtlintFormatOverKotlinScripts")
+                }
+
                 project.logger.lifecycle("Applied missing plugin: Gorylenko Git Properties")
             } else {
                 project.logger.lifecycle("Cannot apply Gorylenko Git Properties! No .git Directory!")

@@ -5,6 +5,9 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 class KotlinTools(private val project: Project) {
     fun applyKotlinSupport(
@@ -70,6 +73,35 @@ class KotlinTools(private val project: Project) {
                 with(named("compileTestKotlin").get()) {
                     dependsOn("ktlintTestSourceSetCheck")
                 }
+                withType(GenerateReportsTask::class.java).configureEach {
+                    it.dependsOn(named("runKtlintFormatOverKotlinScripts"))
+                }
+                withType(KtLintCheckTask::class.java).configureEach {
+                    it.dependsOn(named("runKtlintFormatOverKotlinScripts"))
+                }
+                with(named("runKtlintCheckOverMainSourceSet").get()) {
+                    dependsOn(named("runKtlintFormatOverMainSourceSet"))
+                }
+                with(named("runKtlintCheckOverTestSourceSet").get()) {
+                    dependsOn(named("runKtlintFormatOverTestSourceSet"))
+                }
+                withType(KtLintFormatTask::class.java).configureEach {
+                    with(it) {
+                        if (name != "runKtlintFormatOverKotlinScripts") {
+                            dependsOn(named("runKtlintFormatOverKotlinScripts"))
+
+                            var parentProject = project.parent
+
+                            while (parentProject != null) {
+                                if (hasKotlin(parentProject)) {
+                                    dependsOn("${parentProject.path}:runKtlintFormatOverKotlinScripts")
+                                }
+
+                                parentProject = parentProject.parent
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -78,4 +110,7 @@ class KotlinTools(private val project: Project) {
             description = "disable android"
         )
     }
+
+    private fun Project.hasKotlin(parentProject: Project) =
+        parentProject.name != rootProject.name && parentProject.plugins.hasPlugin("org.jlleitschuh.gradle.ktlint")
 }

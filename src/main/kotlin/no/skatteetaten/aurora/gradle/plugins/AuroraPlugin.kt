@@ -27,11 +27,13 @@ import org.gradle.kotlin.dsl.getByType
 class AuroraPlugin : Plugin<Project> {
     override fun apply(p: Project) {
         if (p.subprojects.isEmpty()) {
+            p.plugins.apply("maven-publish")
             p.registerProjectConfiguration()
         } else {
             p.subprojects {
                 it.group = p.group
                 it.plugins.apply("java")
+                it.plugins.apply("maven-publish")
                 it.registerProjectConfiguration()
             }
         }
@@ -39,9 +41,8 @@ class AuroraPlugin : Plugin<Project> {
 
     private fun Project.registerProjectConfiguration() {
         configureExtensions()
-        afterEvaluate { project ->
-            project.logger.lifecycle("After evaluate")
 
+        afterEvaluate { project ->
             val config = project.getConfig()
             val java = Java(project, config)
             val aurora = Aurora(project, config)

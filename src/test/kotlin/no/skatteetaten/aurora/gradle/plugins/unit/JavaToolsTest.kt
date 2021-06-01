@@ -18,7 +18,6 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.jvm.tasks.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
@@ -235,14 +234,11 @@ class JavaToolsTest {
         )
         (project as ProjectInternal).evaluate()
         val report = javaTools.applyAsciiDocPlugin()
-        val jar = project.tasks.named("jar", Jar::class.java).get()
         val asciiDoctor = project.tasks.named("asciidoctor", AsciidoctorTask::class.java).get()
 
         assertThat(report.description).isEqualTo("configure html5 report in static/docs")
         assertThat(asciiDoctor.outputDir.path).isEqualTo("${project.buildDir}/asciidoc")
         assertThat(asciiDoctor.sourceDir).isEqualTo(project.file("${project.projectDir}/src/main/asciidoc"))
         assertThat(asciiDoctor.dependsOn).contains("test")
-        assertThat(jar).isNotNull()
-        assertThat(jar.dependsOn).contains("asciidoctor")
     }
 }

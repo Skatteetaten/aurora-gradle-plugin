@@ -7,27 +7,27 @@ object Versions {
     const val objenesis: String = "3.1"
     const val auroraSpringBootMvcStarter: String = "1.1.+"
     const val auroraSpringBootWebFluxStarter: String = "1.1.+"
-    const val springCloudContract: String = "3.0.1"
+    const val springCloudContract: String = "3.0.3"
     const val kotlinLogging: String = "2.0.6"
     const val checkstyleConfig: String = "2.2.5"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
-    const val kotlin = "1.4.31"
-    const val assertk = "0.23.1"
+    const val kotlin = "1.5.10"
+    const val assertk = "0.24"
 }
 
 object PluginVersions {
-    const val gradle_test_logger = "2.1.1"
+    const val gradle_test_logger = "3.0.0"
     const val ktlint = "10.0.0"
-    const val spring_boot = "2.4.3"
-    const val ben_manes_versions = "0.38.0"
-    const val gradle_plugin_publish = "0.13.0"
+    const val spring_boot = "2.5.0"
+    const val ben_manes_versions = "0.39.0"
+    const val gradle_plugin_publish = "0.15.0"
     const val asciidoctor = "3.3.2"
     const val pitest = "1.6.0"
-    const val cloud_contract = "3.0.1"
+    const val cloud_contract = "3.0.3"
     const val dependency_management = "1.0.11.RELEASE"
-    const val sonar = "3.1.1"
+    const val sonar = "3.2.0"
     const val git_properties = "2.2.4"
-    const val latest_versions = "0.2.15"
+    const val latest_versions = "0.2.17"
 }
 
 object Features {

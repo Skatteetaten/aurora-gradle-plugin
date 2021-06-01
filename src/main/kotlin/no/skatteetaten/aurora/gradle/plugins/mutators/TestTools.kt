@@ -5,7 +5,9 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.GroovyCompile
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -98,13 +100,17 @@ class TestTools(private val project: Project) {
         )
     }
 
-    fun applyJacocoTestReport(): AuroraReport {
+    fun applyJacocoTestReport(toolsVersion: String): AuroraReport {
         project.logger.lifecycle("Apply jacoco support")
 
         return when {
             project.plugins.hasPlugin("java") -> {
                 with(project) {
                     plugins.apply("jacoco")
+
+                    configure<JacocoPluginExtension> {
+                        toolVersion = toolsVersion
+                    }
 
                     tasks.named("jacocoTestReport", JacocoReport::class.java) {
                         with(it.reports) {

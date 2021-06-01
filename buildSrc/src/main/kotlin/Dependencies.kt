@@ -3,6 +3,7 @@ object Versions {
     const val groovy: String = "3.0.5"
     const val spock: String = "1.3-groovy-2.5"
     const val junit5: String = "5.7.1"
+    const val jacocoTools: String = "0.8.7"
     const val cglib: String = "3.3.2"
     const val objenesis: String = "3.1"
     const val auroraSpringBootMvcStarter: String = "1.1.+"

@@ -12,6 +12,7 @@ data class AuroraConfiguration(
     val groovyVersion: String = Versions.groovy,
     val spockVersion: String = Versions.spock,
     val junit5Version: String = Versions.junit5,
+    val jacocoToolsVersion: String = Versions.jacocoTools,
     val cglibVersion: String = Versions.cglib,
     val objenesisVersion: String = Versions.objenesis,
     val auroraSpringBootMvcStarterVersion: String = Versions.auroraSpringBootMvcStarter,
@@ -40,6 +41,7 @@ data class AuroraConfiguration(
             "groovyVersion='$groovyVersion',\n" +
             "spockVersion='$spockVersion',\n" +
             "junit5Version='$junit5Version',\n" +
+            "jacocoToolsVersion='$jacocoToolsVersion',\n" +
             "cglibVersion='$cglibVersion',\n" +
             "objenesisVersion='$objenesisVersion',\n" +
             "auroraSpringBootMvcStarterVersion='$auroraSpringBootMvcStarterVersion',\n" +
@@ -82,6 +84,7 @@ fun Project.getConfig(): AuroraConfiguration {
         groovyVersion = versions.groovy ?: props.asString("groovyVersion") ?: Versions.groovy,
         spockVersion = versions.spock ?: props.asString("spockVersion") ?: Versions.spock,
         junit5Version = versions.junit5 ?: props.asString("junit5Version") ?: Versions.junit5,
+        jacocoToolsVersion = versions.jacocoTools ?: props.asString("jacocoToolsVersion") ?: Versions.jacocoTools,
         cglibVersion = versions.cglib ?: props.asString("cglibVersion") ?: Versions.cglib,
         objenesisVersion = versions.objenesis ?: props.asString("objenesisVersion") ?: Versions.objenesis,
         auroraSpringBootMvcStarterVersion = versions.auroraSpringBootMvcStarter ?: props.asString("auroraSpringBootMvcStarterVersion") ?: Versions.auroraSpringBootMvcStarter,

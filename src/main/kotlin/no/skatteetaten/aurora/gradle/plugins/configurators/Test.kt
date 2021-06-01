@@ -19,7 +19,7 @@ class Test(
         }
 
         if (config.applyJacocoTestReport) {
-            list.add(tools.applyJacocoTestReport())
+            list.add(tools.applyJacocoTestReport(config.jacocoToolsVersion))
         }
 
         project.plugins.withId("info.solidsoft.pitest") {

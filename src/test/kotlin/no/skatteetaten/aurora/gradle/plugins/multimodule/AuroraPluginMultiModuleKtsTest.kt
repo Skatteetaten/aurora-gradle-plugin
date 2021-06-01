@@ -39,7 +39,6 @@ class AuroraPluginMultiModuleKtsTest {
             .withProjectDir(testProjectDir)
             .withArguments("build")
             .withPluginClasspath()
-            .forwardOutput()
             .build()
 
         assertThat(result.task("build")).isNull()
@@ -52,8 +51,6 @@ class AuroraPluginMultiModuleKtsTest {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("build")
-            .withPluginClasspath()
-            .forwardOutput()
             .build()
 
         assertThat(result.task(":lib:distZip")).isNull()
@@ -65,7 +62,6 @@ class AuroraPluginMultiModuleKtsTest {
             .withProjectDir(testProjectDir)
             .withArguments("build")
             .withPluginClasspath()
-            .forwardOutput()
             .build()
 
         assertThat(result.taskOutcome(":app:distZip")).isSuccessOrEqualTo()

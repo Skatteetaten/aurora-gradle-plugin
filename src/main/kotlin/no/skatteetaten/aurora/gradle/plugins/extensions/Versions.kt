@@ -7,6 +7,7 @@ open class Versions {
     var groovy: String? = null
     var spock: String? = null
     var junit5: String? = null
+    var jacocoTools: String? = null
     var cglib: String? = null
     var objenesis: String? = null
     var auroraSpringBootMvcStarter: String? = null

@@ -2,14 +2,13 @@ package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
-import org.gradle.api.plugins.MavenRepositoryHandlerConvention
-import org.gradle.api.tasks.TaskContainer
-import org.gradle.api.tasks.Upload
-import org.gradle.kotlin.dsl.withConvention
-import org.gradle.kotlin.dsl.withGroovyBuilder
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.get
 
 class MavenTools(private val project: Project) {
-    fun addMavenDeployer(python: Boolean = false): AuroraReport = when {
+    fun addMavenDeployer(): AuroraReport = when {
         missingRepositoryConfiguration() -> AuroraReport(
             name = "aurora.applyMavenDeployer",
             description = MISSING_REPO_CREDS_MESSAGE
@@ -24,16 +23,22 @@ class MavenTools(private val project: Project) {
             val repositoryPassword = exProps["repositoryPassword"] as String
 
             with(project) {
-                with(tasks) {
-                    configureDeployer(
-                        python,
-                        repositoryReleaseUrl,
-                        repositoryUsername,
-                        repositoryPassword,
-                        repositorySnapshotUrl
-                    )
+                configureDeployer(
+                    repositoryReleaseUrl,
+                    repositoryUsername,
+                    repositoryPassword,
+                    repositorySnapshotUrl
+                )
 
-                    configureDeployTask()
+                with(tasks) {
+                    register("upload") { task ->
+                        with(task) {
+                            description = "Build and deploy artifacts to Nexus"
+
+                            dependsOn(tasks.named("publish"))
+                            mustRunAfter("clean")
+                        }
+                    }
                 }
             }
 
@@ -44,44 +49,59 @@ class MavenTools(private val project: Project) {
         }
     }
 
-    private fun TaskContainer.configureDeployTask() {
-        with(register("deploy").get()) {
-            description = "Build and deploy artifacts to Nexus"
-
-            dependsOn("uploadArchives")
-            mustRunAfter("clean")
-        }
-    }
-
-    private fun TaskContainer.configureDeployer(
-        python: Boolean,
+    private fun Project.configureDeployer(
         repositoryReleaseUrl: String,
         repositoryUsername: String,
         repositoryPassword: String,
         repositorySnapshotUrl: String
-    ) = named("uploadArchives", Upload::class.java) {
-        with(it) {
-            if (python) {
-                isUploadDescriptor = false
+    ) {
+        with(extensions.getByType(PublishingExtension::class.java)) {
+            val pubVersion = project.version as? String? ?: "local-SNAPSHOT"
+            val pubGroup = when {
+                (project.group as String).isBlank() -> "no.skatteetaten.aurora.noop"
+                else -> project.group as String
+            }
+
+            with(publications) {
+                create<MavenPublication>("leveranse") {
+                    groupId = pubGroup
+                    artifactId = project.name
+                    version = when {
+                        pubVersion.endsWith("-SNAPSHOT") -> pubVersion.removeSuffix("-SNAPSHOT")
+                        else -> pubVersion
+                    }
+
+                    from(components["java"])
+
+                    versionMapping {
+                        with(it) {
+                            usage("java-runtime") { strategy ->
+                                strategy.fromResolutionResult()
+                            }
+                        }
+                    }
+                }
             }
 
             with(repositories) {
-                withConvention(MavenRepositoryHandlerConvention::class) {
-                    with(mavenDeployer()) {
-                        withGroovyBuilder {
-                            "repository"("url" to repositoryReleaseUrl) {
-                                "authentication"(
-                                    "userName" to repositoryUsername,
-                                    "password" to repositoryPassword
-                                )
-                            }
-                            "snapshotRepository"("url" to repositorySnapshotUrl) {
-                                "authentication"(
-                                    "userName" to repositoryUsername,
-                                    "password" to repositoryPassword
-                                )
-                            }
+                when (pubVersion.endsWith("SNAPSHOT")) {
+                    true -> maven {
+                        it.name = "snapshotRepository"
+                        it.url = uri(repositorySnapshotUrl)
+                        it.credentials { credentials ->
+                            credentials.username = repositoryUsername
+                            credentials.password = repositoryPassword
                         }
+                        it.isAllowInsecureProtocol = true
+                    }
+                    else -> maven {
+                        it.name = "repository"
+                        it.url = uri(repositoryReleaseUrl)
+                        it.credentials { credentials ->
+                            credentials.username = repositoryUsername
+                            credentials.password = repositoryPassword
+                        }
+                        it.isAllowInsecureProtocol = true
                     }
                 }
             }

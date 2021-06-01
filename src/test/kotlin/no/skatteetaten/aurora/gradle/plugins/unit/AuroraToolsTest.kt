@@ -224,7 +224,7 @@ class AuroraToolsTest {
             }
             
             dependencies { 
-                compile group: 'org.seleniumhq.selenium', name: 'selenium-leg-rc', version: '4.0.0-alpha-6'
+                implementation group: 'org.seleniumhq.selenium', name: 'selenium-leg-rc', version: '4.0.0-alpha-6'
             }
             """.trimIndent()
         )

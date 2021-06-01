@@ -14,12 +14,11 @@ class JavaTools(private val project: Project) {
 
         with(project) {
             plugins.apply("java")
-            plugins.apply("maven")
         }
 
         return AuroraReport(
             name = "aurora.applyDefaultPlugins",
-            pluginsApplied = listOf("java", "maven")
+            pluginsApplied = listOf("java", "maven-publish")
         )
     }
 
@@ -68,8 +67,6 @@ class JavaTools(private val project: Project) {
                 from("${asciidoctor.outputDir}/html5") {
                     into("static/docs")
                 }
-
-                dependsOn("asciidoctor")
             }
         }
 

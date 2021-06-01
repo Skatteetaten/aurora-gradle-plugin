@@ -108,8 +108,47 @@ tasks {
 
         dependsOn(listOf(ktlintKotlinScriptFormat, ktlintFormat))
     }
+    withType(GenerateReportsTask::class.java).configureEach {
+        dependsOn(named("runKtlintFormatOverKotlinScripts"))
+    }
+    withType(org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask::class.java).configureEach {
+        dependsOn(named("runKtlintFormatOverKotlinScripts"))
+    }
+    with(named("runKtlintCheckOverMainSourceSet").get()) {
+        dependsOn(named("runKtlintFormatOverMainSourceSet"))
+    }
+    with(named("runKtlintCheckOverTestSourceSet").get()) {
+        dependsOn(named("runKtlintFormatOverTestSourceSet"))
+    }
+    with(named("processResources").get()) {
+        dependsOn(named("runKtlintFormatOverKotlinScripts"))
+    }
+    with(named("processTestResources").get()) {
+        dependsOn(named("runKtlintFormatOverKotlinScripts"))
+    }
+    with(named("sourcesJar").get()) {
+        dependsOn(named("runKtlintFormatOverKotlinScripts"), named("runKtlintFormatOverMainSourceSet"))
+    }
+    withType(org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask::class.java).configureEach {
+        if (name != "runKtlintFormatOverKotlinScripts") {
+            dependsOn(named("runKtlintFormatOverKotlinScripts"))
+
+            var parentProject = project.parent
+
+            while (parentProject != null) {
+                if (hasKotlin(parentProject)) {
+                    dependsOn("${parentProject.path}:runKtlintFormatOverKotlinScripts")
+                }
+
+                parentProject = parentProject.parent
+            }
+        }
+    }
 
     withType<Test> {
         useJUnitPlatform()
     }
 }
+
+fun Project.hasKotlin(parentProject: Project) =
+    parentProject.name != rootProject.name && parentProject.plugins.hasPlugin("org.jlleitschuh.gradle.ktlint")

@@ -31,9 +31,9 @@ class AuroraPlugin : Plugin<Project> {
             p.registerProjectConfiguration()
         } else {
             p.subprojects {
-                it.plugins.apply("maven-publish")
                 it.group = p.group
                 it.plugins.apply("java")
+                it.plugins.apply("maven-publish")
                 it.registerProjectConfiguration()
             }
         }

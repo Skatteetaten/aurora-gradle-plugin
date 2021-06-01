@@ -73,6 +73,15 @@ class MavenTools(private val project: Project) {
 
                     from(components["java"])
 
+                    configurations.getByName("archives").artifacts.filter {
+                        it.name.contains("Leveransepakke") ||
+                            it.name.contains("sources") ||
+                            it.name.contains("stubs")
+                    }.forEach {
+                        artifact(it)
+                    }
+                    tasks.findByName("distZip")?.let { artifact(it) }
+
                     versionMapping {
                         with(it) {
                             usage("java-runtime") { strategy ->

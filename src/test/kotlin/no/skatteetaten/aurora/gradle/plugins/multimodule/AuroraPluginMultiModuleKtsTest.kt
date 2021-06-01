@@ -51,6 +51,7 @@ class AuroraPluginMultiModuleKtsTest {
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("build")
+            .withPluginClasspath()
             .build()
 
         assertThat(result.task(":lib:distZip")).isNull()

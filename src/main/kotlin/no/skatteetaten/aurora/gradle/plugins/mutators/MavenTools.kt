@@ -67,20 +67,17 @@ class MavenTools(private val project: Project) {
                     groupId = pubGroup
                     artifactId = project.name
                     version = when {
-                        pubVersion.endsWith("-SNAPSHOT") -> pubVersion.removeSuffix("-SNAPSHOT")
+                        pubVersion.endsWith("-SNAPSHOT-SNAPSHOT") -> pubVersion.removeSuffix("-SNAPSHOT")
                         else -> pubVersion
                     }
 
                     from(components["java"])
 
                     configurations.getByName("archives").artifacts.filter {
-                        it.name.contains("Leveransepakke") ||
-                            it.name.contains("sources") ||
-                            it.name.contains("stubs")
+                        it.extension != "tar" && !it.name.endsWith("boot") && it.classifier != "plain"
                     }.forEach {
                         artifact(it)
                     }
-                    tasks.findByName("distZip")?.let { artifact(it) }
 
                     versionMapping {
                         with(it) {
@@ -97,20 +94,20 @@ class MavenTools(private val project: Project) {
                     true -> maven {
                         it.name = "snapshotRepository"
                         it.url = uri(repositorySnapshotUrl)
+                        it.isAllowInsecureProtocol = true
                         it.credentials { credentials ->
                             credentials.username = repositoryUsername
                             credentials.password = repositoryPassword
                         }
-                        it.isAllowInsecureProtocol = true
                     }
                     else -> maven {
                         it.name = "repository"
                         it.url = uri(repositoryReleaseUrl)
+                        it.isAllowInsecureProtocol = true
                         it.credentials { credentials ->
                             credentials.username = repositoryUsername
                             credentials.password = repositoryPassword
                         }
-                        it.isAllowInsecureProtocol = true
                     }
                 }
             }

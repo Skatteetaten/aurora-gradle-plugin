@@ -4,6 +4,7 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 
@@ -71,13 +72,13 @@ class MavenTools(private val project: Project) {
                         else -> pubVersion
                     }
 
-                    from(components["java"])
-
-                    configurations.getByName("archives").artifacts.filter {
-                        it.extension != "tar" && !it.name.endsWith("boot") && it.classifier != "plain"
-                    }.forEach {
-                        artifact(it)
-                    }
+                    tasks.findByName("distZip")?.let { artifact(tasks["distZip"]) }
+                    tasks
+                        .filter { it is Jar || it is org.gradle.api.tasks.bundling.Jar }
+                        .filter { it.name != "kotlinSourcesJar" }
+                        .forEach {
+                            artifact(tasks[it.name])
+                        }
 
                     versionMapping {
                         with(it) {

@@ -78,6 +78,6 @@ fun Project.disableSuperfluousArtifacts() {
     }
 
     configurations.getByName("archives").artifacts.removeIf {
-        it.extension == "tar" || it.name.endsWith("boot")
+        it.extension == "tar" || it.name.endsWith("boot") || it.name.endsWith("plain")
     }
 }

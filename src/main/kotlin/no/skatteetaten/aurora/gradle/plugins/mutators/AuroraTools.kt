@@ -4,7 +4,6 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
-import org.gradle.api.tasks.bundling.Tar
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
@@ -57,10 +56,6 @@ class AuroraTools(private val project: Project) {
             with(project) {
                 plugins.apply("application")
 
-                with(tasks.named("jar", Jar::class).get()) {
-                    archiveClassifier.set("")
-                }
-
                 with(tasks.named("distZip", org.gradle.api.tasks.bundling.Zip::class).get()) {
                     archiveClassifier.set("Leveransepakke")
 
@@ -84,11 +79,13 @@ class AuroraTools(private val project: Project) {
 }
 
 fun Project.disableSuperfluousArtifacts() {
-    with(tasks.named("distTar", Tar::class).get()) {
-        enabled = false
+    with(tasks) {
+        findByName("distTar")?.let { it.enabled = false }
     }
 
-    configurations.getByName("archives").artifacts.removeIf {
-        it.extension == "tar" || it.name.endsWith("boot")
+    configurations.findByName("archives")?.let { config ->
+        config.artifacts.removeIf {
+            it.extension == "tar" || it.name.endsWith("boot")
+        }
     }
 }

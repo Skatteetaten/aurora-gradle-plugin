@@ -45,12 +45,12 @@ class SpringTools(private val project: Project) {
 
             if (!bootJarEnabled) {
                 with(tasks) {
-                    getByName("jar") { it.enabled = true }
-                    getByName("distZip") { it.enabled = true }
-                    getByName("bootJar") { it.enabled = false }
-                    getByName("distTar") { it.enabled = false }
-                    getByName("bootDistTar") { it.enabled = false }
-                    getByName("bootDistZip") { it.enabled = false }
+                    findByName("jar")?.let { it.enabled = true }
+                    findByName("distZip")?.let { it.enabled = true }
+                    findByName("bootJar")?.let { it.enabled = false }
+                    findByName("distTar")?.let { it.enabled = false }
+                    findByName("bootDistTar")?.let { it.enabled = false }
+                    findByName("bootDistZip")?.let { it.enabled = false }
                 }
             }
 

@@ -2,9 +2,9 @@ package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
+import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 
@@ -65,6 +65,7 @@ class MavenTools(private val project: Project) {
 
             with(publications) {
                 create<MavenPublication>("leveranse") {
+                    from(components.getByName("java"))
                     groupId = pubGroup
                     artifactId = project.name
                     version = when {
@@ -73,12 +74,14 @@ class MavenTools(private val project: Project) {
                     }
 
                     tasks.findByName("distZip")?.let { artifact(tasks["distZip"]) }
-                    tasks
-                        .filter { it is Jar || it is org.gradle.api.tasks.bundling.Jar }
-                        .filter { it.name != "kotlinSourcesJar" }
-                        .forEach {
-                            artifact(tasks[it.name])
+
+                    configurations.findByName("archives")?.let { config ->
+                        config.artifacts.filter {
+                            it.isCustom()
+                        }.forEach {
+                            artifact(it)
                         }
+                    }
 
                     versionMapping {
                         with(it) {
@@ -113,6 +116,17 @@ class MavenTools(private val project: Project) {
                 }
             }
         }
+    }
+
+    private fun PublishArtifact.isCustom() = when (classifier) {
+        "module",
+        "jar",
+        "sources",
+        "stubs",
+        "plain",
+        "Leveransepakke",
+        "" -> false
+        else -> true
     }
 
     private fun missingRepositoryConfiguration(): Boolean =

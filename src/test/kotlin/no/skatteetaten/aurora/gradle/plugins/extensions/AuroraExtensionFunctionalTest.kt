@@ -325,7 +325,7 @@ class AuroraExtensionFunctionalTest {
 
         assertThat(result.output).contains("----- Aurora Plugin Report -----")
         assertThat(result.output).contains("no.skatteetaten.aurora.springboot:aurora-spring-boot-mvc-starter:1.0.7")
-        assertThat(result.output).contains("testImplementation org.codehaus.groovy:groovy-all:3.0.5")
+        assertThat(result.output).contains("testImplementation org.codehaus.groovy:groovy-all:3.0.8")
         assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
 

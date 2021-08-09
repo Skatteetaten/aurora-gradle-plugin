@@ -26,10 +26,10 @@ import org.gradle.kotlin.dsl.getByType
 @ExperimentalStdlibApi
 class AuroraPlugin : Plugin<Project> {
     override fun apply(p: Project) {
-        if (p.subprojects.isEmpty()) {
-            p.plugins.apply("maven-publish")
-            p.registerProjectConfiguration()
-        } else {
+        p.plugins.apply("maven-publish")
+        p.registerProjectConfiguration()
+
+        if (p.subprojects.isNotEmpty()) {
             p.subprojects {
                 it.group = p.group
                 it.plugins.apply("java")

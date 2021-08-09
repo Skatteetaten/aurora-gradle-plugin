@@ -41,7 +41,7 @@ class AuroraPluginMultiModuleKtsTest {
             .withPluginClasspath()
             .build()
 
-        assertThat(result.task("build")).isNull()
+        assertThat(result.taskOutcome(":build")).isSuccessOrEqualTo()
         assertThat(result.taskOutcome(":app:build")).isSuccessOrEqualTo()
         assertThat(result.taskOutcome(":lib:build")).isSuccessOrEqualTo()
     }
@@ -66,5 +66,16 @@ class AuroraPluginMultiModuleKtsTest {
             .build()
 
         assertThat(result.taskOutcome(":app:distZip")).isSuccessOrEqualTo()
+    }
+
+    @Test
+    fun `root app should build deliverybundle`() {
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("build")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.taskOutcome(":distZip")).isSuccessOrEqualTo()
     }
 }

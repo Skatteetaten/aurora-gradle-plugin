@@ -19,7 +19,7 @@ object Versions {
 object PluginVersions {
     const val gradle_test_logger = "3.0.0"
     const val ktlint = "10.2.0"
-    const val spring_boot = "2.5.5"
+    const val spring_boot = "2.5.6"
     const val ben_manes_versions = "0.39.0"
     const val gradle_plugin_publish = "0.16.0"
     const val asciidoctor = "3.3.2"

@@ -207,39 +207,6 @@ class AuroraToolsTest {
     }
 
     @Test
-    fun `ben-manes versions test resolutionStrategy`() {
-        buildFile.writeText(
-            """
-            plugins {
-                id 'java'
-                id 'no.skatteetaten.gradle.aurora'
-            }
-            
-            repositories {
-                mavenCentral()
-            }
-            
-            aurora {
-                useVersions
-            }
-            
-            dependencies { 
-                implementation group: 'org.seleniumhq.selenium', name: 'selenium-leg-rc', version: '4.0.0-alpha-6'
-            }
-            """.trimIndent()
-        )
-        val result = GradleRunner.create()
-            .withProjectDir(testProjectDir)
-            .withArguments("dependencyUpdates")
-            .withPluginClasspath()
-            .build()
-
-        assertThat(result.output).contains("The following dependencies exceed the version found at the release revision level")
-        assertThat(result.output).contains("org.seleniumhq.selenium:selenium-leg-rc [4.0.0-alpha-6 <- ")
-        assertThat(result.taskOutcome(taskName = ":dependencyUpdates")).isSuccessOrEqualTo()
-    }
-
-    @Test
     fun `override plugin test`() {
         buildFile.writeText(
             """

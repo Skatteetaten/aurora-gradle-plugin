@@ -44,28 +44,38 @@ class JavaTools(private val project: Project) {
         project.logger.lifecycle("Apply asciiDoctor support")
 
         with(project) {
-            val snippetsDir = project.file("${project.buildDir}/generated-snippets")
-            extra.set("snippetsDir", snippetsDir)
+            val snippetsDir = "$buildDir/generated-snippets"
+            val prepareAsciiDoctor = tasks.create("prepareAsciiDoctor")
 
-            with(tasks.named("asciidoctor", AsciidoctorTask::class.java).get()) {
-                attributes(
-                    mapOf(
-                        "snippets" to snippetsDir,
-                        "version" to project.version
-                    )
-                )
-                inputs.dir(snippetsDir)
-                setOutputDir(project.file("${project.buildDir}/asciidoc"))
-                setSourceDir(project.file("src/main/asciidoc"))
-
-                dependsOn("test")
+            with(prepareAsciiDoctor) {
+                mustRunAfter("clean")
+                doLast {
+                    extra.set("snippetsDir", mkdir(snippetsDir))
+                }
             }
 
             val asciidoctor = tasks.named("asciidoctor", AsciidoctorTask::class.java).get()
 
+            with(asciidoctor) {
+                mustRunAfter(prepareAsciiDoctor)
+                attributes(
+                    mapOf(
+                        "snippets" to file(snippetsDir),
+                        "version" to version
+                    )
+                )
+                inputs.dir(file(snippetsDir))
+                setOutputDir(file("$buildDir/asciidoc"))
+                setSourceDir(file("src/main/asciidoc"))
+
+                dependsOn(prepareAsciiDoctor, "test")
+            }
+
             with(tasks.named("jar", Jar::class.java).get()) {
-                from("${asciidoctor.outputDir}/html5") {
-                    into("static/docs")
+                dependsOn(asciidoctor)
+
+                from(asciidoctor.outputDir) {
+                    it.into("static/docs")
                 }
             }
         }

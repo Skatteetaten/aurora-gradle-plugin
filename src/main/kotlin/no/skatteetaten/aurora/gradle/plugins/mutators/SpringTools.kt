@@ -134,13 +134,13 @@ class SpringTools(private val project: Project) {
                 testDependencies.forEach { add("testImplementation", it) }
             }
 
-            val stubsJar = tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) {
-                with(it) {
+            val stubsJar = tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) { jar ->
+                with(jar) {
                     archiveClassifier.set("stubs")
 
-                    into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
-                        include("**/*.*")
-                        from("${project.buildDir}/generated-snippets/stubs")
+                    jar.into("META-INF/${project.group}/${project.name}/${project.version}/mappings") {
+                        it.from("${project.buildDir}/generated-snippets/stubs")
+                        it.include("**/*.*")
                     }
 
                     dependsOn("test")

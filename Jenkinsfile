@@ -22,8 +22,4 @@ fileLoader.withGit(overrides.pipelineScript,, overrides.scriptVersion) {
    jenkinsfile = fileLoader.load('templates/leveransepakke')
 }
 
-jenkinsfile.gradle(overrides.scriptVersion, overrides, {
-  if(it.isSnapshotVersion) {
-    error("Cannot publish snapshot version to gradle plugin portal")
-  }
-})
+jenkinsfile.gradle(overrides.scriptVersion, overrides)

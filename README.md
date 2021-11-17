@@ -16,26 +16,51 @@ To get an overview of how applying the Aurora plugin will affect your project, s
 
 ## Getting Started
 
-Put the following snippet in your `~/.gradle/init.gradle` file
+Put the following snippet in your `~/.gradle/init.gradle` file.
+
+    def nexus3User = "<NEXUS_3_USER>"
+    def nexus3Password = "<NEXUS_3_PASSWORD>"
 
     allprojects {
-        ext.repos= {
-            mavenCentral()
-            jcenter()
+      ext.repos= {
+        mavenLocal()
+        maven {
+          url "https://nexus.sits.no/repository/maven-intern"
+          credentials {
+            username "${nexus3User}"
+            password "${nexus3Password}"
+          }
         }
+        mavenCentral()
+      }
+
+      repositories repos
+    
+      buildscript {
         repositories repos
-        buildscript {
-         repositories repos
-        }
+      }
     }
+    
     settingsEvaluated { settings ->
       settings.pluginManagement {
         repositories {
           maven {
-            url 'http://aurora/nexus/content/repositories/gradle-plugins/'
+            url 'https://nexus.sits.no/repository/gradle-plugins'
+            credentials {
+              username "${nexus3User}"
+              password "${nexus3Password}"
+            }
+          }
+          mavenLocal()
+          maven {
+            url "https://nexus.sits.no/repository/maven-intern"
+            credentials {
+              username "${nexus3User}"
+              password "${nexus3Password}"
+            }
           }
           gradlePluginPortal()
-          maven { url "http://aurora/nexus/content/groups/public" }
+          mavenCentral()
         }
       }
     }
@@ -65,6 +90,7 @@ For a complete reference of options read through the following sections, and bro
 A complete example `build.gradle.kts` file can look like this
 
     plugins {
+        id("java")
         id("no.skatteetaten.gradle.aurora") version "<version>"
     }
     
@@ -495,7 +521,7 @@ To see specifics on how plugins are mutated please check out our [Mutators](src/
 ### Development
 
 * Run `./gradlew build publishToMavenLocal` to add the plugin to your local repository.
-* Add this block to `settings.gradle` in the project in which you want to test the plugin:
+* Add this block to `settings.gradle` in the project in which you want to test the plugin (if `init.gradle` from top of document was not added):
 
     ```groovy
     pluginManagement {

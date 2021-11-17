@@ -9,17 +9,13 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
-import no.skatteetaten.aurora.gradle.plugins.AuroraPlugin
 import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.mutators.AuroraTools
 import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.gradle.api.Project
-import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.parallel.Execution
@@ -27,7 +23,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
 import java.io.File
 import java.util.zip.ZipFile
 
-@Disabled
 @ExperimentalStdlibApi
 @Execution(CONCURRENT)
 class AuroraToolsTest {
@@ -206,27 +201,5 @@ class AuroraToolsTest {
 
         assertThat(jar).endsWith("-local.jar")
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
-    }
-
-    @Test
-    fun `override plugin test`() {
-        buildFile.writeText(
-            """
-            plugins {
-                id("org.jetbrains.kotlin.jvm") version("1.3.70")
-            }
-        """
-        )
-        val project = ProjectBuilder.builder()
-            .withProjectDir(testProjectDir)
-            .build()
-        project.plugins.apply(AuroraPlugin::class)
-        (project as ProjectInternal).evaluate()
-
-        assertThat(
-            project.buildscript.scriptClassPath.asURLs.any {
-                it.toString().endsWith("kotlin-gradle-plugin-1.3.70.jar")
-            }
-        ).isTrue()
     }
 }

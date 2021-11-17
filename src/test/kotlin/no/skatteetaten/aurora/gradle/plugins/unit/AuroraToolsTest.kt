@@ -19,6 +19,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.parallel.Execution
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
 import java.io.File
 import java.util.zip.ZipFile
 
+@Disabled
 @ExperimentalStdlibApi
 @Execution(CONCURRENT)
 class AuroraToolsTest {

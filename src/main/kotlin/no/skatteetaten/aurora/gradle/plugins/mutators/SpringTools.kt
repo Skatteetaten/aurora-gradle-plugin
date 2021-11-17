@@ -4,6 +4,7 @@ import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.exclude
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
@@ -134,7 +135,7 @@ class SpringTools(private val project: Project) {
                 testDependencies.forEach { add("testImplementation", it) }
             }
 
-            val stubsJar = tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) { jar ->
+            tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) { jar ->
                 with(jar) {
                     archiveClassifier.set("stubs")
 
@@ -149,10 +150,6 @@ class SpringTools(private val project: Project) {
 
             with(tasks.named("verifierStubsJar", org.gradle.jvm.tasks.Jar::class).get()) {
                 enabled = false
-            }
-
-            artifacts {
-                it.add("archives", stubsJar)
             }
         }
 

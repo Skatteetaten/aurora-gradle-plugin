@@ -5,16 +5,16 @@ package no.skatteetaten.aurora.gradle.plugins.unit
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import no.skatteetaten.aurora.gradle.plugins.mutators.MavenTools
-import no.skatteetaten.aurora.gradle.plugins.mutators.MavenTools.Companion.MISSING_REPO_CREDS_MESSAGE
+import no.skatteetaten.aurora.gradle.plugins.mutators.SpringTools
 import org.gradle.api.Project
-import org.gradle.api.UnknownTaskException
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
@@ -27,6 +27,7 @@ class MavenToolsTest {
     private lateinit var buildFile: File
     private lateinit var project: Project
     private lateinit var mavenTools: MavenTools
+    private lateinit var springTools: SpringTools
 
     @BeforeEach
     fun setup() {
@@ -37,6 +38,7 @@ class MavenToolsTest {
             .withProjectDir(testProjectDir)
             .build()
         mavenTools = MavenTools(project)
+        springTools = SpringTools(project)
     }
 
     @Test
@@ -56,62 +58,6 @@ class MavenToolsTest {
     }
 
     @Test
-    fun `maven deployer not configured if missing creds`() {
-        val report = mavenTools.addMavenDeployer()
-
-        assertThat(report.description).isEqualTo(MISSING_REPO_CREDS_MESSAGE)
-        assertThrows<UnknownTaskException> { project.tasks.getByName("deploy") }
-    }
-
-    @Test
-    fun `maven deployer not configured if missing creds user`() {
-        project.extensions.extraProperties["repositoryPassword"] = "repositoryPassword"
-        project.extensions.extraProperties["repositoryReleaseUrl"] = "http://repositoryReleaseUrl"
-        project.extensions.extraProperties["repositorySnapshotUrl"] = "http://repositorySnapshotUrl"
-
-        val report = mavenTools.addMavenDeployer()
-
-        assertThat(report.description).isEqualTo(MISSING_REPO_CREDS_MESSAGE)
-        assertThrows<UnknownTaskException> { project.tasks.getByName("deploy") }
-    }
-
-    @Test
-    fun `maven deployer not configured if missing creds pass`() {
-        project.extensions.extraProperties["repositoryUsername"] = "repositoryUsername"
-        project.extensions.extraProperties["repositoryReleaseUrl"] = "http://repositoryReleaseUrl"
-        project.extensions.extraProperties["repositorySnapshotUrl"] = "http://repositorySnapshotUrl"
-
-        val report = mavenTools.addMavenDeployer()
-
-        assertThat(report.description).isEqualTo(MISSING_REPO_CREDS_MESSAGE)
-        assertThrows<UnknownTaskException> { project.tasks.getByName("deploy") }
-    }
-
-    @Test
-    fun `maven deployer not configured if missing creds repoUrl`() {
-        project.extensions.extraProperties["repositoryUsername"] = "repositoryUsername"
-        project.extensions.extraProperties["repositoryPassword"] = "repositoryPassword"
-        project.extensions.extraProperties["repositorySnapshotUrl"] = "http://repositorySnapshotUrl"
-
-        val report = mavenTools.addMavenDeployer()
-
-        assertThat(report.description).isEqualTo(MISSING_REPO_CREDS_MESSAGE)
-        assertThrows<UnknownTaskException> { project.tasks.getByName("deploy") }
-    }
-
-    @Test
-    fun `maven deployer not configured if missing creds snapshotUrl`() {
-        project.extensions.extraProperties["repositoryUsername"] = "repositoryUsername"
-        project.extensions.extraProperties["repositoryPassword"] = "repositoryPassword"
-        project.extensions.extraProperties["repositoryReleaseUrl"] = "http://repositoryReleaseUrl"
-
-        val report = mavenTools.addMavenDeployer()
-
-        assertThat(report.description).isEqualTo(MISSING_REPO_CREDS_MESSAGE)
-        assertThrows<UnknownTaskException> { project.tasks.getByName("deploy") }
-    }
-
-    @Test
     fun `maven deployer configured correctly for release`() {
         project.extensions.extraProperties["repositoryUsername"] = "repositoryUsername"
         project.extensions.extraProperties["repositoryPassword"] = "repositoryPassword"
@@ -119,7 +65,18 @@ class MavenToolsTest {
         project.extensions.extraProperties["repositorySnapshotUrl"] = "http://repositorySnapshotUrl"
         project.plugins.apply("java")
         project.plugins.apply("maven-publish")
+        project.plugins.apply("org.springframework.boot")
+        project.plugins.apply("spring-cloud-contract")
 
+        springTools.applySpring(
+            mvcStarterVersion = Versions.auroraSpringBootMvcStarter,
+            webFluxStarterVersion = Versions.auroraSpringBootWebFluxStarter,
+            devTools = false,
+            webFluxEnabled = false,
+            bootJarEnabled = false,
+            startersEnabled = false,
+        )
+        springTools.applySpringCloudContract(true, Versions.springCloudContract)
         val report = mavenTools.addMavenDeployer()
         val deployTask = project.tasks.getByName("upload")
 
@@ -131,8 +88,12 @@ class MavenToolsTest {
         val publish = project.extensions.getByType(PublishingExtension::class.java)
         val repo = publish.repositories.getByName("repository") as MavenArtifactRepository
         val snapShotRepo = publish.repositories.findByName("snapshotRepository")
+        val publication = publish.publications.first() as MavenPublication
+        val artifacts = publication.artifacts
+        val stubsArtifact = artifacts.any { it.classifier == "stubs" }
 
         assertThat(snapShotRepo).isNull()
+        assertThat(stubsArtifact).isTrue()
         assertThat(repo.url.toString()).isEqualTo("http://repositoryReleaseUrl")
         assertThat(repo.credentials.username).isEqualTo("repositoryUsername")
         assertThat(repo.credentials.password).isEqualTo("repositoryPassword")

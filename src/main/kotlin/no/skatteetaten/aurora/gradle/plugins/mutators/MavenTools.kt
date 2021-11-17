@@ -10,51 +10,58 @@ import org.gradle.kotlin.dsl.get
 
 class MavenTools(private val project: Project) {
     fun addMavenDeployer(): AuroraReport = when {
-        missingRepositoryConfiguration() -> AuroraReport(
-            name = "aurora.applyMavenDeployer",
-            description = MISSING_REPO_CREDS_MESSAGE
+        missingRepositoryConfiguration() -> addDeployer(
+            AuroraReport(
+                name = "aurora.applyMavenDeployer",
+                description = MISSING_REPO_CREDS_MESSAGE
+            )
         )
-        else -> {
-            project.logger.lifecycle("Apply maven deployment support")
-
-            val exProps = project.extensions.extraProperties.properties
-            val repositoryReleaseUrl = exProps["repositoryReleaseUrl"] as String
-            val repositorySnapshotUrl = exProps["repositorySnapshotUrl"] as String
-            val repositoryUsername = exProps["repositoryUsername"] as String
-            val repositoryPassword = exProps["repositoryPassword"] as String
-
-            with(project) {
-                configureDeployer(
-                    repositoryReleaseUrl,
-                    repositoryUsername,
-                    repositoryPassword,
-                    repositorySnapshotUrl
-                )
-
-                with(tasks) {
-                    register("upload") { task ->
-                        with(task) {
-                            description = "Build and deploy artifacts to Nexus"
-
-                            dependsOn(tasks.named("publish"))
-                            mustRunAfter("clean")
-                        }
-                    }
-                }
-            }
-
+        else -> addDeployer(
             AuroraReport(
                 name = "aurora.applyMavenDeployer",
                 description = "add deploy task and configure from repository* properties in .gradle.properties."
             )
+        )
+    }
+
+    private fun addDeployer(report: AuroraReport): AuroraReport {
+        project.logger.lifecycle("Apply maven deployment support")
+
+        val exProps = project.extensions.extraProperties.properties
+        val repositoryReleaseUrl = exProps["repositoryReleaseUrl"] as? String
+        val repositorySnapshotUrl = exProps["repositorySnapshotUrl"] as? String
+        val repositoryUsername = exProps["repositoryUsername"] as? String
+        val repositoryPassword = exProps["repositoryPassword"] as? String
+
+        with(project) {
+            configureDeployer(
+                repositoryReleaseUrl,
+                repositoryUsername,
+                repositoryPassword,
+                repositorySnapshotUrl
+            )
+
+            with(tasks) {
+                register("upload") { task ->
+                    with(task) {
+                        description = "Build and deploy artifacts to Nexus"
+
+                        dependsOn(tasks.named("publish"))
+
+                        mustRunAfter("clean")
+                    }
+                }
+            }
         }
+
+        return report
     }
 
     private fun Project.configureDeployer(
-        repositoryReleaseUrl: String,
-        repositoryUsername: String,
-        repositoryPassword: String,
-        repositorySnapshotUrl: String
+        repositoryReleaseUrl: String?,
+        repositoryUsername: String?,
+        repositoryPassword: String?,
+        repositorySnapshotUrl: String?,
     ) {
         with(extensions.getByType(PublishingExtension::class.java)) {
             val pubVersion = project.version as? String? ?: "local-SNAPSHOT"
@@ -81,6 +88,10 @@ class MavenTools(private val project: Project) {
                         }.forEach {
                             artifact(it)
                         }
+
+                        tasks.findByName("stubsJar")?.let {
+                            artifact(it)
+                        }
                     }
 
                     versionMapping {
@@ -94,23 +105,30 @@ class MavenTools(private val project: Project) {
             }
 
             with(repositories) {
-                when (pubVersion.endsWith("SNAPSHOT")) {
-                    true -> maven {
-                        it.name = "snapshotRepository"
-                        it.url = uri(repositorySnapshotUrl)
-                        it.isAllowInsecureProtocol = true
-                        it.credentials { credentials ->
-                            credentials.username = repositoryUsername
-                            credentials.password = repositoryPassword
-                        }
-                    }
-                    else -> maven {
-                        it.name = "repository"
-                        it.url = uri(repositoryReleaseUrl)
-                        it.isAllowInsecureProtocol = true
-                        it.credentials { credentials ->
-                            credentials.username = repositoryUsername
-                            credentials.password = repositoryPassword
+                when {
+                    missingRepositoryConfiguration() -> mavenLocal()
+                    else -> {
+                        mavenLocal()
+
+                        when (pubVersion.endsWith("SNAPSHOT")) {
+                            true -> maven {
+                                it.name = "snapshotRepository"
+                                it.url = uri(repositorySnapshotUrl!!)
+                                it.isAllowInsecureProtocol = true
+                                it.credentials { credentials ->
+                                    credentials.username = repositoryUsername
+                                    credentials.password = repositoryPassword
+                                }
+                            }
+                            else -> maven {
+                                it.name = "repository"
+                                it.url = uri(repositoryReleaseUrl!!)
+                                it.isAllowInsecureProtocol = true
+                                it.credentials { credentials ->
+                                    credentials.username = repositoryUsername
+                                    credentials.password = repositoryPassword
+                                }
+                            }
                         }
                     }
                 }
@@ -149,6 +167,6 @@ class MavenTools(private val project: Project) {
         val MISSING_REPO_CREDS_MESSAGE =
             """One of the following properties are missing in your .gradle file
                                 | repositoryUsername, repositoryPassword, repositoryReleaseUrl,
-                                | repositorySnapshotUrl""".trimMargin()
+                                | repositorySnapshotUrl, only local depoy possible""".trimMargin()
     }
 }

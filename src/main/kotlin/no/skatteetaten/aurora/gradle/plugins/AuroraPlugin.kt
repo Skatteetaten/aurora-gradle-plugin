@@ -56,12 +56,12 @@ class AuroraPlugin : Plugin<Project> {
             val reports = listOf(
                 java.configure(),
                 aurora.configure(),
-                maven.configure(),
                 kotlin.configure(),
                 test.configure(),
                 spring.configure(),
                 analysis.configure(),
-                miscellaneous.configure()
+                miscellaneous.configure(),
+                maven.configure(),
             ).flatten()
 
             with(project.tasks) {

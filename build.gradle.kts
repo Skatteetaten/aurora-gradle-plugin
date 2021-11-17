@@ -21,7 +21,6 @@ group = properties["groupId"] as String
 version = properties["version"] as String
 
 repositories {
-    jcenter()
     gradlePluginPortal()
 }
 

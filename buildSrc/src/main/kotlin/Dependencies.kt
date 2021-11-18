@@ -12,7 +12,7 @@ object Versions {
     const val kotlinLogging: String = "2.0.11"
     const val checkstyleConfig: String = "2.2.7"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
-    const val kotlin = "1.5.31"
+    const val kotlin = "1.6.0"
     const val assertk = "0.25"
 }
 

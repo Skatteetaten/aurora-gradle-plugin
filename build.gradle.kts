@@ -151,3 +151,50 @@ tasks {
 
 fun Project.hasKotlin(parentProject: Project) =
     parentProject.name != rootProject.name && parentProject.plugins.hasPlugin("org.jlleitschuh.gradle.ktlint")
+
+publishing {
+    publications {
+        when {
+            missingRepositoryConfiguration() -> repositories {
+                mavenLocal()
+            }
+            else -> {
+                val exProps = project.extensions.extraProperties.properties
+                val repositoryReleaseUrl = exProps["repositoryReleaseUrl"] as String
+                val repositorySnapshotUrl = exProps["repositorySnapshotUrl"] as String
+                val repositoryUsername = exProps["repositoryUsername"] as String
+                val repositoryPassword = exProps["repositoryPassword"] as String
+
+                repositories {
+                    when (version.toString().endsWith("SNAPSHOT")) {
+                        true -> maven {
+                            name = "snapshotRepository"
+                            url = uri(repositorySnapshotUrl)
+                            isAllowInsecureProtocol = true
+                            credentials {
+                                username = repositoryUsername
+                                password = repositoryPassword
+                            }
+                        }
+                        else -> maven {
+                            name = "repository"
+                            url = uri(repositoryReleaseUrl)
+                            isAllowInsecureProtocol = true
+                            credentials {
+                                username = repositoryUsername
+                                password = repositoryPassword
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun missingRepositoryConfiguration(): Boolean = !(
+    project.extensions.extraProperties.properties.containsKey("repositoryUsername") &&
+        project.extensions.extraProperties.properties.containsKey("repositoryPassword") &&
+        project.extensions.extraProperties.properties.containsKey("repositoryReleaseUrl") &&
+        project.extensions.extraProperties.properties.containsKey("repositorySnapshotUrl")
+    )

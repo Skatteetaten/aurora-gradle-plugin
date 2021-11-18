@@ -2,7 +2,6 @@
 
 package no.skatteetaten.aurora.gradle.plugins.unit
 
-import Versions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isNotNull
@@ -12,10 +11,7 @@ import no.skatteetaten.aurora.gradle.plugins.model.getConfig
 import no.skatteetaten.aurora.gradle.plugins.mutators.TestTools
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.api.tasks.compile.GroovyCompile
-import org.gradle.kotlin.dsl.named
 import org.gradle.testfixtures.ProjectBuilder
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -48,7 +44,6 @@ class TestToolsTest {
             """
             plugins {
                 id 'java'
-                id 'org.jetbrains.kotlin.jvm' version '${Versions.kotlin}'
             }
             
             repositories {
@@ -65,8 +60,6 @@ class TestToolsTest {
             cglibVersion = config.cglibVersion,
             objenesisVersion = config.objenesisVersion
         )
-        val kotlinTestCompile = (project.tasks.getByName("compileTestKotlin") as KotlinCompile)
-        val compileTestGroovy = project.tasks.named("compileTestGroovy", GroovyCompile::class).get()
 
         assertThat(project.plugins.hasPlugin("groovy")).isTrue()
         with(project.configurations.getByName("testImplementation").allDependencies) {
@@ -98,12 +91,6 @@ class TestToolsTest {
                         it.version == config.objenesisVersion
                 }
             ).isNotNull()
-        }
-        with(compileTestGroovy) {
-            assertThat(dependsOn).contains(kotlinTestCompile)
-        }
-        with(project.tasks.getByName("testClasses")) {
-            assertThat(dependsOn).contains(compileTestGroovy)
         }
         assertThat(report.name).contains("aurora.applySpockSupport")
     }

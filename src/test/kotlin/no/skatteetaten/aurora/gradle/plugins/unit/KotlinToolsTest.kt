@@ -20,12 +20,14 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
 import java.io.File
 
+@Disabled("disabled because of internal gradle stuff that is expected to be fixed in a future version")
 @ExperimentalStdlibApi
 @Execution(CONCURRENT)
 class KotlinToolsTest {

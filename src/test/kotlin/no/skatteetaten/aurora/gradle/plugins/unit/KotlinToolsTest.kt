@@ -27,7 +27,7 @@ import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT
 import java.io.File
 
-@Disabled // disabled because of internal gradle stuff that is expected to be fixed in a future version
+@Disabled("disabled because of internal gradle stuff that is expected to be fixed in a future version")
 @ExperimentalStdlibApi
 @Execution(CONCURRENT)
 class KotlinToolsTest {

@@ -62,6 +62,11 @@ class AuroraExtensionFunctionalTest {
                 useSpringBoot {
                     useWebFlux()
                 }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -86,6 +91,11 @@ class AuroraExtensionFunctionalTest {
                     useWebFlux()
                 }
                 useKotlin()
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -120,6 +130,11 @@ class AuroraExtensionFunctionalTest {
                 useSpringBoot {
                     useWebFlux
                     useCloudContract
+                }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
                 }
             }
             
@@ -158,6 +173,11 @@ class AuroraExtensionFunctionalTest {
             
             aurora {
                 useAuroraDefaults
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
             """.trimMargin()
         )

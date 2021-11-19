@@ -5,8 +5,10 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
+import java.io.File
 
 class MavenTools(private val project: Project) {
     fun addMavenDeployer(): AuroraReport = when {
@@ -131,6 +133,26 @@ class MavenTools(private val project: Project) {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        tasks.withType(GenerateMavenPom::class.java) {
+            it.doLast {
+                val file = File("$buildDir/publications/leveranse/pom-default.xml")
+                var text = file.readText()
+                val regex =
+                    "(?s)(<dependencyManagement>.+?<dependencies>)(.+?)(</dependencies>.+?</dependencyManagement>)"
+                        .toRegex()
+
+                if (text.contains("dependencyManagement")) {
+                    val matcher = regex.find(text)
+                    if (matcher != null) {
+                        text = regex.replaceFirst(text, "")
+                        val firstDeps = matcher.groups[2]!!.value
+                        text = regex.replaceFirst(text, "$1$2$firstDeps$3")
+                    }
+                    file.writeText(text)
                 }
             }
         }

@@ -34,6 +34,13 @@ class AuroraPluginSpringBootFunctionalTest {
             repositories {
                 mavenCentral()
             }
+            
+            aurora {
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
+            }
         """
         )
     }

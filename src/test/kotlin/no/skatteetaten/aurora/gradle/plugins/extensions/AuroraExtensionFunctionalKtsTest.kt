@@ -62,6 +62,11 @@ class AuroraExtensionFunctionalKtsTest {
                 useSpringBoot {
                     useWebFlux()
                 }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -90,6 +95,11 @@ class AuroraExtensionFunctionalKtsTest {
                     useWebFlux()
                 }
                 useKotlin()
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -132,6 +142,11 @@ class AuroraExtensionFunctionalKtsTest {
                     useWebFlux
                     useCloudContract
                 }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
             
             configure<TestLoggerExtension> {
@@ -170,6 +185,11 @@ class AuroraExtensionFunctionalKtsTest {
             
             aurora {
                 useAuroraDefaults
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
             """.trimMargin()
         )
@@ -198,6 +218,11 @@ class AuroraExtensionFunctionalKtsTest {
                 useSpringBoot {
                     useWebFlux()
                 }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -224,6 +249,11 @@ class AuroraExtensionFunctionalKtsTest {
             aurora {
                 useKotlin()
                 useSpringBoot()
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -250,6 +280,11 @@ class AuroraExtensionFunctionalKtsTest {
             aurora {
                 useKotlin()
                 useSpringBoot {}
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -276,6 +311,11 @@ class AuroraExtensionFunctionalKtsTest {
             aurora {
                 useKotlin
                 useSpringBoot
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
         """
         )
@@ -303,6 +343,11 @@ class AuroraExtensionFunctionalKtsTest {
                 useKotlin
                 useSpringBoot {
                     useWebFlux
+                }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
                 }
             }
         """

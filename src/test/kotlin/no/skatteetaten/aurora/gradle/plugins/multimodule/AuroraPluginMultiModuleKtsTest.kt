@@ -1,6 +1,7 @@
 package no.skatteetaten.aurora.gradle.plugins.multimodule
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.taskOutcome
@@ -66,6 +67,26 @@ class AuroraPluginMultiModuleKtsTest {
             .build()
 
         assertThat(result.taskOutcome(":app:distZip")).isSuccessOrEqualTo()
+    }
+
+    @Test
+    fun `all should upload correcty`() {
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("build", "upload")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.taskOutcome(":upload")).isSuccessOrEqualTo()
+        assertThat(result.taskOutcome(":app:upload")).isSuccessOrEqualTo()
+        assertThat(result.taskOutcome(":lib:upload")).isSuccessOrEqualTo()
+
+        val pom = testProjectDir.resolve("build/publications/leveranse/pom-default.xml")
+        val pomAsText = pom.readText()
+
+        assertThat(pomAsText.split("/dependencyManagement").size).isEqualTo(2)
+        assertThat(pomAsText.contains("software.amazon.awssdk"))
+        assertThat(pomAsText.contains("spring-boot-dependencies"))
     }
 
     @Test

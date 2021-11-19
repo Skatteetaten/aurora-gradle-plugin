@@ -84,6 +84,11 @@ class AuroraToolsTest {
                 useSpringBoot {
                     useBootJar
                 }
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
             """.trimIndent()
         )
@@ -151,6 +156,11 @@ class AuroraToolsTest {
             aurora {
                 useKotlin
                 useSpringBoot
+    
+                versions {
+                    auroraSpringBootWebFluxStarter = "1.2.+"
+                    auroraSpringBootMvcStarter = "1.2.+"
+                }
             }
             """.trimIndent()
         )

@@ -84,7 +84,7 @@ class AuroraPluginMultiModuleKtsTest {
         val pom = testProjectDir.resolve("build/publications/leveranse/pom-default.xml")
         val pomAsText = pom.readText()
 
-        assertThat(pomAsText.split("/dependencyManagement").size).isEqualTo(2)
+        assertThat(pomAsText.split("/dependencyManagement").size).isEqualTo(1)
         assertThat(pomAsText.contains("software.amazon.awssdk"))
         assertThat(pomAsText.contains("spring-boot-dependencies"))
     }

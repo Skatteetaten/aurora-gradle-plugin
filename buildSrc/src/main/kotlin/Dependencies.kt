@@ -9,7 +9,7 @@ object Versions {
     const val auroraSpringBootMvcStarter: String = "1.3.+"
     const val auroraSpringBootWebFluxStarter: String = "1.3.+"
     const val springCloudContract: String = "3.0.4"
-    const val kotlinLogging: String = "2.0.13"
+    const val kotlinLogging: String = "2.1.0"
     const val checkstyleConfig: String = "2.2.7"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
     const val kotlin = "1.6.0"

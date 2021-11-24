@@ -7,6 +7,7 @@ def overrides = [
     credentialsId: "github",
     javaVersion: 11,
     iqOrganizationName: "Team AOS",
+    disableAllReports: true,
     deployTo: "gradle-plugin-portal",
     chatRoom: "#aos-notifications",
     deployGoal : "publishPlugins",

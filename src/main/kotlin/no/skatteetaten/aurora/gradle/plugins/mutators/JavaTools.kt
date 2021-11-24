@@ -7,6 +7,7 @@ import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
+import java.util.UUID
 
 class JavaTools(private val project: Project) {
     fun applyDefaultPlugins(): AuroraReport {
@@ -26,12 +27,13 @@ class JavaTools(private val project: Project) {
         with(project) {
             setProperty("sourceCompatibility", compatibility)
 
-            extensions.extraProperties.properties["version"]?.let {
-                version = extensions.extraProperties.properties["version"] as String
-            }
-            extensions.extraProperties.properties["groupId"]?.let {
-                group = extensions.extraProperties.properties["groupId"] as String
-            }
+            version = version ?: extensions.extraProperties.properties["version"]?.let {
+                extensions.extraProperties.properties["version"] as String
+            } ?: "local-SNAPSHOT"
+
+            group = group ?: extensions.extraProperties.properties["groupId"]?.let {
+                extensions.extraProperties.properties["groupId"] as String
+            } ?: "no.skatteetaten.noop.${UUID.randomUUID()}"
         }
 
         return AuroraReport(

@@ -21,6 +21,12 @@ class AuroraTools(private val project: Project) {
                         with(contents) {
                             from("${project.buildDir}/libs") {
                                 it.into("lib")
+                                it.filesMatching("**/*.jar") { fileCopyDetails ->
+                                    when {
+                                        version == "unspecified" -> Unit
+                                        !fileCopyDetails.name.contains("$version") -> fileCopyDetails.exclude()
+                                    }
+                                }
                             }
 
                             from("${project.projectDir}/src/main/dist/metadata") {

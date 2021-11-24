@@ -3,6 +3,8 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD_PARALLEL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.tasks.GenerateReportsTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
     kotlin("jvm") version(Versions.kotlin)
@@ -15,13 +17,6 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version(PluginVersions.ktlint)
     id("com.adarshr.test-logger") version(PluginVersions.gradle_test_logger)
     id("se.patrikerdes.use-latest-versions") version(PluginVersions.latest_versions)
-}
-
-group = properties["groupId"] as String
-version = properties["version"] as String
-
-repositories {
-    gradlePluginPortal()
 }
 
 dependencies {
@@ -50,6 +45,24 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit5}")
 }
 
+testlogger {
+    theme = STANDARD_PARALLEL
+    showStandardStreams = true
+    showPassedStandardStreams = false
+    showSkippedStandardStreams = false
+    showFailedStandardStreams = true
+}
+
+java {
+    withSourcesJar()
+}
+
+tasks {
+    configureKotlin()
+
+    withType<Test> { useJUnitPlatform() }
+}
+
 gradlePlugin {
     plugins {
         create("auroraPlugin") {
@@ -67,33 +80,20 @@ pluginBundle {
     tags = setOf("skatteetaten", "corporate")
 }
 
-testlogger {
-    theme = STANDARD_PARALLEL
-    showStandardStreams = true
-    showPassedStandardStreams = false
-    showSkippedStandardStreams = false
-    showFailedStandardStreams = true
+publishing {
+    publications {
+        when {
+            missingRepositoryConfiguration() -> repositories { mavenLocal() }
+            else -> configureNexus(this@publishing)
+        }
+    }
 }
 
-java {
-    withSourcesJar()
-}
-
-val sourcesJar by tasks.getting(Jar::class)
-
-artifacts {
-    add("archives", sourcesJar)
-}
-
-tasks {
+fun TaskContainerScope.configureKotlin() {
     val ktlintKotlinScriptFormat by existing(GenerateReportsTask::class)
     val ktlintFormat by existing(Task::class)
 
-    wrapper {
-        distributionType = Wrapper.DistributionType.ALL
-    }
-
-    withType(KotlinCompile::class).configureEach {
+    withType(KotlinCompile::class) {
         kotlinOptions {
             suppressWarnings = true
             jvmTarget = Versions.javaSourceCompatibility
@@ -107,10 +107,15 @@ tasks {
 
         dependsOn(listOf(ktlintKotlinScriptFormat, ktlintFormat))
     }
-    withType(GenerateReportsTask::class.java).configureEach {
+
+    configureKtLint()
+}
+
+fun TaskContainerScope.configureKtLint() {
+    withType(GenerateReportsTask::class.java) {
         dependsOn(named("runKtlintFormatOverKotlinScripts"))
     }
-    withType(org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask::class.java).configureEach {
+    withType(KtLintCheckTask::class.java) {
         dependsOn(named("runKtlintFormatOverKotlinScripts"))
     }
     with(named("runKtlintCheckOverMainSourceSet").get()) {
@@ -119,23 +124,20 @@ tasks {
     with(named("runKtlintCheckOverTestSourceSet").get()) {
         dependsOn(named("runKtlintFormatOverTestSourceSet"))
     }
-    with(named("processResources").get()) {
-        dependsOn(named("runKtlintFormatOverKotlinScripts"))
-    }
-    with(named("processTestResources").get()) {
-        dependsOn(named("runKtlintFormatOverKotlinScripts"))
-    }
     with(named("sourcesJar").get()) {
-        dependsOn(named("runKtlintFormatOverKotlinScripts"), named("runKtlintFormatOverMainSourceSet"))
+        dependsOn(
+            named("runKtlintFormatOverKotlinScripts"),
+            named("runKtlintFormatOverMainSourceSet"),
+        )
     }
-    withType(org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask::class.java).configureEach {
+    withType(KtLintFormatTask::class.java) {
         if (name != "runKtlintFormatOverKotlinScripts") {
             dependsOn(named("runKtlintFormatOverKotlinScripts"))
 
             var parentProject = project.parent
 
             while (parentProject != null) {
-                if (hasKotlin(parentProject)) {
+                if (project.hasKotlin(parentProject)) {
                     dependsOn("${parentProject.path}:runKtlintFormatOverKotlinScripts")
                 }
 
@@ -143,58 +145,4 @@ tasks {
             }
         }
     }
-
-    withType<Test> {
-        useJUnitPlatform()
-    }
 }
-
-fun Project.hasKotlin(parentProject: Project) =
-    parentProject.name != rootProject.name && parentProject.plugins.hasPlugin("org.jlleitschuh.gradle.ktlint")
-
-publishing {
-    publications {
-        when {
-            missingRepositoryConfiguration() -> repositories {
-                mavenLocal()
-            }
-            else -> {
-                val exProps = project.extensions.extraProperties.properties
-                val repositoryReleaseUrl = exProps["repositoryReleaseUrl"] as String
-                val repositorySnapshotUrl = exProps["repositorySnapshotUrl"] as String
-                val repositoryUsername = exProps["repositoryUsername"] as String
-                val repositoryPassword = exProps["repositoryPassword"] as String
-
-                repositories {
-                    when (version.toString().endsWith("SNAPSHOT")) {
-                        true -> maven {
-                            name = "snapshotRepository"
-                            url = uri(repositorySnapshotUrl)
-                            isAllowInsecureProtocol = true
-                            credentials {
-                                username = repositoryUsername
-                                password = repositoryPassword
-                            }
-                        }
-                        else -> maven {
-                            name = "repository"
-                            url = uri(repositoryReleaseUrl)
-                            isAllowInsecureProtocol = true
-                            credentials {
-                                username = repositoryUsername
-                                password = repositoryPassword
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-fun missingRepositoryConfiguration(): Boolean = !(
-    project.extensions.extraProperties.properties.containsKey("repositoryUsername") &&
-        project.extensions.extraProperties.properties.containsKey("repositoryPassword") &&
-        project.extensions.extraProperties.properties.containsKey("repositoryReleaseUrl") &&
-        project.extensions.extraProperties.properties.containsKey("repositorySnapshotUrl")
-    )

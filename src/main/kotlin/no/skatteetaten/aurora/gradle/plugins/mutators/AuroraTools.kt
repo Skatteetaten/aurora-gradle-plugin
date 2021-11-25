@@ -21,10 +21,10 @@ class AuroraTools(private val project: Project) {
                         with(contents) {
                             from("${project.buildDir}/libs") {
                                 it.into("lib")
-                                it.filesMatching("**/*.jar") { fileCopyDetails ->
+                                it.filesMatching("**/*.jar") { fcd ->
                                     when {
                                         version == "unspecified" -> Unit
-                                        !fileCopyDetails.name.contains("$version") -> fileCopyDetails.exclude()
+                                        !fcd.name.endsWith("$version.jar") -> fcd.exclude()
                                     }
                                 }
                             }

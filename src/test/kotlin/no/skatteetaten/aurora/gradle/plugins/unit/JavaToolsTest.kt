@@ -118,9 +118,14 @@ class JavaToolsTest {
             }
             """.trimIndent()
         )
-        val result = GradleRunner.create()
+        GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments("build")
+            .withPluginClasspath()
+            .build()
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("-Pversion=develop-test-SNAPSHOT", "upload")
             .withPluginClasspath()
             .build()
         val jar = testProjectDir.resolve("build/distributions").listFiles()
@@ -134,9 +139,10 @@ class JavaToolsTest {
 
         assertThat(libEntry?.isDirectory).isNotNull().isTrue()
         assertThat(libEntryCount.size).isEqualTo(2)
+        assertThat(libEntryCount[1].name).endsWith("develop-test-SNAPSHOT.jar")
         assertThat(metaEntry?.isDirectory).isNotNull().isTrue()
         assertThat(metaEntryCount.size).isEqualTo(2)
-        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
+        assertThat(result.taskOutcome(":upload")).isSuccessOrEqualTo()
     }
 
     @Test

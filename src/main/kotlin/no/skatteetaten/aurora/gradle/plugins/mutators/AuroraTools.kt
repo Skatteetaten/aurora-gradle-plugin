@@ -21,6 +21,12 @@ class AuroraTools(private val project: Project) {
                         with(contents) {
                             from("${project.buildDir}/libs") {
                                 it.into("lib")
+                                it.filesMatching("**/*.jar") { fcd ->
+                                    when {
+                                        version == "unspecified" -> Unit
+                                        !fcd.name.endsWith("$version.jar") -> fcd.exclude()
+                                    }
+                                }
                             }
 
                             from("${project.projectDir}/src/main/dist/metadata") {

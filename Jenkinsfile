@@ -2,14 +2,12 @@ def jenkinsfile
 
 def overrides = [
     scriptVersion  : 'v7',
-    iq : false,
-    checkstyle : false,
     openShiftBuild: false,
-    disableAllReports: true,
     pipelineScript: 'https://git.aurora.skead.no/scm/ao/aurora-pipeline-scripts.git',
     credentialsId: "github",
     javaVersion: 11,
-    jiraFiksetIKomponentversjon: true,
+    iqOrganizationName: "Team AOS",
+    disableAllReports: true,
     deployTo: "gradle-plugin-portal",
     chatRoom: "#aos-notifications",
     deployGoal : "publishPlugins",

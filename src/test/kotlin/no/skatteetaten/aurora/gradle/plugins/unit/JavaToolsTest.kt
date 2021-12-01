@@ -3,7 +3,6 @@
 package no.skatteetaten.aurora.gradle.plugins.unit
 
 import PluginVersions
-import Versions
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.endsWith
@@ -14,8 +13,6 @@ import no.skatteetaten.aurora.gradle.plugins.isSuccessOrEqualTo
 import no.skatteetaten.aurora.gradle.plugins.mutators.JavaTools
 import no.skatteetaten.aurora.gradle.plugins.taskOutcome
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
-import org.gradle.api.JavaVersion
-import org.gradle.api.JavaVersion.VERSION_11
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.testfixtures.ProjectBuilder
@@ -45,28 +42,6 @@ class JavaToolsTest {
             .withProjectDir(testProjectDir)
             .build()
         javaTools = JavaTools(project)
-    }
-
-    @Test
-    fun `java defaults configured correctly`() {
-        val gradleProps = testProjectDir.resolve("gradle.properties")
-        gradleProps.createNewFile()
-        gradleProps.writeText(
-            """
-            version=local
-            groupId=no.test
-            """.trimIndent()
-        )
-        buildFile.writeText(
-            """
-            """.trimIndent()
-        )
-        (project as ProjectInternal).evaluate()
-        javaTools.applyDefaultPlugins()
-        val report = javaTools.applyJavaDefaults(Versions.javaSourceCompatibility)
-
-        assertThat(report.description).isEqualTo("Set groupId, version and add sourceCompatibility")
-        assertThat(project.property("sourceCompatibility") as JavaVersion).isEqualTo(VERSION_11)
     }
 
     @Test

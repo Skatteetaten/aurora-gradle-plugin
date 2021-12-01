@@ -17,6 +17,7 @@ class AuroraPluginFunctionalTest {
     @TempDir
     lateinit var testProjectDir: File
     private lateinit var buildFile: File
+    private lateinit var propertiesFile: File
 
     @BeforeEach
     fun setup() {
@@ -42,6 +43,80 @@ class AuroraPluginFunctionalTest {
             .build()
 
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
+    }
+
+    @Test
+    fun `build test default version and group`() {
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("properties")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.taskOutcome(":properties")).isSuccessOrEqualTo()
+        assertThat(result.output.contains("version: local-SNAPSHOT"))
+        assertThat(result.output.contains("group: no.skatteetaten.noop"))
+    }
+
+    @Test
+    fun `build test overriden version`() {
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("properties")
+            .withPluginClasspath()
+            .build()
+        propertiesFile = testProjectDir.resolve("gradle.properties")
+        propertiesFile.createNewFile()
+        propertiesFile.writeText(
+            """
+                version=local
+        """
+        )
+
+        assertThat(result.taskOutcome(":properties")).isSuccessOrEqualTo()
+        assertThat(result.output.contains("version: local"))
+        assertThat(result.output.contains("group: no.skatteetaten.noop"))
+    }
+
+    @Test
+    fun `build test overidden group`() {
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("properties")
+            .withPluginClasspath()
+            .build()
+        propertiesFile = testProjectDir.resolve("gradle.properties")
+        propertiesFile.createNewFile()
+        propertiesFile.writeText(
+            """
+                groupId=no.test
+        """
+        )
+
+        assertThat(result.taskOutcome(":properties")).isSuccessOrEqualTo()
+        assertThat(result.output.contains("version: local-SNAPSHOT"))
+        assertThat(result.output.contains("group: no.test"))
+    }
+
+    @Test
+    fun `build test overidden both`() {
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("properties")
+            .withPluginClasspath()
+            .build()
+        propertiesFile = testProjectDir.resolve("gradle.properties")
+        propertiesFile.createNewFile()
+        propertiesFile.writeText(
+            """
+                version=local
+                groupId=no.test
+        """
+        )
+
+        assertThat(result.taskOutcome(":properties")).isSuccessOrEqualTo()
+        assertThat(result.output.contains("version: local"))
+        assertThat(result.output.contains("group: no.test"))
     }
 
     @Test

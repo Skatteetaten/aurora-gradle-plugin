@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "SENSELESS_NULL_IN_WHEN", "KotlinConstantConditions")
 
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
@@ -76,7 +76,7 @@ class JavaTools(private val project: Project) {
                 )
                 inputs.dir(file(snippetsDir))
                 setOutputDir(file("$buildDir/asciidoc"))
-                setSourceDir(file("src/main/asciidoc"))
+                setSourceDir(file("$projectDir/src/main/asciidoc"))
 
                 dependsOn(prepareAsciiDoctor, "test")
             }

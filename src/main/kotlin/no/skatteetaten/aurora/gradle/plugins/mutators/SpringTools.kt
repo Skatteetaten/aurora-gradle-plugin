@@ -99,16 +99,26 @@ class SpringTools(private val project: Project) {
 
     fun applySpringCloudContract(
         junit5: Boolean,
-        springCloudContractVersion: String
+        springCloudContractVersion: String,
+        webFluxEnabled: Boolean,
     ): AuroraReport {
         project.logger.lifecycle("Apply spring-cloud-contract support")
 
-        val testDependencies = listOf(
-            "org.springframework.cloud:spring-cloud-starter-contract-stub-runner",
-            "org.springframework.cloud:spring-cloud-starter-contract-verifier",
-            "org.springframework.cloud:spring-cloud-contract-wiremock",
-            "org.springframework.restdocs:spring-restdocs-mockmvc"
-        )
+        val testDependencies = buildList {
+            addAll(
+                listOf(
+                    "org.springframework.cloud:spring-cloud-starter-contract-stub-runner",
+                    "org.springframework.cloud:spring-cloud-starter-contract-verifier",
+                    "org.springframework.cloud:spring-cloud-contract-wiremock",
+                    "org.springframework.restdocs:spring-restdocs-asciidoctor",
+                )
+            )
+
+            when {
+                webFluxEnabled -> add("org.springframework.restdocs:spring-restdocs-webtestclient")
+                else -> add("org.springframework.restdocs:spring-restdocs-mockmvc")
+            }
+        }
 
         with(project) {
             val springCloudDep =
@@ -135,7 +145,7 @@ class SpringTools(private val project: Project) {
                 testDependencies.forEach { add("testImplementation", it) }
             }
 
-            tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) { jar ->
+            val stubsJar = tasks.create("stubsJar", org.gradle.jvm.tasks.Jar::class.java) { jar ->
                 with(jar) {
                     archiveClassifier.set("stubs")
 
@@ -146,6 +156,10 @@ class SpringTools(private val project: Project) {
 
                     dependsOn("test")
                 }
+            }
+
+            tasks.named("jar") {
+                it.dependsOn(stubsJar)
             }
 
             with(tasks.named("verifierStubsJar", org.gradle.jvm.tasks.Jar::class).get()) {

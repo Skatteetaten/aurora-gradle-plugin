@@ -32,6 +32,7 @@ class Spring(
                 tools.applySpringCloudContract(
                     junit5 = config.applyJunit5Support,
                     springCloudContractVersion = config.springCloudContractVersion,
+                    webFluxEnabled = config.useWebFlux,
                 )
             )
         }

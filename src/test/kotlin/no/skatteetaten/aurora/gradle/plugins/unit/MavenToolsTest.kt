@@ -76,7 +76,7 @@ class MavenToolsTest {
             bootJarEnabled = false,
             startersEnabled = false,
         )
-        springTools.applySpringCloudContract(true, Versions.springCloudContract)
+        springTools.applySpringCloudContract(true, Versions.springCloudContract, webFluxEnabled = false)
         val report = mavenTools.addMavenDeployer()
         val deployTask = project.tasks.getByName("upload")
 

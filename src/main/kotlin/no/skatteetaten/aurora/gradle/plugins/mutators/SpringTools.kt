@@ -41,7 +41,7 @@ class SpringTools(private val project: Project) {
         project.logger.lifecycle("Apply Spring support")
 
         with(project) {
-            extra.set("tomcat.version", "9.0.58")
+            extra.set("tomcat.version", "9.0.58") // TODO: Remove this when Spring upgrades to use this version
             with(plugins) {
                 apply("io.spring.dependency-management")
             }

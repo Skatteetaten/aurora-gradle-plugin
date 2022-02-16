@@ -27,7 +27,7 @@ object PluginVersions {
     const val cloud_contract = "3.1.0"
     const val dependency_management = "1.0.11.RELEASE"
     const val sonar = "3.3"
-    const val git_properties = "2.2.4"
+    const val git_properties = "2.4.0"
     const val latest_versions = "0.2.18"
 }
 

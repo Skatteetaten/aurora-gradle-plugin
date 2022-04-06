@@ -4,7 +4,6 @@ import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.exclude
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.springframework.boot.gradle.dsl.SpringBootExtension

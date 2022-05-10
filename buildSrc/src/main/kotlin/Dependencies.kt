@@ -6,7 +6,7 @@ object Versions {
     const val jacocoTools: String = "0.8.7"
     const val cglib: String = "3.3.2"
     const val objenesis: String = "3.2"
-    const val auroraSpringBootMvcStarter: String = "1.5.+"
+    const val auroraSpringBootMvcStarter: String = "1.6.+"
     const val auroraSpringBootWebFluxStarter: String = "1.4.+"
     const val springCloudContract: String = "3.1.0"
     const val kotlinLogging: String = "2.1.21"

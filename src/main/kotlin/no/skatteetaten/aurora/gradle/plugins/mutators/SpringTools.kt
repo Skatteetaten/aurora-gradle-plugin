@@ -4,6 +4,7 @@ import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.exclude
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.springframework.boot.gradle.dsl.SpringBootExtension
@@ -40,6 +41,8 @@ class SpringTools(private val project: Project) {
         project.logger.lifecycle("Apply Spring support")
 
         with(project) {
+            extra.set("spring-security.version", "5.6.4") // TODO: Fjern dette når Spring Boot er oppdatert
+
             with(plugins) {
                 apply("io.spring.dependency-management")
             }

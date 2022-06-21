@@ -15,11 +15,12 @@ class JavaTools(private val project: Project) {
 
         with(project) {
             plugins.apply("java")
+            plugins.apply("org.cyclonedx.bom")
         }
 
         return AuroraReport(
             name = "aurora.applyDefaultPlugins",
-            pluginsApplied = listOf("java", "maven-publish")
+            pluginsApplied = listOf("java", "org.cyclonedx.bom", "maven-publish")
         )
     }
 

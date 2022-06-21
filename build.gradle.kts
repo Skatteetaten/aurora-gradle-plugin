@@ -17,6 +17,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version(PluginVersions.ktlint)
     id("com.adarshr.test-logger") version(PluginVersions.gradle_test_logger)
     id("se.patrikerdes.use-latest-versions") version(PluginVersions.latest_versions)
+    id("org.cyclonedx.bom") version(PluginVersions.cyclonedx_versions)
 }
 
 dependencies {
@@ -38,6 +39,7 @@ dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:${PluginVersions.gradle_test_logger}")
     implementation("com.gorylenko.gradle-git-properties:gradle-git-properties:${PluginVersions.git_properties}")
     implementation("se.patrikerdes:gradle-use-latest-versions-plugin:${PluginVersions.latest_versions}")
+    implementation("org.cyclonedx:cyclonedx-gradle-plugin:${PluginVersions.cyclonedx_versions}")
 
     testImplementation(gradleTestKit())
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:${Versions.assertk}")

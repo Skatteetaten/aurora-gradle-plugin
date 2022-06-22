@@ -29,6 +29,7 @@ object PluginVersions {
     const val sonar = "3.3"
     const val git_properties = "2.4.0"
     const val latest_versions = "0.2.18"
+    const val cyclonedx_versions = "1.6.1"
 }
 
 object Features {

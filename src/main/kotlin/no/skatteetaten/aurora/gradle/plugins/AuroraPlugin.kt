@@ -15,12 +15,14 @@ import no.skatteetaten.aurora.gradle.plugins.extensions.UseSpringBoot
 import no.skatteetaten.aurora.gradle.plugins.extensions.Versions
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.model.getConfig
+import org.cyclonedx.gradle.CycloneDxTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 
 @Suppress("unused")
 @ExperimentalStdlibApi
@@ -83,6 +85,14 @@ class AuroraPlugin : Plugin<Project> {
                             project.logger.lifecycle(config.toString())
                         }
                     }
+                }
+
+                register<CycloneDxTask>("auroraCyclonedxBom") {
+                    setIncludeConfigs(listOf("runtimeClasspath"))
+                    setProjectType("application")
+                    setSchemaVersion("1.4")
+                    setDestination(project.file("build/reports"))
+                    setOutputName("bom")
                 }
             }
         }

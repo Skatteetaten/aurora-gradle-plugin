@@ -7,7 +7,6 @@ import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.mutators.MiscellaneousTools
 import org.gradle.api.Project
 
-@OptIn(ExperimentalStdlibApi::class)
 class Miscellaneous(
     private val project: Project,
     private val config: AuroraConfiguration

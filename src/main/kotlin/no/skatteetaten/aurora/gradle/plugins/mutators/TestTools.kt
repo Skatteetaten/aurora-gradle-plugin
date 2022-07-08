@@ -77,7 +77,7 @@ class TestTools(private val project: Project) {
                     val compileTestGroovy = tasks.named("compileTestGroovy", GroovyCompile::class).get()
 
                     with(compileTestGroovy) {
-                        classpath += files(kotlinTestCompile.destinationDir)
+                        classpath += files(kotlinTestCompile.destinationDirectory)
 
                         dependsOn(kotlinTestCompile)
                     }
@@ -114,9 +114,9 @@ class TestTools(private val project: Project) {
 
                     tasks.named("jacocoTestReport", JacocoReport::class.java) {
                         with(it.reports) {
-                            xml.isEnabled = true
-                            xml.destination = file("$buildDir/reports/jacoco/report.xml")
-                            csv.isEnabled = false
+                            xml.required.set(true)
+                            xml.outputLocation.set(file("$buildDir/reports/jacoco/report.xml"))
+                            csv.required.set(false)
                         }
                     }
                 }

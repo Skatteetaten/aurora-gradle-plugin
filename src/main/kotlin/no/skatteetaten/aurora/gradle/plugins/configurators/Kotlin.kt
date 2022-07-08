@@ -14,17 +14,22 @@ class Kotlin(
     override fun configure(): List<AuroraReport> {
         val list = mutableListOf<AuroraReport>()
 
-        project.plugins.withId("org.jetbrains.kotlin.jvm") {
-            list.add(
-                tools.applyKotlinSupport(
-                    kotlinLoggingVersion = config.kotlinLoggingVersion,
-                    sourceCompatibility = config.javaSourceCompatibility
+        val stdlib: String? = project.properties["kotlin.stdlib.default.dependency"] as String?
+        if (stdlib == "false") {
+            project.logger.lifecycle("kotlin.stdlib.default.dependency set, kotlin-stdlib excluded")
+        } else {
+            project.plugins.withId("org.jetbrains.kotlin.jvm") {
+                list.add(
+                    tools.applyKotlinSupport(
+                        kotlinLoggingVersion = config.kotlinLoggingVersion,
+                        sourceCompatibility = config.javaSourceCompatibility
+                    )
                 )
-            )
-        }
+            }
 
-        project.plugins.withId("org.jlleitschuh.gradle.ktlint") {
-            list.add(tools.applyKtLint())
+            project.plugins.withId("org.jlleitschuh.gradle.ktlint") {
+                list.add(tools.applyKtLint())
+            }
         }
 
         return list.toList()

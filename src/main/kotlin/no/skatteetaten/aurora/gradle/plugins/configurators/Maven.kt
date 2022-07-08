@@ -9,7 +9,7 @@ class Maven(
     private val project: Project,
     private val config: AuroraConfiguration
 ) : Configurator {
-    val tools = MavenTools(project)
+    private val tools = MavenTools(project)
 
     override fun configure(): List<AuroraReport> {
         val list = mutableListOf<AuroraReport>()

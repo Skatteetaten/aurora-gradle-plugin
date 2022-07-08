@@ -12,14 +12,14 @@ object Versions {
     const val kotlinLogging: String = "2.1.21"
     const val checkstyleConfig: String = "2.2.7"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
-    const val kotlin = "1.6.10"
+    const val kotlin = "1.7.0"
     const val assertk = "0.25"
 }
 
 object PluginVersions {
     const val gradle_test_logger = "3.1.0"
     const val ktlint = "10.2.0"
-    const val spring_boot = "2.6.8"
+    const val spring_boot = "2.7.1"
     const val ben_manes_versions = "0.39.0"
     const val gradle_plugin_publish = "0.18.0"
     const val asciidoctor = "3.3.2"

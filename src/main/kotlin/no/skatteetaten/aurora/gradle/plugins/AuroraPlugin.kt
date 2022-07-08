@@ -89,10 +89,10 @@ class AuroraPlugin : Plugin<Project> {
 
                 register<CycloneDxTask>("auroraCyclonedxBom") {
                     setIncludeConfigs(listOf("runtimeClasspath"))
-                    setProjectType("application")
-                    setSchemaVersion("1.4")
-                    setDestination(project.file("build/reports"))
-                    setOutputName("bom")
+                    projectType = "application"
+                    schemaVersion = "1.4"
+                    destination = project.file("build/reports")
+                    outputName = "bom"
                 }
             }
         }

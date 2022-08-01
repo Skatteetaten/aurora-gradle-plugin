@@ -331,3 +331,8 @@ fun Project.getFeaturesExtension(): Features {
 
     return (extension as ExtensionAware).extensions.getByType(Features::class.java)
 }
+
+fun Project.isKotlinStdlibEnabled(): Boolean {
+    val stdlib = project.properties["kotlin.stdlib.default.dependency"] as String?
+    return stdlib == null || stdlib == "enabled"
+}

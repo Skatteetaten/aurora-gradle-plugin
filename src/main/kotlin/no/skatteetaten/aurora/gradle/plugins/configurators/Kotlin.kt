@@ -1,5 +1,6 @@
 package no.skatteetaten.aurora.gradle.plugins.configurators
 
+import no.skatteetaten.aurora.gradle.plugins.extensions.isKotlinStdlibEnabled
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraConfiguration
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import no.skatteetaten.aurora.gradle.plugins.mutators.KotlinTools
@@ -14,10 +15,7 @@ class Kotlin(
     override fun configure(): List<AuroraReport> {
         val list = mutableListOf<AuroraReport>()
 
-        val stdlib: String? = project.properties["kotlin.stdlib.default.dependency"] as String?
-        if (stdlib == "false") {
-            project.logger.lifecycle("kotlin.stdlib.default.dependency set, kotlin-stdlib excluded")
-        } else {
+        if (project.isKotlinStdlibEnabled()) {
             project.plugins.withId("org.jetbrains.kotlin.jvm") {
                 list.add(
                     tools.applyKotlinSupport(
@@ -30,6 +28,8 @@ class Kotlin(
             project.plugins.withId("org.jlleitschuh.gradle.ktlint") {
                 list.add(tools.applyKtLint())
             }
+        } else {
+            project.logger.lifecycle("kotlin.stdlib.default.dependency set, kotlin-stdlib excluded")
         }
 
         return list.toList()

@@ -1,10 +1,10 @@
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import no.skatteetaten.aurora.gradle.plugins.extensions.isKotlinStdlibEnabled
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.exclude
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
@@ -182,9 +182,11 @@ class SpringTools(private val project: Project) {
 
         project.logger.lifecycle("Apply spring kotlin support")
 
-        with(project) {
-            with(dependencies) {
-                implementationDependencies.forEach { add("implementation", it) }
+        if (project.isKotlinStdlibEnabled()) {
+            with(project) {
+                with(dependencies) {
+                    implementationDependencies.forEach { add("implementation", it) }
+                }
             }
         }
 

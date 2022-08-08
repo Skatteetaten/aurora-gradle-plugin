@@ -8,11 +8,11 @@ object Versions {
     const val objenesis: String = "3.2"
     const val auroraSpringBootMvcStarter: String = "1.6.+"
     const val auroraSpringBootWebFluxStarter: String = "1.4.+"
-    const val springCloudContract: String = "3.1.0"
+    const val springCloudContract: String = "3.1.3"
     const val kotlinLogging: String = "2.1.23"
     const val checkstyleConfig: String = "2.2.7"
     const val checkstyleConfigFile: String = "checkstyle/checkstyle-with-metrics.xml"
-    const val kotlin = "1.7.0"
+    const val kotlin = "1.7.10"
     const val assertk = "0.25"
 }
 

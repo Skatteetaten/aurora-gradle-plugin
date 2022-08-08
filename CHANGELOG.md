@@ -20,4 +20,6 @@ og prosjektet følger [Semantic Versioning](http://semver.org/).
 - Updated `spring dependency-management` from 1.0.11.RELEASE to 1.0.12.RELEASE
 - Updated `sonar plugin` from 3.3 to 3.4.0.2513
 - Updated `cyclonedx plugin` from 1.6.1 to 1.7.0
+- Updated `kotlin` from 1.7.0 to 1.7.10
+- Updated `Spring cloud contract` from 3.1.0 to 3.1.3
 - Updated gradle wrapper from 7.4.2 to 7.5.1

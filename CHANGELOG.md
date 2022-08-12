@@ -5,7 +5,7 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
-## [4.6.3] - 2022-08-08
+## [4.5.3] - 2022-08-08
 
 ### Changed
 

@@ -5,6 +5,15 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
+## [4.5.5] - 2022-09-09
+
+- Updated `spring cloud contract` from 3.1.3 to 3.1.4
+- Updated `ktlint plugin` from 10.3.0 to 11.0.0
+- Updated `Spring boot` from 2.7.2 to 2.7.3
+- Updated `pitest` from 1.7.4 to 1.9.0
+- Updated `spring dependency-management` from 1.0.12.RELEASE to 1.0.13.RELEASE
+- Updated `cyclonedx` from 1.7.0 to 1.7.1
+
 ## [4.5.3] - 2022-08-08
 
 ### Changed

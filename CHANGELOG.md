@@ -5,7 +5,7 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
-## [4.5.5] - 2022-09-09
+## [4.5.6] - 2022-09-09
 
 - Updated `spring cloud contract` from 3.1.3 to 3.1.4
 - Updated `ktlint plugin` from 10.3.0 to 11.0.0

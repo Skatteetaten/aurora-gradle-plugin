@@ -5,8 +5,11 @@ package no.skatteetaten.aurora.gradle.plugins.extensions
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.util.ConfigureUtil.configure
+import org.slf4j.LoggerFactory
 
 @Suppress("unused")
 open class AuroraExtension(private val project: Project) {
@@ -335,4 +338,9 @@ fun Project.getFeaturesExtension(): Features {
 fun Project.isKotlinStdlibEnabled(): Boolean {
     val stdlib = project.properties["kotlin.stdlib.default.dependency"] as String?
     return stdlib == null || stdlib == "enabled"
+}
+
+fun DependencyHandler.implementationTransitiveNexusIQIssue(dependencyNotation: Any): Dependency? {
+    LoggerFactory.getLogger("custom-dependency-handler").error("Nexus IQ transitive dependency issue: $dependencyNotation")
+    return add("implementation", dependencyNotation)
 }

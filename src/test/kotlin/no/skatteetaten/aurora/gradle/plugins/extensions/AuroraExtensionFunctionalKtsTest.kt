@@ -425,4 +425,35 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("Use task :aurora to get full report on how AuroraPlugin modifies your gradle setup")
         assertThat(result.taskOutcome(taskName = ":aurora")).isSuccessOrEqualTo()
     }
+
+    @Test
+    fun `custom implementation function`() {
+        buildFile.writeText(
+            """
+                import no.skatteetaten.aurora.gradle.plugins.extensions.implementationTransitiveNexusIQIssue
+                
+                plugins {
+                    java
+                    id("no.skatteetaten.gradle.aurora")
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                dependencies {
+                    implementationTransitiveNexusIQIssue("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
+                }
+            """
+        )
+
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("build")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.output).contains("Nexus IQ transitive dependency issue")
+        assertThat(result.taskOutcome()).isSuccessOrEqualTo()
+    }
 }

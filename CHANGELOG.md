@@ -5,7 +5,7 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
-## [4.5.7] - 2022-11-02
+## [4.5.8] - 2022-11-02
 - Added implementationTransitiveNexusIQIssue for dependencies added to fix Nexus IQ issues
 
 ## [4.5.6] - 2022-09-09

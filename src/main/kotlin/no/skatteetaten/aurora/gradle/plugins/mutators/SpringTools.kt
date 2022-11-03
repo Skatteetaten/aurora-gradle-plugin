@@ -5,6 +5,7 @@ import no.skatteetaten.aurora.gradle.plugins.extensions.isKotlinStdlibEnabled
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.exclude
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5
@@ -40,6 +41,9 @@ class SpringTools(private val project: Project) {
         project.logger.lifecycle("Apply Spring support")
 
         with(project) {
+            // TODO: Fjern disse når Spring Boot er oppdatert
+            extra.set("spring-security.version", "5.7.5")
+            extra.set("snakeyaml.version", "1.33")
 
             with(plugins) {
                 apply("io.spring.dependency-management")

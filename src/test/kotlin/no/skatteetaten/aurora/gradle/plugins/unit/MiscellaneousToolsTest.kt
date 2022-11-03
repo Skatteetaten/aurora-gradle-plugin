@@ -52,7 +52,7 @@ class MiscellaneousToolsTest {
 
         assertThat(dependencyUpdates.revision).isEqualTo("release")
         assertThat(dependencyUpdates.checkForGradleUpdate).isEqualTo(true)
-        assertThat(dependencyUpdates.outputFormatter).isEqualTo("json")
+        assertThat(dependencyUpdates.getOutputFormatterName()).isEqualTo("json")
         assertThat(dependencyUpdates.outputDir).isEqualTo("build/dependencyUpdates")
         assertThat(dependencyUpdates.reportfileName).isEqualTo("report")
         assertThat(report.description).isEqualTo("only allow stable versions in upgrade")

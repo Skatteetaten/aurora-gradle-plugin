@@ -5,6 +5,18 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
+## [4.5.9] - 2022-11-03
+- Updated `JUnit5` to 5.9.1
+- Updated `kotlin logging` to 3.0.4
+- Updated `kotlin` to 1.7.20
+- Updated `Spring boot` to 2.7.5
+- Updated `Ben manes versions plugin` to 0.43.0
+- Updated `spring dependency-management` to 1.1.0
+- Updated `sonar plugin` to 3.5.0.2730
+- Updated `cyclonedx plugin` to 1.7.2
+- Set spring-security version to 5.7.5
+- Set snakeyaml version to 1.33
+
 ## [4.5.8] - 2022-11-02
 - Added implementationTransitiveNexusIQIssue for dependencies added to fix Nexus IQ issues
 

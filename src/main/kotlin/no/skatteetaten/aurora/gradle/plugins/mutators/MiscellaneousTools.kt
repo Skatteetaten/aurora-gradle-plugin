@@ -1,6 +1,7 @@
 package no.skatteetaten.aurora.gradle.plugins.mutators
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import com.github.benmanes.gradle.versions.updates.resolutionstrategy.ComponentSelectionWithCurrent
 import no.skatteetaten.aurora.gradle.plugins.model.AuroraReport
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.named
@@ -18,7 +19,7 @@ class MiscellaneousTools(private val project: Project) {
                 reportfileName = "report"
                 resolutionStrategy { strategy ->
                     strategy.componentSelection { selection ->
-                        selection.all { all ->
+                        selection.all { all: ComponentSelectionWithCurrent ->
                             val rejectionPatterns = listOf("alpha", "beta", "pr", "rc", "cr", "m", "preview")
                             val regex: (String) -> Regex = { Regex("(?i).*[.-]$it[.\\d-]*") }
 

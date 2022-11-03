@@ -5,6 +5,9 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
+## [4.5.10] - 2022-11-03
+- Fixed bug in dependencyUpdates task
+
 ## [4.5.9] - 2022-11-03
 - Updated `JUnit5` to 5.9.1
 - Updated `kotlin logging` to 3.0.4

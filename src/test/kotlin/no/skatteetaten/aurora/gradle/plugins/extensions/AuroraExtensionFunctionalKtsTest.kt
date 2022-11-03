@@ -456,4 +456,30 @@ class AuroraExtensionFunctionalKtsTest {
         assertThat(result.output).contains("Nexus IQ transitive dependency issue")
         assertThat(result.taskOutcome()).isSuccessOrEqualTo()
     }
+
+    @Test
+    fun `dependency updates report`() {
+        buildFile.writeText(
+            """
+                plugins {
+                    java
+                    id("no.skatteetaten.gradle.aurora")
+                }
+                
+                aurora {
+                    useKotlinDefaults
+                }
+            """
+        )
+
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("dependencyUpdates")
+            .withPluginClasspath()
+            .build()
+
+        assertThat(result.output).contains("Project Dependency Updates ")
+        assertThat(result.output).contains("Failed to determine the latest version for the following dependencies")
+        assertThat(result.taskOutcome(":dependencyUpdates")).isSuccessOrEqualTo()
+    }
 }

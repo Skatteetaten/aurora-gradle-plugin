@@ -11,7 +11,9 @@ def overrides = [
     deployTo: "gradle-plugin-portal",
     chatRoom: "#aos-notifications",
     deployGoal : "publishPlugins",
-    versionStrategy: []
+    versionStrategy: [
+      [branch: 'master', versionHint: '4.5']
+    ]
 ]
 
 fileLoader.withGit(overrides.pipelineScript,, overrides.scriptVersion) {

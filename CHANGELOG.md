@@ -5,6 +5,10 @@ Alle viktige endringer i dette prosjektet vil bli dokumentert i denne filen.
 Formatet i denne filen er basert på [Keep a Changelog](http://keepachangelog.com/)
 og prosjektet følger [Semantic Versioning](http://semver.org/).
 
+## [4.5.11] - 2022-11-10
+- Updated `aurora-spring-boot-mvc-starter` to 1.8.+
+- Updated `aurora-spring-boot-webflux-starter` to 1.6.+
+
 ## [4.5.10] - 2022-11-03
 - Fixed bug in dependencyUpdates task
 
